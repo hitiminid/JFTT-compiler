@@ -1,26 +1,24 @@
 %{
-
+// C code
 %}
-%token num IF WHILE FOR FROM TO DOWNTO DO ENDFOR READ WRITE pidentifier VAR BEGIN END THEN ENDIF ELSE ENDWHILE
-
-
+//Bison declarations
+%token VAR END IF THEN ELSE ENDIF WHILE DO ENDWHILE FOR FROM TO num BEG ENDFOR DOWNTO READ WRITE pidentifier
 %left '-' '+'
 %left '*' '/'
-%precedence NEGATIVE
 %right '^'
 
-
 %%
-program:        VAR vdeclarations BEGIN commands END
 
-vdeclarations: vdeclarations  pidentifier
+program        : VAR  vdeclarations BEG  commands  END
+
+vdeclarations : vdeclarations  pidentifier
                 | vdeclarations  pidentifier[num]
                 |
 
-commands:     commands  command
+commands     : commands  command
              | command
 
-command:      identifier  ":="  expression;
+command      : identifier  ":="  expression;
              | IF  condition  THEN  commands  ELSE  commands  ENDIF
              | IF  condition  THEN  commands  ENDIF
              | WHILE  condition  DO  commands  ENDWHILE
@@ -29,37 +27,32 @@ command:      identifier  ":="  expression;
              | READ  identifier;
              | WRITE  value;
 
-expression:   value
-             | value '+' value
-             | value '-' value
-             | value '*' value
-             | value '/' value
-             | value '%' value
+expression  : value
+             | value "+" value
+             | value "-" value
+             | value "*" value
+             | value "/" value
+             | value "%" value
 
-condition:    value '=' value
-             | value  "<>" value
+condition   : value "=" value
+             | value "<>" value
              | value "<" value
              | value ">" value
              | value  "<=" value
              | value  ">=" value
 
-value:        num
+value        : num
              | identifier
 
-identifier:   pidentifier
+identifier  : pidentifier
              | pidentifier[pidentifier]
              | pidentifier[num]
 
 %%
-
 int main() {
     yyparse();
 }
 
-int yywrap(){
-    return 1;
-}
-
-int yyerror(char *msg) {
-  return 0;
+int yyerror (char *msg) {
+    printf("ERROR\n");
 }

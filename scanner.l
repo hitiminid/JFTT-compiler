@@ -1,29 +1,47 @@
 %{
+#include "gram.tab.h"
 #include <stdlib.h>
 void yyerror(char *);
 %}
 
-DIGIT           [0-9]+
-PIDENTIFIER     [_a-z]+
+NUMBER        [0-9]+
+IDENTIFIER    [_a-z]+
 
 %%
 
-[ \t\n]+ { // used for eating up whitespace
-    //should be empty - there is no action
-}
+"+"           { return(ADD);         }
+"-"           { return(SUB);         }
+"*"           { return(MULT);        }
+"/"           { return(DIV);         }
+"%"           { return(MOD);         }
 
-{DIGIT} {
-    //yylval = atoi(yytext);  // number should be parsed
+"VAR"         { return(VAR);         }
+"BEGIN"       { return(BEG);         }
+"END"         { return(END);         }
 
-}
+"IF"          { return(IF);          }
+"THEN"        { return(THEN);        }
+"ELSE"        { return(ELSE);        }
+"ENDIF"       { return(ENDIF);       }
 
-{PIDENTIFIER} {  }
+"WHILE"       { return(WHILE);       }
+"DO"          { return(DO);          }
+"ENDWHILE"    { return(ENDWHILE);    }
 
+"FOR"         { return(FOR);         }
+"FROM"        { return(FROM);        }
+"TO"          { return(TO);          }
+"ENDFOR"      { return(ENDFOR);      }
+"DOWNTO"      { return(DOWNTO);      }
 
+"READ"        { return(READ);        }
+"WRITE"       { return(WRITE);       }
+
+{IDENTIFIER}  { return(pidentifier); }
+{NUMBER}      { return (num);        }
 
 %%
 
-int main(int argc, char **argv)
-{
-	yylex();
+int yywrap(void) {
+    return 1;
 }
