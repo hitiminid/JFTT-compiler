@@ -1,0 +1,9 @@
+Flex
+flex scanner.l
+gcc lex.yy.c -lfl
+./a.out < data.txt > result.txt
+
+
+
+Bison
+bison gram.y -d
