@@ -40,25 +40,29 @@
   /*                      FUNCTIONS                    */
   /*===================================================*/
 
-
   // used for declaring a variable
   void declareAVariable(std::string name);
   // used for declaring an array
   void declareAnArray(std::string name, int arraySize);
 
+  // function used for determining whether variable is declared
+  int isVariableAlreadyDeclared(std::string name);
 
 
+  // debug function performed at the end of parsing
+  void finish();
+
+
+  void displayMap(std::map<std::string, int>* mapToDisplay);
 
 
 
 %}
 
-
 %union {
     char* string;
     int   num;
 }
-
 
 // program structure
 %token VAR BEG END
@@ -90,7 +94,7 @@
 %%
 
 program         : VAR vdeclarations BEG commands END {
-                  std::cout << "SUCCESS"; /*HALT*/
+                  finish();
                 }
 
 vdeclarations   : vdeclarations  PID {
@@ -149,19 +153,35 @@ identifier   : PID
 
 void declareAVariable(std::string name) {
   std::cout << "Declaring new variable: " << name << "\n";
-
+  variablesMap[name] = 0;
 /*
-1) sprawdz czy zmienna jest juz zadeklarowana
+1) sprawdz czy zmienna jest juz zadeklarowan
 2a) jesli jest to zwroc blad
 2b) jesli nie to wrzuc do tablicy symboli
 */
-
 }
 
 void declareAnArray(std::string name, int arraySize) {
   std::cout << "Declaring new array: " << name << " of size: " << arraySize << "\n";
 
+}
 
+int isVariableAlreadyDeclared(std::string name) {
+
+  //
+
+}
+
+void finish() {
+  std::cout << " map size: " << variablesMap.size() << "\n";
+  displayMap(&variablesMap);
+}
+
+void displayMap(std::map<std::string, int>* mapToDisplay) {
+  for(auto elem : *mapToDisplay)
+  {
+     std::cout << elem.first << " " << elem.second << "\n";
+  }
 }
 
 int main() {
