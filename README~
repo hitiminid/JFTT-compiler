@@ -7,17 +7,3 @@ gcc lex.yy.c -lfl
 
 Bison
 bison gram.y -d
-
-
-
-
-C++ 
-
-flex
-flex scanner.l
-
-Bison
-
-bison gram.ypp -d 
-
-g++ gram.tab.c lex.yy.c -o parse

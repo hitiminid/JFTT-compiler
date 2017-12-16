@@ -510,11 +510,12 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "scanner.l"
 #line 2 "scanner.l"
-#include "gram.tab.h"
+#include "gram.tab.hpp"
 #include <stdlib.h>
-int yylex();
+extern "C" int yylex();
+
 //todo: comments
-#line 518 "lex.yy.c"
+#line 519 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -701,12 +702,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 11 "scanner.l"
+#line 13 "scanner.l"
 
 
-
-
-#line 710 "lex.yy.c"
+#line 709 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -893,108 +892,104 @@ case 19:
 YY_RULE_SETUP
 #line 48 "scanner.l"
 {
-  // printf(" y ");
   yylval.str = (char *)strdup(yytext);
   return(PID);
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 55 "scanner.l"
+#line 53 "scanner.l"
 {
-  // printf(" x ");
   yylval.str = (char *)strdup(yytext);
   return(num);
 }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 61 "scanner.l"
-{
-  // printf(":=");
-  return(ASSGN);       }
+#line 58 "scanner.l"
+{ return(ASSGN);       }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 64 "scanner.l"
+#line 59 "scanner.l"
 { return(EQ);          }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 65 "scanner.l"
+#line 60 "scanner.l"
 { return(NEQ);         }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 61 "scanner.l"
 { return(GT);          }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 67 "scanner.l"
+#line 62 "scanner.l"
 { return(GE);          }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 68 "scanner.l"
+#line 63 "scanner.l"
 { return(LT);          }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 69 "scanner.l"
+#line 64 "scanner.l"
 { return(LE);          }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 71 "scanner.l"
+#line 66 "scanner.l"
 { return(ADD);         }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 72 "scanner.l"
+#line 67 "scanner.l"
 { return(SUB);         }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 73 "scanner.l"
+#line 68 "scanner.l"
 { return(MUL);         }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 74 "scanner.l"
+#line 69 "scanner.l"
 { return(DIV);         }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 75 "scanner.l"
+#line 70 "scanner.l"
 { return(MOD);         }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 76 "scanner.l"
+#line 71 "scanner.l"
 { return(SEM);         }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 78 "scanner.l"
+#line 73 "scanner.l"
 { return(LEFT_BR);     }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 79 "scanner.l"
+#line 74 "scanner.l"
 { return(RIGHT_BR);    }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 82 "scanner.l"
+#line 76 "scanner.l"
 {printf(" x ");}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 83 "scanner.l"
+#line 77 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 998 "lex.yy.c"
+#line 993 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1992,7 +1987,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 83 "scanner.l"
+#line 77 "scanner.l"
 
 
 

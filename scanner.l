@@ -1,18 +1,18 @@
 %{
-#include "gram.tab.h"
+#include "gram.tab.hpp"
 #include <stdlib.h>
-int yylex();
+extern "C" int yylex();
+
 //todo: comments
 %}
 
 NUMBER        [0-9]+
 IDENTIFIER    [_a-z]+
+WHITESPACES   [ \t\r\n]+
 
 %%
 
-
-
-[ \t\r\n]+    {                      }
+{WHITESPACES} {                      }
 
 "VAR"         {
   // printf("VAR");/
@@ -45,22 +45,17 @@ IDENTIFIER    [_a-z]+
 "READ"        { return(READ);        }
 "WRITE"       { return(WRITE);       }
 
-[_a-z]+       {
-  // printf(" y ");
+{IDENTIFIER}      {
   yylval.str = (char *)strdup(yytext);
   return(PID);
 }
 
-
-[0-9]+        {
-  // printf(" x ");
+{NUMBER}  {
   yylval.str = (char *)strdup(yytext);
   return(num);
 }
 
-":="          {
-  // printf(":=");
-  return(ASSGN);       }
+":="          { return(ASSGN);       }
 "="           { return(EQ);          }
 "<>"          { return(NEQ);         }
 ">"           { return(GT);          }
@@ -77,7 +72,6 @@ IDENTIFIER    [_a-z]+
 
 "["           { return(LEFT_BR);     }
 "]"           { return(RIGHT_BR);    }
-
 
 .             {printf(" x ");}
 %%
