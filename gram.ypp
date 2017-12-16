@@ -1,23 +1,62 @@
 %{
-// C code
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-extern "C" int yylex();
-extern "C" int yyparse();
-// int yylex();
-void yyerror (char* msg);
+  // code
+  // #include <stdio.h>
+  // #include <stdlib.h>
+  #include <cstdlib>
+  #include <iostream>
 
-//functions
+  #include <string>
+  #include <map>
+  #include <stdio.h>
+  #include <stdlib.h>
 
-void declareAVariable();
+  extern "C" int yylex();
+  extern "C" int yyparse();
+
+  // variables
+
+  /*===================================================*/
+  /*                     STRUCTURES                    */
+  /*===================================================*/
+
+  /* declaredVariables */
+  /* (name :: string, adress :: int) */
+  std::map<std::string, int> variablesMap;
+
+  /* each initialized variable */
+  /* (name :: string, isInitialized :: boolean) */
+  std::map<std::string, int> initializedVariablesMap;
+
+  /* each array's size */
+  /* if a variable is in here then it's an array - useful when determining type of a data*/
+  /* (name :: string, arraySize :: int) */
+  std::map<std::string, int> arraysMap;
+
+
+  // int yylex();
+  void yyerror (char* msg);
+
+  /*===================================================*/
+  /*                      FUNCTIONS                    */
+  /*===================================================*/
+
+
+  // used for declaring a variable
+  void declareAVariable(std::string name);
+  // used for declaring an array
+  void declareAnArray(std::string name, int arraySize);
+
+
+
+
 
 
 %}
 
 
 %union {
-    char* str;
+    char* string;
+    int   num;
 }
 
 
@@ -36,7 +75,7 @@ void declareAVariable();
 // operations
 %token ADD SUB MUL DIV MOD
 // numbers and variables
-%token <string> num
+%token <num> num
 %token <string> PID
 %token SEM
 // right and left brackets used for arrays
@@ -50,14 +89,23 @@ void declareAVariable();
 
 %%
 
-program         : VAR vdeclarations BEG commands END { printf("SUCCESS");/*HALT*/ }
+program         : VAR vdeclarations BEG commands END {
+                  std::cout << "SUCCESS"; /*HALT*/
+                }
 
-vdeclarations   : vdeclarations  PID {  declareAVariable(); }
-                | vdeclarations  PID LEFT_BR num RIGHT_BR
-                |
+vdeclarations   : vdeclarations  PID {
+                  declareAVariable($2);
+                }
+
+                | vdeclarations  PID LEFT_BR num RIGHT_BR {
+                  declareAnArray($2, $4);
+                }
+                | {
+                  std::cout << "No variables declared" << "\n";
+                }
 
 commands     : commands  command { }
-             | command           {  }
+             | command           { }
 
 
 command      :
@@ -72,7 +120,9 @@ identifier  ASSGN  expression SEM {
              | READ  identifier SEM {
 
              }
-             | WRITE  value SEM
+             | WRITE  value SEM {
+
+             }
 
 expression   : value
              | value ADD value
@@ -97,15 +147,8 @@ identifier   : PID
 
 %%
 
-void declareAVariable() {
-
-
-
-/*
-  if ()
-
-
-*/
+void declareAVariable(std::string name) {
+  std::cout << "Declaring new variable: " << name << "\n";
 
 /*
 1) sprawdz czy zmienna jest juz zadeklarowana
@@ -113,7 +156,10 @@ void declareAVariable() {
 2b) jesli nie to wrzuc do tablicy symboli
 */
 
+}
 
+void declareAnArray(std::string name, int arraySize) {
+  std::cout << "Declaring new array: " << name << " of size: " << arraySize << "\n";
 
 
 }

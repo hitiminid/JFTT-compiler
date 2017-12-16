@@ -2,9 +2,17 @@
 // C code
 #include <stdio.h>
 #include <string.h>
-int yylex();
-%}
+#include <stdlib.h>
+extern "C" int yylex();
+extern "C" int yyparse();
+// int yylex();
+void yyerror (char* msg);
 
+//functions
+
+void declareAVariable();
+
+%}
 
 %union {
     char* str;
@@ -25,7 +33,9 @@ int yylex();
 // operations
 %token ADD SUB MUL DIV MOD
 // numbers and variables
-%token num PID SEM
+%token <string> num
+%token <string> PID
+%token SEM
 // right and left brackets used for arrays
 %token LEFT_BR RIGHT_BR
 
@@ -35,21 +45,23 @@ int yylex();
 // where is modulo ???
 %right '^' // do I need it?
 
+
 %%
 
-program         : VAR vdeclarations BEG commands END { }
+program         : VAR vdeclarations BEG commands END { /*printf("SUCCESS");HALT*/ }
 
-vdeclarations   : vdeclarations  PID {
-                    printf(" declaration complete ");
-                }
+vdeclarations   : vdeclarations  PID {  declareAVariable(); }
                 | vdeclarations  PID LEFT_BR num RIGHT_BR
                 |
 
-commands     : commands  command { }
+commands     : commands  command {  }
              | command           {  }
 
 
-command      : identifier  ASSGN  expression SEM
+command      :
+identifier  ASSGN  expression SEM {
+
+}
              | IF  condition  THEN  commands  ELSE  commands  ENDIF
              | IF  condition  THEN  commands  ENDIF
              | WHILE  condition  DO  commands  ENDWHILE
@@ -82,11 +94,26 @@ identifier   : PID
              | PID LEFT_BR num RIGHT_BR
 
 %%
+
+void declareAVariable() {
+  /*
+    if () {
+
+    }
+  */
+
+  /*
+  1) sprawdz czy zmienna jest juz zadeklarowana
+  2a) jesli jest to zwroc blad
+  2b) jesli nie to wrzuc do tablicy symboli
+  */
+}
+
 int main() {
   yyparse();
   return 0;
 }
 
-int yyerror (char *msg) {
+void yyerror (char *msg) {
     printf("ERROR\n");
 }

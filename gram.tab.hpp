@@ -87,11 +87,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 19 "gram.ypp" /* yacc.c:1909  */
+#line 57 "gram.ypp" /* yacc.c:1909  */
 
-    char* str;
+    char* string;
+    int   num;
 
-#line 95 "gram.tab.hpp" /* yacc.c:1909  */
+#line 96 "gram.tab.hpp" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

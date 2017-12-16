@@ -64,22 +64,60 @@
 /* Copy the first part of user declarations.  */
 #line 1 "gram.ypp" /* yacc.c:339  */
 
-// C code
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-extern "C" int yylex();
-extern "C" int yyparse();
-// int yylex();
-void yyerror (char* msg);
+  // code
+  // #include <stdio.h>
+  // #include <stdlib.h>
+  #include <cstdlib>
+  #include <iostream>
 
-//functions
+  #include <string>
+  #include <map>
+  #include <stdio.h>
+  #include <stdlib.h>
 
-void declareAVariable();
+  extern "C" int yylex();
+  extern "C" int yyparse();
+
+  // variables
+
+  /*===================================================*/
+  /*                     STRUCTURES                    */
+  /*===================================================*/
+
+  /* declaredVariables */
+  /* (name :: string, adress :: int) */
+  std::map<std::string, int> variablesMap;
+
+  /* each initialized variable */
+  /* (name :: string, isInitialized :: boolean) */
+  std::map<std::string, int> initializedVariablesMap;
+
+  /* each array's size */
+  /* if a variable is in here then it's an array - useful when determining type of a data*/
+  /* (name :: string, arraySize :: int) */
+  std::map<std::string, int> arraysMap;
+
+
+  // int yylex();
+  void yyerror (char* msg);
+
+  /*===================================================*/
+  /*                      FUNCTIONS                    */
+  /*===================================================*/
+
+
+  // used for declaring a variable
+  void declareAVariable(std::string name);
+  // used for declaring an array
+  void declareAnArray(std::string name, int arraySize);
 
 
 
-#line 83 "gram.tab.cpp" /* yacc.c:339  */
+
+
+
+
+#line 121 "gram.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -156,11 +194,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 19 "gram.ypp" /* yacc.c:355  */
+#line 57 "gram.ypp" /* yacc.c:355  */
 
-    char* str;
+    char* string;
+    int   num;
 
-#line 164 "gram.tab.cpp" /* yacc.c:355  */
+#line 203 "gram.tab.cpp" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -175,7 +214,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 179 "gram.tab.cpp" /* yacc.c:358  */
+#line 218 "gram.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -476,10 +515,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    53,    53,    55,    56,    57,    59,    60,    64,    67,
-      68,    69,    70,    71,    72,    75,    77,    78,    79,    80,
-      81,    82,    84,    85,    86,    87,    88,    89,    91,    92,
-      94,    95,    96
+       0,    92,    92,    96,   100,   103,   107,   108,   112,   115,
+     116,   117,   118,   119,   120,   123,   127,   128,   129,   130,
+     131,   132,   134,   135,   136,   137,   138,   139,   141,   142,
+     144,   145,   146
 };
 #endif
 
@@ -1318,53 +1357,81 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 53 "gram.ypp" /* yacc.c:1646  */
-    { printf("SUCCESS");/*HALT*/ }
-#line 1324 "gram.tab.cpp" /* yacc.c:1646  */
+#line 92 "gram.ypp" /* yacc.c:1646  */
+    {
+                  std::cout << "SUCCESS"; /*HALT*/
+                }
+#line 1365 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 55 "gram.ypp" /* yacc.c:1646  */
-    {  declareAVariable(); }
-#line 1330 "gram.tab.cpp" /* yacc.c:1646  */
+#line 96 "gram.ypp" /* yacc.c:1646  */
+    {
+                  declareAVariable((yyvsp[0].string));
+                }
+#line 1373 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 4:
+#line 100 "gram.ypp" /* yacc.c:1646  */
+    {
+                  declareAnArray((yyvsp[-3].string), (yyvsp[-1].num));
+                }
+#line 1381 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 5:
+#line 103 "gram.ypp" /* yacc.c:1646  */
+    {
+                  std::cout << "No variables declared" << "\n";
+                }
+#line 1389 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 59 "gram.ypp" /* yacc.c:1646  */
+#line 107 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1336 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1395 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 60 "gram.ypp" /* yacc.c:1646  */
-    {  }
-#line 1342 "gram.tab.cpp" /* yacc.c:1646  */
+#line 108 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1401 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 64 "gram.ypp" /* yacc.c:1646  */
+#line 112 "gram.ypp" /* yacc.c:1646  */
     {
 
 }
-#line 1350 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1409 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 72 "gram.ypp" /* yacc.c:1646  */
+#line 120 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1358 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1417 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 15:
+#line 123 "gram.ypp" /* yacc.c:1646  */
+    {
+
+             }
+#line 1425 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 92 "gram.ypp" /* yacc.c:1646  */
+#line 142 "gram.ypp" /* yacc.c:1646  */
     {   }
-#line 1364 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1431 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1368 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1435 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1592,18 +1659,11 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 98 "gram.ypp" /* yacc.c:1906  */
+#line 148 "gram.ypp" /* yacc.c:1906  */
 
 
-void declareAVariable() {
-
-
-
-/*
-  if ()
-
-
-*/
+void declareAVariable(std::string name) {
+  std::cout << "Declaring new variable: " << name << "\n";
 
 /*
 1) sprawdz czy zmienna jest juz zadeklarowana
@@ -1611,7 +1671,10 @@ void declareAVariable() {
 2b) jesli nie to wrzuc do tablicy symboli
 */
 
+}
 
+void declareAnArray(std::string name, int arraySize) {
+  std::cout << "Declaring new array: '" << name << "' of size: " << arraySize << "\n";
 
 
 }

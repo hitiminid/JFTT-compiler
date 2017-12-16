@@ -1,4 +1,7 @@
+%option yylineno
+
 %{
+
 #include "gram.tab.hpp"
 #include <stdlib.h>
 extern "C" int yylex();
@@ -12,7 +15,7 @@ WHITESPACES   [ \t\r\n]+
 
 %%
 
-{WHITESPACES} {                      }
+{WHITESPACES} {  }
 
 "VAR"         {
   // printf("VAR");/
@@ -45,14 +48,14 @@ WHITESPACES   [ \t\r\n]+
 "READ"        { return(READ);        }
 "WRITE"       { return(WRITE);       }
 
-{IDENTIFIER}      {
-  yylval.str = (char *)strdup(yytext);
-  return(PID);
+{IDENTIFIER}  {
+    yylval.string = (char *)strdup(yytext);
+    return(PID);
 }
 
-{NUMBER}  {
-  yylval.str = (char *)strdup(yytext);
-  return(num);
+{NUMBER}      {
+    yylval.num = atoi(yytext);
+    return(num);
 }
 
 ":="          { return(ASSGN);       }
