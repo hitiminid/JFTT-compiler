@@ -1,7 +1,8 @@
 %{
 #include "gram.tab.h"
 #include <stdlib.h>
-void yyerror(char *);
+int yylex();
+//todo: comments
 %}
 
 NUMBER        [0-9]+
@@ -9,15 +10,22 @@ IDENTIFIER    [_a-z]+
 
 %%
 
-"+"           { return(ADD);         }
-"-"           { return(SUB);         }
-"*"           { return(MULT);        }
-"/"           { return(DIV);         }
-"%"           { return(MOD);         }
 
-"VAR"         { return(VAR);         }
-"BEGIN"       { return(BEG);         }
-"END"         { return(END);         }
+
+[ \t\r\n]+    {                      }
+
+"VAR"         {
+  // printf("VAR");/
+  return(VAR);
+}
+"BEGIN"       {
+  // printf("BEGIN");
+  return(BEG);
+}
+"END"         {
+  // printf("END");
+  return(END);
+ }
 
 "IF"          { return(IF);          }
 "THEN"        { return(THEN);        }
@@ -37,9 +45,41 @@ IDENTIFIER    [_a-z]+
 "READ"        { return(READ);        }
 "WRITE"       { return(WRITE);       }
 
-{IDENTIFIER}  { return(pidentifier); }
-{NUMBER}      { return (num);        }
+[_a-z]+       {
+  // printf(" y ");
+  yylval.str = (char *)strdup(yytext);
+  return(PID);
+}
 
+
+[0-9]+        {
+  // printf(" x ");
+  yylval.str = (char *)strdup(yytext);
+  return(num);
+}
+
+":="          {
+  // printf(":=");
+  return(ASSGN);       }
+"="           { return(EQ);          }
+"<>"          { return(NEQ);         }
+">"           { return(GT);          }
+">="          { return(GE);          }
+"<"           { return(LT);          }
+"<="          { return(LE);          }
+
+"+"           { return(ADD);         }
+"-"           { return(SUB);         }
+"*"           { return(MUL);         }
+"/"           { return(DIV);         }
+"%"           { return(MOD);         }
+";"           { return(SEM);         }
+
+"["           { return(LEFT_BR);     }
+"]"           { return(RIGHT_BR);    }
+
+
+.             {printf(" x ");}
 %%
 
 int yywrap(void) {

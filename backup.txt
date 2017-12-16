@@ -1,15 +1,17 @@
 %{
 // C code
-#include <stdio.h>
+#include <string>
 #include <string.h>
-int yylex();
+#include <cstdlib>
+#include <iostream>
+#include <map>
+extern "C" int yylex();
+extern int yylex(void);
+extern "C" int yyparse();
+void yyerror (char const *);
+extern char* yytext;
+extern int yylineno;
 %}
-
-
-%union {
-    char* str;
-}
-
 // program structure
 %token VAR BEG END
 // control statements
@@ -37,19 +39,19 @@ int yylex();
 
 %%
 
-program         : VAR vdeclarations BEG commands END { }
+program        : VAR  vdeclarations BEG  commands  END
 
-vdeclarations   : vdeclarations  PID {
-                    printf(" declaration complete ");
+vdeclarations : vdeclarations  PID {
+
                 }
                 | vdeclarations  PID LEFT_BR num RIGHT_BR
                 |
 
-commands     : commands  command { }
-             | command           {  }
+commands:    commands  command
+             | command
 
 
-command      : identifier  ASSGN  expression SEM
+command:     identifier  ASSGN  expression SEM
              | IF  condition  THEN  commands  ELSE  commands  ENDIF
              | IF  condition  THEN  commands  ENDIF
              | WHILE  condition  DO  commands  ENDWHILE
@@ -60,24 +62,24 @@ command      : identifier  ASSGN  expression SEM
              }
              | WRITE  value SEM
 
-expression   : value
+expression:  value
              | value ADD value
              | value SUB value
              | value MUL value
              | value DIV value
              | value MOD value
 
-condition    : value EQ value
+condition:   value EQ value
              | value NEQ value
              | value LT  value
              | value GT  value
              | value LE  value
              | value GE  value
 
-value        : num
+value:       num
              | identifier {   }
 
-identifier   : PID
+identifier  : PID
              | PID LEFT_BR PID RIGHT_BR
              | PID LEFT_BR num RIGHT_BR
 
@@ -87,6 +89,8 @@ int main() {
   return 0;
 }
 
-int yyerror (char *msg) {
-    printf("ERROR\n");
+void yyerror (char const *s)
+{
+	std::cout << ("Error");
 }
+ba

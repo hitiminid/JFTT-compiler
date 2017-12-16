@@ -45,8 +45,8 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NUMBER = 258,
-    VAR = 259,
+    VAR = 258,
+    BEG = 259,
     END = 260,
     IF = 261,
     THEN = 262,
@@ -58,18 +58,41 @@ extern int yydebug;
     FOR = 268,
     FROM = 269,
     TO = 270,
-    num = 271,
-    ENDFOR = 272,
-    DOWNTO = 273,
-    READ = 274,
-    WRITE = 275,
-    pidentifier = 276
+    ENDFOR = 271,
+    DOWNTO = 272,
+    READ = 273,
+    WRITE = 274,
+    ASSGN = 275,
+    EQ = 276,
+    NEQ = 277,
+    GT = 278,
+    GE = 279,
+    LT = 280,
+    LE = 281,
+    ADD = 282,
+    SUB = 283,
+    MUL = 284,
+    DIV = 285,
+    MOD = 286,
+    num = 287,
+    PID = 288,
+    SEM = 289,
+    LEFT_BR = 290,
+    RIGHT_BR = 291
   };
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE YYSTYPE;
+union YYSTYPE
+{
+#line 9 "gram.y" /* yacc.c:1909  */
+
+    char* str;
+
+#line 95 "gram.tab.h" /* yacc.c:1909  */
+};
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
