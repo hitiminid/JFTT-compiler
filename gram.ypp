@@ -46,7 +46,7 @@
   void declareAnArray(std::string name, int arraySize);
 
   // function used for determining whether variable is declared
-  int isVariableAlreadyDeclared(std::string name);
+  bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name);
 
 
   // debug function performed at the end of parsing
@@ -98,7 +98,13 @@ program         : VAR vdeclarations BEG commands END {
                 }
 
 vdeclarations   : vdeclarations  PID {
-                  declareAVariable($2);
+                  if (!isVariableAlreadyInMap(&variablesMap, $2)) {
+                    declareAVariable($2);
+                  } else {
+                    //throw an error
+                    std::cout << "Variable " << $2 << " already defined!" << "\n";
+                    //exit(1);
+                  }
                 }
 
                 | vdeclarations  PID LEFT_BR num RIGHT_BR {
@@ -154,6 +160,8 @@ identifier   : PID
 void declareAVariable(std::string name) {
   std::cout << "Declaring new variable: " << name << "\n";
   variablesMap[name] = 0;
+
+
 /*
 1) sprawdz czy zmienna jest juz zadeklarowan
 2a) jesli jest to zwroc blad
@@ -166,10 +174,18 @@ void declareAnArray(std::string name, int arraySize) {
 
 }
 
-int isVariableAlreadyDeclared(std::string name) {
+bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name) {
+//  std::cout << "DEBUG" << "\n";
 
-  //
-
+  if ( (*mapToSearch).find(name) == (*mapToSearch).end() ) {
+    // not found
+    return false;
+    // std::cout << "variable " <<  name  << " is new" << "\n";
+  } else {
+    // found
+    return true;
+    // std::cout << "variable " << name << " is already declared!!!" << "\n";
+  }
 }
 
 void finish() {
@@ -178,8 +194,7 @@ void finish() {
 }
 
 void displayMap(std::map<std::string, int>* mapToDisplay) {
-  for(auto elem : *mapToDisplay)
-  {
+  for(auto elem : *mapToDisplay) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
 }

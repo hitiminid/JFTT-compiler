@@ -5,14 +5,14 @@ Czy nazwa zmiennej i tablicy moze byc taka sama?
 
 R
 
-Jak przedstawiać pamięć? 
+Jak przedstawiać pamięć?
 
 
 1) variables (memory)
 
 mapa
 key      value
-nazwa    miejsce w pamieci
+nazwa    miejsce w pamieci ( a wlasciwie wskaznik)
 
 Wiemy ze miejsce w pamięci dla danej zmiennej się nie zmienia.
 Jeśli jest to zwykła zmienna to wskazuje na jej miejsce w pamięci.

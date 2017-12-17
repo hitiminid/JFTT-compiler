@@ -111,7 +111,7 @@
   void declareAnArray(std::string name, int arraySize);
 
   // function used for determining whether variable is declared
-  int isVariableAlreadyDeclared(std::string name);
+  bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name);
 
 
   // debug function performed at the end of parsing
@@ -521,10 +521,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    96,    96,   100,   104,   107,   111,   112,   116,   119,
-     120,   121,   122,   123,   124,   127,   131,   132,   133,   134,
-     135,   136,   138,   139,   140,   141,   142,   143,   145,   146,
-     148,   149,   150
+       0,    96,    96,   100,   110,   113,   117,   118,   122,   125,
+     126,   127,   128,   129,   130,   133,   137,   138,   139,   140,
+     141,   142,   144,   145,   146,   147,   148,   149,   151,   152,
+     154,   155,   156
 };
 #endif
 
@@ -1373,71 +1373,77 @@ yyreduce:
   case 3:
 #line 100 "gram.ypp" /* yacc.c:1646  */
     {
-                  declareAVariable((yyvsp[0].string));
+                  if (!isVariableAlreadyInMap(&variablesMap, (yyvsp[0].string))) {
+                    declareAVariable((yyvsp[0].string));
+                  } else {
+                    //throw an error
+                    std::cout << "Variable " << (yyvsp[0].string) << " already defined!" << "\n";
+                    //exit(1);
+                  }
                 }
-#line 1379 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1385 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 104 "gram.ypp" /* yacc.c:1646  */
+#line 110 "gram.ypp" /* yacc.c:1646  */
     {
                   declareAnArray((yyvsp[-3].string), (yyvsp[-1].num));
                 }
-#line 1387 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1393 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 107 "gram.ypp" /* yacc.c:1646  */
+#line 113 "gram.ypp" /* yacc.c:1646  */
     {
                   std::cout << "No variables declared" << "\n";
                 }
-#line 1395 "gram.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 6:
-#line 111 "gram.ypp" /* yacc.c:1646  */
-    { }
 #line 1401 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 7:
-#line 112 "gram.ypp" /* yacc.c:1646  */
+  case 6:
+#line 117 "gram.ypp" /* yacc.c:1646  */
     { }
 #line 1407 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
+  case 7:
+#line 118 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1413 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
   case 8:
-#line 116 "gram.ypp" /* yacc.c:1646  */
+#line 122 "gram.ypp" /* yacc.c:1646  */
     {
 
 }
-#line 1415 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1421 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 124 "gram.ypp" /* yacc.c:1646  */
+#line 130 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1423 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1429 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 127 "gram.ypp" /* yacc.c:1646  */
+#line 133 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1431 "gram.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 29:
-#line 146 "gram.ypp" /* yacc.c:1646  */
-    {   }
 #line 1437 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
+  case 29:
+#line 152 "gram.ypp" /* yacc.c:1646  */
+    {   }
+#line 1443 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
 
-#line 1441 "gram.tab.cpp" /* yacc.c:1646  */
+
+#line 1447 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1665,12 +1671,14 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 152 "gram.ypp" /* yacc.c:1906  */
+#line 158 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
   std::cout << "Declaring new variable: " << name << "\n";
   variablesMap[name] = 0;
+
+
 /*
 1) sprawdz czy zmienna jest juz zadeklarowan
 2a) jesli jest to zwroc blad
@@ -1681,14 +1689,20 @@ void declareAVariable(std::string name) {
 void declareAnArray(std::string name, int arraySize) {
   std::cout << "Declaring new array: " << name << " of size: " << arraySize << "\n";
 
-
 }
 
+bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name) {
+//  std::cout << "DEBUG" << "\n";
 
-int isVariableAlreadyDeclared(std::string name) {
-
-  //
-
+  if ( (*mapToSearch).find(name) == (*mapToSearch).end() ) {
+    // not found
+    return false;
+    // std::cout << "variable " <<  name  << " is new" << "\n";
+  } else {
+    // found
+    return true;
+    // std::cout << "variable " << name << " is already declared!!!" << "\n";
+  }
 }
 
 void finish() {
@@ -1696,15 +1710,11 @@ void finish() {
   displayMap(&variablesMap);
 }
 
-
-
 void displayMap(std::map<std::string, int>* mapToDisplay) {
-  for(auto elem : *mapToDisplay)
-  {
+  for(auto elem : *mapToDisplay) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
 }
-
 
 int main() {
   yyparse();
