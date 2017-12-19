@@ -521,10 +521,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    96,    96,   100,   110,   113,   117,   118,   122,   125,
-     126,   127,   128,   129,   130,   133,   137,   138,   139,   140,
-     141,   142,   144,   145,   146,   147,   148,   149,   151,   152,
-     154,   155,   156
+       0,    96,    96,   100,   106,   109,   113,   114,   118,   121,
+     122,   123,   124,   125,   126,   129,   133,   134,   135,   136,
+     137,   138,   140,   141,   142,   143,   144,   145,   147,   148,
+     150,   151,   152
 };
 #endif
 
@@ -1373,77 +1373,73 @@ yyreduce:
   case 3:
 #line 100 "gram.ypp" /* yacc.c:1646  */
     {
-                  if (!isVariableAlreadyInMap(&variablesMap, (yyvsp[0].string))) {
-                    declareAVariable((yyvsp[0].string));
-                  } else {
-                    //throw an error
-                    std::cout << "Variable " << (yyvsp[0].string) << " already defined!" << "\n";
-                    //exit(1);
-                  }
+                  declareAVariable((yyvsp[0].string));
+
+
                 }
-#line 1385 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1381 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 110 "gram.ypp" /* yacc.c:1646  */
+#line 106 "gram.ypp" /* yacc.c:1646  */
     {
                   declareAnArray((yyvsp[-3].string), (yyvsp[-1].num));
                 }
-#line 1393 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1389 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 113 "gram.ypp" /* yacc.c:1646  */
+#line 109 "gram.ypp" /* yacc.c:1646  */
     {
                   std::cout << "No variables declared" << "\n";
                 }
-#line 1401 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1397 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 117 "gram.ypp" /* yacc.c:1646  */
+#line 113 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1407 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1403 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 118 "gram.ypp" /* yacc.c:1646  */
+#line 114 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1413 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1409 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 122 "gram.ypp" /* yacc.c:1646  */
+#line 118 "gram.ypp" /* yacc.c:1646  */
     {
 
 }
-#line 1421 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1417 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 130 "gram.ypp" /* yacc.c:1646  */
+#line 126 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1429 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1425 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 133 "gram.ypp" /* yacc.c:1646  */
+#line 129 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1437 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1433 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 152 "gram.ypp" /* yacc.c:1646  */
+#line 148 "gram.ypp" /* yacc.c:1646  */
     {   }
-#line 1443 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1439 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1447 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1443 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1671,12 +1667,19 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 158 "gram.ypp" /* yacc.c:1906  */
+#line 154 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
-  std::cout << "Declaring new variable: " << name << "\n";
-  variablesMap[name] = 0;
+  if (!isVariableAlreadyInMap(&variablesMap, name)) {
+    std::cout << "Declaring new variable: " << name << "\n";
+    variablesMap[name] = 0;
+    initializedVariablesMap[name] = false;
+  } else {
+    //throw an error
+    std::cout << "Variable " << name << " already defined!" << "\n";
+    //exit(1);
+  }
 
 
 /*
@@ -1685,9 +1688,26 @@ void declareAVariable(std::string name) {
 2b) jesli nie to wrzuc do tablicy symboli
 */
 }
+void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
+  std::cout << "MAP START" << "\n";
+  for(auto elem : *arraySizesMap) {
+     std::cout << elem.first << " " << elem.second << "\n";
+  }
+  std::cout << "MAP END" << "\n";
+}
 
 void declareAnArray(std::string name, int arraySize) {
-  std::cout << "Declaring new array: " << name << " of size: " << arraySize << "\n";
+  if (!isVariableAlreadyInMap(&variablesMap, name)) {
+    std::cout << "Declaring new array: " << name << " of size: " << arraySize << "\n";
+    variablesMap[name] = 0;
+    initializedVariablesMap[name] = true;
+    arraysMap[name] = arraySize;
+    displayArraySizesMap(&arraysMap);
+  } else {
+    //throw an error
+    std::cout << "Array " << name << " already defined!" << "\n";
+    //exit(1);
+  }
 
 }
 

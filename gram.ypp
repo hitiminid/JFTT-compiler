@@ -98,13 +98,9 @@ program         : VAR vdeclarations BEG commands END {
                 }
 
 vdeclarations   : vdeclarations  PID {
-                  if (!isVariableAlreadyInMap(&variablesMap, $2)) {
-                    declareAVariable($2);
-                  } else {
-                    //throw an error
-                    std::cout << "Variable " << $2 << " already defined!" << "\n";
-                    //exit(1);
-                  }
+                  declareAVariable($2);
+
+
                 }
 
                 | vdeclarations  PID LEFT_BR num RIGHT_BR {
@@ -158,8 +154,15 @@ identifier   : PID
 %%
 
 void declareAVariable(std::string name) {
-  std::cout << "Declaring new variable: " << name << "\n";
-  variablesMap[name] = 0;
+  if (!isVariableAlreadyInMap(&variablesMap, name)) {
+    std::cout << "Declaring new variable: " << name << "\n";
+    variablesMap[name] = 0;
+    initializedVariablesMap[name] = false;
+  } else {
+    //throw an error
+    std::cout << "Variable " << name << " already defined!" << "\n";
+    //exit(1);
+  }
 
 
 /*
@@ -168,9 +171,26 @@ void declareAVariable(std::string name) {
 2b) jesli nie to wrzuc do tablicy symboli
 */
 }
+void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
+  std::cout << "MAP START" << "\n";
+  for(auto elem : *arraySizesMap) {
+     std::cout << elem.first << " " << elem.second << "\n";
+  }
+  std::cout << "MAP END" << "\n";
+}
 
 void declareAnArray(std::string name, int arraySize) {
-  std::cout << "Declaring new array: " << name << " of size: " << arraySize << "\n";
+  if (!isVariableAlreadyInMap(&variablesMap, name)) {
+    std::cout << "Declaring new array: " << name << " of size: " << arraySize << "\n";
+    variablesMap[name] = 0;
+    initializedVariablesMap[name] = true;
+    arraysMap[name] = arraySize;
+    displayArraySizesMap(&arraysMap);
+  } else {
+    //throw an error
+    std::cout << "Array " << name << " already defined!" << "\n";
+    //exit(1);
+  }
 
 }
 
