@@ -72,6 +72,7 @@
 
   #include <string>
   #include <map>
+  #include <vector>
   #include <stdio.h>
   #include <stdlib.h>
 
@@ -91,22 +92,23 @@
   /*===================================================*/
   int currentMemoryIndex = NUMBER_OF_RESERVED_MEMORY_INDEXES;
 
-
-
-
-
   /*===================================================*/
   /*                     STRUCTURES                    */
   /*===================================================*/
 
 
+  int accumulator;
   char errorMessage[ERROR_BUFFER];
+
+
+  /*vector containing commands*/
+	std::vector<std::string> commandsVector;
 
   /* declaredVariables */
   /* (name :: string, adress :: int) */
   /* (name :: string, pair of pointer and memory adress :: int) */
-
   std::map<std::string, int> variablesMap;
+
   /* each initialized variable */
   /* (name :: string, isInitialized :: boolean) */
   std::map<std::string, int> initializedVariablesMap;
@@ -136,11 +138,15 @@
   void finish();
 
   void displayMap(std::map<std::string, int>* mapToDisplay);
+  void displayCommandVector(std::vector<std::string>* commandsVector);
 
   void showAllocatedMemoryIndexes();
 
+  void pushCodeWithAddress(std::string opCode, int number);
 
-#line 144 "gram.tab.cpp" /* yacc.c:339  */
+
+
+#line 150 "gram.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -217,12 +223,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 79 "gram.ypp" /* yacc.c:355  */
+#line 85 "gram.ypp" /* yacc.c:355  */
 
     char* string;
     int   num;
 
-#line 226 "gram.tab.cpp" /* yacc.c:355  */
+#line 232 "gram.tab.cpp" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -237,7 +243,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 241 "gram.tab.cpp" /* yacc.c:358  */
+#line 247 "gram.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -538,10 +544,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   113,   113,   113,   117,   121,   124,   128,   129,   133,
-     136,   137,   138,   139,   140,   141,   144,   148,   151,   152,
-     153,   154,   155,   157,   158,   159,   160,   161,   162,   164,
-     165,   167,   168,   169
+       0,   119,   119,   119,   123,   127,   130,   134,   135,   138,
+     149,   150,   151,   152,   153,   154,   157,   161,   164,   165,
+     166,   167,   168,   170,   171,   172,   173,   174,   175,   177,
+     178,   180,   181,   182
 };
 #endif
 
@@ -1380,95 +1386,133 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 113 "gram.ypp" /* yacc.c:1646  */
+#line 119 "gram.ypp" /* yacc.c:1646  */
     {showAllocatedMemoryIndexes();}
-#line 1386 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1392 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 113 "gram.ypp" /* yacc.c:1646  */
+#line 119 "gram.ypp" /* yacc.c:1646  */
     {
                   finish();
                 }
-#line 1394 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1400 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 117 "gram.ypp" /* yacc.c:1646  */
+#line 123 "gram.ypp" /* yacc.c:1646  */
     {
                   declareAVariable((yyvsp[0].string));
                 }
-#line 1402 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1408 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 121 "gram.ypp" /* yacc.c:1646  */
+#line 127 "gram.ypp" /* yacc.c:1646  */
     {
                   declareAnArray((yyvsp[-3].string), (yyvsp[-1].num));
                 }
-#line 1410 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1416 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 124 "gram.ypp" /* yacc.c:1646  */
+#line 130 "gram.ypp" /* yacc.c:1646  */
     {
                   // std::cout << "No variables declared" << "\n";
                 }
-#line 1418 "gram.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 7:
-#line 128 "gram.ypp" /* yacc.c:1646  */
-    { }
 #line 1424 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 8:
-#line 129 "gram.ypp" /* yacc.c:1646  */
+  case 7:
+#line 134 "gram.ypp" /* yacc.c:1646  */
     { }
 #line 1430 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 9:
-#line 133 "gram.ypp" /* yacc.c:1646  */
-    {
+  case 8:
+#line 135 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1436 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
 
-}
-#line 1438 "gram.tab.cpp" /* yacc.c:1646  */
+  case 9:
+#line 138 "gram.ypp" /* yacc.c:1646  */
+    {
+                std::string variableName = (yyvsp[-3].string);
+                if (!isVariableAlreadyInMap(&variablesMap, variableName)) { //variable is not declared
+                  std::cout << "Variable "<< (yyvsp[-3].string) <<" not declared!" << "\n";
+                  exit(1);
+                } else {
+                  int variableAddress = variablesMap[variableName];
+                  pushCodeWithAddress("STORE", variableAddress);
+                }
+
+             }
+#line 1452 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 141 "gram.ypp" /* yacc.c:1646  */
+#line 154 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1446 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1460 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 144 "gram.ypp" /* yacc.c:1646  */
+#line 157 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1454 "gram.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 17:
-#line 148 "gram.ypp" /* yacc.c:1646  */
-    {
-
-              }
-#line 1462 "gram.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 30:
-#line 165 "gram.ypp" /* yacc.c:1646  */
-    {   }
 #line 1468 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
+  case 17:
+#line 161 "gram.ypp" /* yacc.c:1646  */
+    {
 
-#line 1472 "gram.tab.cpp" /* yacc.c:1646  */
+              }
+#line 1476 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 18:
+#line 164 "gram.ypp" /* yacc.c:1646  */
+    {}
+#line 1482 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 19:
+#line 165 "gram.ypp" /* yacc.c:1646  */
+    {}
+#line 1488 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 20:
+#line 166 "gram.ypp" /* yacc.c:1646  */
+    {}
+#line 1494 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 167 "gram.ypp" /* yacc.c:1646  */
+    {}
+#line 1500 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 22:
+#line 168 "gram.ypp" /* yacc.c:1646  */
+    {}
+#line 1506 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 178 "gram.ypp" /* yacc.c:1646  */
+    {   }
+#line 1512 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+
+#line 1516 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1696,7 +1740,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 171 "gram.ypp" /* yacc.c:1906  */
+#line 184 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
@@ -1746,30 +1790,55 @@ bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string
   if ( (*mapToSearch).find(name) == (*mapToSearch).end() ) {
     // not found
     return false;
-    // std::cout << "variable " <<  name  << " is new" << "\n";
   } else {
     // found
     return true;
-    // std::cout << "variable " << name << " is already declared!!!" << "\n";
   }
 }
 
 
 void showAllocatedMemoryIndexes() {
   for (int i = 0; i < 10; i++) {
-    std::cout << "index:" << i << " allocated for computing variables\n";
+    std::cout << "index: " << i << " allocated for computing variables\n";
   }
+  std::cout << "###################\n\n\n\n";
 }
 
 void finish() {
   std::cout << "number of variables + tokens = " << variablesMap.size() << "\n";
-  displayMap(&variablesMap);
+  // displayMap(&variablesMap);
+  displayCommandVector(&commandsVector);
 }
 
 void displayMap(std::map<std::string, int>* mapToDisplay) {
   for(auto elem : *mapToDisplay) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
+}
+
+
+void displayCommandVector(std::vector<std::string> *commands) {
+  int vectorSize = commands->size();
+
+  for (int i=0; i < vectorSize; i++) {
+    std::cout << commands->at(i) << " ";
+  }
+  // for (std::vector<char>::const_iterator i = commands.begin(); i != commands.end(); ++i)
+  //   std::cout << *i << ' ';
+}
+
+/*===================================================*/
+/*                 GENERATING CODE                   */
+/*===================================================*/
+
+void pushCode(std::string opCode, int number) {
+
+}
+
+void pushCodeWithAddress(std::string opCode, int number) {
+  std::string space = " ";
+  std::string whole = opCode + space + std::to_string(number);
+  commandsVector.push_back(whole);
 }
 
 int main() {

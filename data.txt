@@ -1,8 +1,5 @@
 VAR
- a b c arr[100] 
+ a
 BEGIN
   a := 5;
-  b := 10;
-  c := a + b;
-  WRITE c;
 END

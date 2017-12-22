@@ -7,6 +7,7 @@
 
   #include <string>
   #include <map>
+  #include <vector>
   #include <stdio.h>
   #include <stdlib.h>
 
@@ -26,22 +27,23 @@
   /*===================================================*/
   int currentMemoryIndex = NUMBER_OF_RESERVED_MEMORY_INDEXES;
 
-
-
-
-
   /*===================================================*/
   /*                     STRUCTURES                    */
   /*===================================================*/
 
 
+  int accumulator;
   char errorMessage[ERROR_BUFFER];
+
+
+  /*vector containing commands*/
+	std::vector<std::string> commandsVector;
 
   /* declaredVariables */
   /* (name :: string, adress :: int) */
   /* (name :: string, pair of pointer and memory adress :: int) */
-
   std::map<std::string, int> variablesMap;
+
   /* each initialized variable */
   /* (name :: string, isInitialized :: boolean) */
   std::map<std::string, int> initializedVariablesMap;
@@ -71,8 +73,12 @@
   void finish();
 
   void displayMap(std::map<std::string, int>* mapToDisplay);
+  void displayCommandVector(std::vector<std::string>* commandsVector);
 
   void showAllocatedMemoryIndexes();
+
+  void pushCodeWithAddress(std::string opCode, int number);
+
 
 %}
 
@@ -129,10 +135,17 @@ commands     : commands  command { }
              | command           { }
 
 ;
-command      :
-identifier  ASSGN  expression SEM {
+command      : identifier  ASSGN  expression SEM {
+                std::string variableName = $<string>1;
+                if (!isVariableAlreadyInMap(&variablesMap, variableName)) { //variable is not declared
+                  std::cout << "Variable "<< $<string>1 <<" not declared!" << "\n";
+                  exit(1);
+                } else {
+                  int variableAddress = variablesMap[variableName];
+                  pushCodeWithAddress("STORE", variableAddress);
+                }
 
-}
+             }
              | IF  condition  THEN  commands  ELSE  commands  ENDIF
              | IF  condition  THEN  commands  ENDIF
              | WHILE  condition  DO  commands  ENDWHILE
@@ -148,11 +161,11 @@ identifier  ASSGN  expression SEM {
 expression   : value {
 
               }
-             | value ADD value
-             | value SUB value
-             | value MUL value
-             | value DIV value
-             | value MOD value
+             | value ADD value {}
+             | value SUB value {}
+             | value MUL value {}
+             | value DIV value {}
+             | value MOD value {}
 ;
 condition    : value EQ value
              | value NEQ value
@@ -217,11 +230,9 @@ bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string
   if ( (*mapToSearch).find(name) == (*mapToSearch).end() ) {
     // not found
     return false;
-    // std::cout << "variable " <<  name  << " is new" << "\n";
   } else {
     // found
     return true;
-    // std::cout << "variable " << name << " is already declared!!!" << "\n";
   }
 }
 
@@ -230,17 +241,44 @@ void showAllocatedMemoryIndexes() {
   for (int i = 0; i < 10; i++) {
     std::cout << "index: " << i << " allocated for computing variables\n";
   }
+  std::cout << "###################\n\n\n\n";
 }
 
 void finish() {
   std::cout << "number of variables + tokens = " << variablesMap.size() << "\n";
-  displayMap(&variablesMap);
+  // displayMap(&variablesMap);
+  displayCommandVector(&commandsVector);
 }
 
 void displayMap(std::map<std::string, int>* mapToDisplay) {
   for(auto elem : *mapToDisplay) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
+}
+
+
+void displayCommandVector(std::vector<std::string> *commands) {
+  int vectorSize = commands->size();
+
+  for (int i=0; i < vectorSize; i++) {
+    std::cout << commands->at(i) << " ";
+  }
+  // for (std::vector<char>::const_iterator i = commands.begin(); i != commands.end(); ++i)
+  //   std::cout << *i << ' ';
+}
+
+/*===================================================*/
+/*                 GENERATING CODE                   */
+/*===================================================*/
+
+void pushCode(std::string opCode, int number) {
+
+}
+
+void pushCodeWithAddress(std::string opCode, int number) {
+  std::string space = " ";
+  std::string whole = opCode + space + std::to_string(number);
+  commandsVector.push_back(whole);
 }
 
 int main() {
