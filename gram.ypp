@@ -14,15 +14,34 @@
   extern "C" int yyparse();
 
   // variables
+  /*===================================================*/
+  /*                      CONSTANTS                    */
+  /*===================================================*/
+
+  #define NUMBER_OF_RESERVED_MEMORY_INDEXES 9
+  #define ERROR_BUFFER 150
+
+  /*===================================================*/
+  /*                      VARIABLES                    */
+  /*===================================================*/
+  int currentMemoryIndex = NUMBER_OF_RESERVED_MEMORY_INDEXES;
+
+
+
+
 
   /*===================================================*/
   /*                     STRUCTURES                    */
   /*===================================================*/
 
+
+  char errorMessage[ERROR_BUFFER];
+
   /* declaredVariables */
   /* (name :: string, adress :: int) */
-  std::map<std::string, int> variablesMap;
+  /* (name :: string, pair of pointer and memory adress :: int) */
 
+  std::map<std::string, int> variablesMap;
   /* each initialized variable */
   /* (name :: string, isInitialized :: boolean) */
   std::map<std::string, int> initializedVariablesMap;
@@ -48,14 +67,12 @@
   // function used for determining whether variable is declared
   bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name);
 
-
   // debug function performed at the end of parsing
   void finish();
 
-
   void displayMap(std::map<std::string, int>* mapToDisplay);
 
-
+  void showAllocatedMemoryIndexes();
 
 %}
 
@@ -93,27 +110,25 @@
 
 %%
 
-program         : VAR vdeclarations BEG commands END {
+program         : VAR {showAllocatedMemoryIndexes();} vdeclarations BEG commands END {
                   finish();
                 }
 
 vdeclarations   : vdeclarations  PID {
                   declareAVariable($2);
-
-
                 }
 
                 | vdeclarations  PID LEFT_BR num RIGHT_BR {
                   declareAnArray($2, $4);
                 }
                 | {
-                  std::cout << "No variables declared" << "\n";
+                  // std::cout << "No variables declared" << "\n";
                 }
-
+;
 commands     : commands  command { }
              | command           { }
 
-
+;
 command      :
 identifier  ASSGN  expression SEM {
 
@@ -129,50 +144,48 @@ identifier  ASSGN  expression SEM {
              | WRITE  value SEM {
 
              }
+;
+expression   : value {
 
-expression   : value
+              }
              | value ADD value
              | value SUB value
              | value MUL value
              | value DIV value
              | value MOD value
-
+;
 condition    : value EQ value
              | value NEQ value
              | value LT  value
              | value GT  value
              | value LE  value
              | value GE  value
-
+;
 value        : num
              | identifier {   }
-
+;
 identifier   : PID
              | PID LEFT_BR PID RIGHT_BR
              | PID LEFT_BR num RIGHT_BR
-
+;
 %%
 
 void declareAVariable(std::string name) {
   if (!isVariableAlreadyInMap(&variablesMap, name)) {
-    std::cout << "Declaring new variable: " << name << "\n";
-    variablesMap[name] = 0;
+    currentMemoryIndex++;
+    variablesMap[name] = currentMemoryIndex;
     initializedVariablesMap[name] = false;
+    std::cout << "Declaring new variable: " << name << " with adress: " << currentMemoryIndex << "\n";
   } else {
     //throw an error
     std::cout << "Variable " << name << " already defined!" << "\n";
-    //exit(1);
+    //snprintf(errorMessage, ERROR_BUFFER, "Variable '%s' already defined.", name);
+    //yyerror(errorMessage);
   }
-
-
-/*
-1) sprawdz czy zmienna jest juz zadeklarowan
-2a) jesli jest to zwroc blad
-2b) jesli nie to wrzuc do tablicy symboli
-*/
 }
+
 void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
-  std::cout << "MAP START" << "\n";
+  std::cout << "\nMAP START" << "\n";
   for(auto elem : *arraySizesMap) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
@@ -181,17 +194,21 @@ void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
 
 void declareAnArray(std::string name, int arraySize) {
   if (!isVariableAlreadyInMap(&variablesMap, name)) {
-    std::cout << "Declaring new array: " << name << " of size: " << arraySize << "\n";
-    variablesMap[name] = 0;
+
+    currentMemoryIndex++;
+    std::cout << "Declaring new array '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
+
+    variablesMap[name] = currentMemoryIndex; // the beggining of an array
     initializedVariablesMap[name] = true;
     arraysMap[name] = arraySize;
+    currentMemoryIndex += arraySize - 1; //without the first one
     displayArraySizesMap(&arraysMap);
+    std::cout << " and ending at " << currentMemoryIndex << "\n";
   } else {
-    //throw an error
     std::cout << "Array " << name << " already defined!" << "\n";
-    //exit(1);
+    //snprintf(errorMessage, ERROR_BUFFER, "Variable '%s' already defined.", name);
+    //yyerror(errorMessage);
   }
-
 }
 
 bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name) {
@@ -208,8 +225,15 @@ bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string
   }
 }
 
+
+void showAllocatedMemoryIndexes() {
+  for (int i = 0; i < 10; i++) {
+    std::cout << "index: " << i << " allocated for computing variables\n";
+  }
+}
+
 void finish() {
-  std::cout << " map size: " << variablesMap.size() << "\n";
+  std::cout << "number of variables + tokens = " << variablesMap.size() << "\n";
   displayMap(&variablesMap);
 }
 

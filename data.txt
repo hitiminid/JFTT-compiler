@@ -1,5 +1,5 @@
 VAR
- a b c arr[100] a b c arr
+ a b c arr[100] 
 BEGIN
   a := 5;
   b := 10;

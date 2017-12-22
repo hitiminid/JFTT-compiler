@@ -79,15 +79,34 @@
   extern "C" int yyparse();
 
   // variables
+  /*===================================================*/
+  /*                      CONSTANTS                    */
+  /*===================================================*/
+
+  #define NUMBER_OF_RESERVED_MEMORY_INDEXES 9
+  #define ERROR_BUFFER 150
+
+  /*===================================================*/
+  /*                      VARIABLES                    */
+  /*===================================================*/
+  int currentMemoryIndex = NUMBER_OF_RESERVED_MEMORY_INDEXES;
+
+
+
+
 
   /*===================================================*/
   /*                     STRUCTURES                    */
   /*===================================================*/
 
+
+  char errorMessage[ERROR_BUFFER];
+
   /* declaredVariables */
   /* (name :: string, adress :: int) */
-  std::map<std::string, int> variablesMap;
+  /* (name :: string, pair of pointer and memory adress :: int) */
 
+  std::map<std::string, int> variablesMap;
   /* each initialized variable */
   /* (name :: string, isInitialized :: boolean) */
   std::map<std::string, int> initializedVariablesMap;
@@ -113,17 +132,15 @@
   // function used for determining whether variable is declared
   bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name);
 
-
   // debug function performed at the end of parsing
   void finish();
 
-
   void displayMap(std::map<std::string, int>* mapToDisplay);
 
+  void showAllocatedMemoryIndexes();
 
 
-
-#line 127 "gram.tab.cpp" /* yacc.c:339  */
+#line 144 "gram.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -200,12 +217,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 62 "gram.ypp" /* yacc.c:355  */
+#line 79 "gram.ypp" /* yacc.c:355  */
 
     char* string;
     int   num;
 
-#line 209 "gram.tab.cpp" /* yacc.c:355  */
+#line 226 "gram.tab.cpp" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -220,7 +237,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 224 "gram.tab.cpp" /* yacc.c:358  */
+#line 241 "gram.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -467,11 +484,11 @@ union yyalloc
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  42
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  9
+#define YYNNTS  10
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  32
+#define YYNRULES  33
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  83
+#define YYNSTATES  84
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -521,10 +538,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    96,    96,   100,   106,   109,   113,   114,   118,   121,
-     122,   123,   124,   125,   126,   129,   133,   134,   135,   136,
-     137,   138,   140,   141,   142,   143,   144,   145,   147,   148,
-     150,   151,   152
+       0,   113,   113,   113,   117,   121,   124,   128,   129,   133,
+     136,   137,   138,   139,   140,   141,   144,   148,   151,   152,
+     153,   154,   155,   157,   158,   159,   160,   161,   162,   164,
+     165,   167,   168,   169
 };
 #endif
 
@@ -538,7 +555,7 @@ static const char *const yytname[] =
   "ENDFOR", "DOWNTO", "READ", "WRITE", "ASSGN", "EQ", "NEQ", "GT", "GE",
   "LT", "LE", "ADD", "SUB", "MUL", "DIV", "MOD", "num", "PID", "SEM",
   "LEFT_BR", "RIGHT_BR", "'-'", "'+'", "'*'", "'/'", "'^'", "$accept",
-  "program", "vdeclarations", "commands", "command", "expression",
+  "program", "$@1", "vdeclarations", "commands", "command", "expression",
   "condition", "value", "identifier", YY_NULLPTR
 };
 #endif
@@ -570,15 +587,15 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-       8,   -27,    13,    -3,   -27,   133,   -15,   -26,   -26,   -12,
-      -9,   -26,    -8,     4,   -27,    -2,    -6,   -27,    21,   135,
-     -27,    20,    19,     0,     1,   -17,   -27,   -27,   -26,     2,
-     133,   -26,   -26,   -26,   -26,   -26,   -26,   133,   -26,   -27,
-     -27,     3,     6,    10,   140,   -27,    80,   -27,   -27,   -27,
-     -27,   -27,   -27,    90,   -13,   -27,   -27,   -27,   -26,   -26,
-     -26,   -26,   -26,   133,   -27,   -27,   -26,   -26,   -27,   -27,
-     -27,   -27,   -27,   101,    29,    36,   -27,   133,   133,   111,
-     122,   -27,   -27
+       8,   -27,    13,   -27,   -27,    -3,   133,   -15,   -26,   -26,
+     -12,    -9,   -26,    -8,     4,   -27,    -2,    -4,   -27,    19,
+     135,   -27,    20,    21,    -1,     0,   -17,   -27,   -27,   -26,
+       2,   133,   -26,   -26,   -26,   -26,   -26,   -26,   133,   -26,
+     -27,   -27,     3,     6,    10,   140,   -27,    80,   -27,   -27,
+     -27,   -27,   -27,   -27,    90,   -13,   -27,   -27,   -27,   -26,
+     -26,   -26,   -26,   -26,   133,   -27,   -27,   -26,   -26,   -27,
+     -27,   -27,   -27,   -27,   101,    29,    36,   -27,   133,   133,
+     111,   122,   -27,   -27
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -586,27 +603,27 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     5,     0,     0,     1,     0,     3,     0,     0,     0,
-       0,     0,    30,     0,     7,     0,     0,    28,     0,     0,
-      29,     0,     0,     0,     0,     0,     2,     6,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    14,
-      15,     0,     0,     0,    16,     4,     0,    22,    23,    25,
-      27,    24,    26,     0,     0,    32,    31,     8,     0,     0,
-       0,     0,     0,     0,    10,    11,     0,     0,    17,    18,
-      19,    20,    21,     0,     0,     0,     9,     0,     0,     0,
-       0,    12,    13
+       0,     2,     0,     6,     1,     0,     0,     4,     0,     0,
+       0,     0,     0,    31,     0,     8,     0,     0,    29,     0,
+       0,    30,     0,     0,     0,     0,     0,     3,     7,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+      15,    16,     0,     0,     0,    17,     5,     0,    23,    24,
+      26,    28,    25,    27,     0,     0,    33,    32,     9,     0,
+       0,     0,     0,     0,     0,    11,    12,     0,     0,    18,
+      19,    20,    21,    22,     0,     0,     0,    10,     0,     0,
+       0,     0,    13,    14
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -27,   -27,   -27,   -18,   -10,   -27,    47,    18,    -5
+     -27,   -27,   -27,   -27,   -19,   -11,   -27,    46,    17,    -6
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,    13,    14,    43,    18,    19,    20
+      -1,     2,     3,     5,    14,    15,    44,    19,    20,    21
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -614,37 +631,37 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      15,     5,    66,    27,    67,    23,    17,    12,    15,    26,
-       7,     1,    46,     4,     8,    41,    42,     9,    28,    53,
-      16,    22,    10,    11,    12,    15,    29,    25,    30,    24,
-       6,    37,    15,    38,    39,    40,    27,    12,    45,    55,
-      77,    15,    56,    27,    57,    73,    44,    78,    15,    47,
-      48,    49,    50,    51,    52,    21,    54,     0,    15,    79,
-      80,     0,     0,    27,     0,     0,     0,     0,    15,    27,
-      27,     0,    15,    15,    15,    15,    68,    69,    70,    71,
-      72,     0,     0,     0,    74,    75,     7,     0,    63,    64,
-       8,     0,     0,     9,     0,     0,     7,     0,    10,    11,
-       8,     0,    65,     9,     0,     0,     0,     7,    10,    11,
-      76,     8,     0,    12,     9,     0,     0,     7,     0,    10,
-      11,     8,     0,    12,     9,     0,     0,    81,     7,    10,
-      11,     0,     8,     0,    12,     9,     0,     0,    82,     7,
-      10,    11,     0,     8,    12,     0,     9,     0,     0,     0,
-       0,    10,    11,     0,     0,    12,    31,    32,    33,    34,
-      35,    36,     0,     0,     0,     0,    12,    58,    59,    60,
-      61,    62
+      16,     6,    67,    28,    68,    24,    18,    13,    16,    27,
+       8,     1,    47,     4,     9,    42,    43,    10,    29,    54,
+      17,    23,    11,    12,    13,    16,    31,    26,    30,    25,
+       7,    38,    16,    40,    41,    39,    28,    13,    46,    56,
+      78,    16,    57,    28,    58,    74,    45,    79,    16,    48,
+      49,    50,    51,    52,    53,    22,    55,     0,    16,    80,
+      81,     0,     0,    28,     0,     0,     0,     0,    16,    28,
+      28,     0,    16,    16,    16,    16,    69,    70,    71,    72,
+      73,     0,     0,     0,    75,    76,     8,     0,    64,    65,
+       9,     0,     0,    10,     0,     0,     8,     0,    11,    12,
+       9,     0,    66,    10,     0,     0,     0,     8,    11,    12,
+      77,     9,     0,    13,    10,     0,     0,     8,     0,    11,
+      12,     9,     0,    13,    10,     0,     0,    82,     8,    11,
+      12,     0,     9,     0,    13,    10,     0,     0,    83,     8,
+      11,    12,     0,     9,    13,     0,    10,     0,     0,     0,
+       0,    11,    12,     0,     0,    13,    32,    33,    34,    35,
+      36,    37,     0,     0,     0,     0,    13,    59,    60,    61,
+      62,    63
 };
 
 static const yytype_int8 yycheck[] =
 {
-       5,     4,    15,    13,    17,    10,    32,    33,    13,     5,
-       6,     3,    30,     0,    10,    32,    33,    13,    20,    37,
-      35,    33,    18,    19,    33,    30,    32,    35,     7,    11,
-      33,    11,    37,    14,    34,    34,    46,    33,    36,    36,
-      11,    46,    36,    53,    34,    63,    28,    11,    53,    31,
-      32,    33,    34,    35,    36,     8,    38,    -1,    63,    77,
-      78,    -1,    -1,    73,    -1,    -1,    -1,    -1,    73,    79,
-      80,    -1,    77,    78,    79,    80,    58,    59,    60,    61,
-      62,    -1,    -1,    -1,    66,    67,     6,    -1,     8,     9,
+       6,     4,    15,    14,    17,    11,    32,    33,    14,     5,
+       6,     3,    31,     0,    10,    32,    33,    13,    20,    38,
+      35,    33,    18,    19,    33,    31,     7,    35,    32,    12,
+      33,    11,    38,    34,    34,    14,    47,    33,    36,    36,
+      11,    47,    36,    54,    34,    64,    29,    11,    54,    32,
+      33,    34,    35,    36,    37,     9,    39,    -1,    64,    78,
+      79,    -1,    -1,    74,    -1,    -1,    -1,    -1,    74,    80,
+      81,    -1,    78,    79,    80,    81,    59,    60,    61,    62,
+      63,    -1,    -1,    -1,    67,    68,     6,    -1,     8,     9,
       10,    -1,    -1,    13,    -1,    -1,     6,    -1,    18,    19,
       10,    -1,    12,    13,    -1,    -1,    -1,     6,    18,    19,
        9,    10,    -1,    33,    13,    -1,    -1,     6,    -1,    18,
@@ -660,33 +677,33 @@ static const yytype_int8 yycheck[] =
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    43,    44,     0,     4,    33,     6,    10,    13,
-      18,    19,    33,    45,    46,    50,    35,    32,    48,    49,
-      50,    48,    33,    50,    49,    35,     5,    46,    20,    32,
-       7,    21,    22,    23,    24,    25,    26,    11,    14,    34,
-      34,    32,    33,    47,    49,    36,    45,    49,    49,    49,
-      49,    49,    49,    45,    49,    36,    36,    34,    27,    28,
-      29,    30,    31,     8,     9,    12,    15,    17,    49,    49,
-      49,    49,    49,    45,    49,    49,     9,    11,    11,    45,
-      45,    16,    16
+       0,     3,    43,    44,     0,    45,     4,    33,     6,    10,
+      13,    18,    19,    33,    46,    47,    51,    35,    32,    49,
+      50,    51,    49,    33,    51,    50,    35,     5,    47,    20,
+      32,     7,    21,    22,    23,    24,    25,    26,    11,    14,
+      34,    34,    32,    33,    48,    50,    36,    46,    50,    50,
+      50,    50,    50,    50,    46,    50,    36,    36,    34,    27,
+      28,    29,    30,    31,     8,     9,    12,    15,    17,    50,
+      50,    50,    50,    50,    46,    50,    50,     9,    11,    11,
+      46,    46,    16,    16
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    42,    43,    44,    44,    44,    45,    45,    46,    46,
-      46,    46,    46,    46,    46,    46,    47,    47,    47,    47,
-      47,    47,    48,    48,    48,    48,    48,    48,    49,    49,
-      50,    50,    50
+       0,    42,    44,    43,    45,    45,    45,    46,    46,    47,
+      47,    47,    47,    47,    47,    47,    47,    48,    48,    48,
+      48,    48,    48,    49,    49,    49,    49,    49,    49,    50,
+      50,    51,    51,    51
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     5,     2,     5,     0,     2,     1,     4,     7,
-       5,     5,     9,     9,     3,     3,     1,     3,     3,     3,
-       3,     3,     3,     3,     3,     3,     3,     3,     1,     1,
-       1,     4,     4
+       0,     2,     0,     6,     2,     5,     0,     2,     1,     4,
+       7,     5,     5,     9,     9,     3,     3,     1,     3,     3,
+       3,     3,     3,     3,     3,     3,     3,     3,     3,     1,
+       1,     1,     4,     4
 };
 
 
@@ -1363,83 +1380,95 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 96 "gram.ypp" /* yacc.c:1646  */
-    {
-                  finish();
-                }
-#line 1371 "gram.tab.cpp" /* yacc.c:1646  */
+#line 113 "gram.ypp" /* yacc.c:1646  */
+    {showAllocatedMemoryIndexes();}
+#line 1386 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 100 "gram.ypp" /* yacc.c:1646  */
+#line 113 "gram.ypp" /* yacc.c:1646  */
     {
-                  declareAVariable((yyvsp[0].string));
-
-
+                  finish();
                 }
-#line 1381 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1394 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 106 "gram.ypp" /* yacc.c:1646  */
+#line 117 "gram.ypp" /* yacc.c:1646  */
     {
-                  declareAnArray((yyvsp[-3].string), (yyvsp[-1].num));
+                  declareAVariable((yyvsp[0].string));
                 }
-#line 1389 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1402 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 109 "gram.ypp" /* yacc.c:1646  */
+#line 121 "gram.ypp" /* yacc.c:1646  */
     {
-                  std::cout << "No variables declared" << "\n";
+                  declareAnArray((yyvsp[-3].string), (yyvsp[-1].num));
                 }
-#line 1397 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1410 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 113 "gram.ypp" /* yacc.c:1646  */
-    { }
-#line 1403 "gram.tab.cpp" /* yacc.c:1646  */
+#line 124 "gram.ypp" /* yacc.c:1646  */
+    {
+                  // std::cout << "No variables declared" << "\n";
+                }
+#line 1418 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 114 "gram.ypp" /* yacc.c:1646  */
+#line 128 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1409 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1424 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 118 "gram.ypp" /* yacc.c:1646  */
+#line 129 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1430 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 9:
+#line 133 "gram.ypp" /* yacc.c:1646  */
     {
 
 }
-#line 1417 "gram.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 14:
-#line 126 "gram.ypp" /* yacc.c:1646  */
-    {
-
-             }
-#line 1425 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1438 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 129 "gram.ypp" /* yacc.c:1646  */
+#line 141 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1433 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1446 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 29:
+  case 16:
+#line 144 "gram.ypp" /* yacc.c:1646  */
+    {
+
+             }
+#line 1454 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 17:
 #line 148 "gram.ypp" /* yacc.c:1646  */
+    {
+
+              }
+#line 1462 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 165 "gram.ypp" /* yacc.c:1646  */
     {   }
-#line 1439 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1468 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1443 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1472 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1667,29 +1696,25 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 154 "gram.ypp" /* yacc.c:1906  */
+#line 171 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
   if (!isVariableAlreadyInMap(&variablesMap, name)) {
-    std::cout << "Declaring new variable: " << name << "\n";
-    variablesMap[name] = 0;
+    currentMemoryIndex++;
+    variablesMap[name] = currentMemoryIndex;
     initializedVariablesMap[name] = false;
+    std::cout << "Declaring new variable: " << name << " with adress: " << currentMemoryIndex << "\n";
   } else {
     //throw an error
     std::cout << "Variable " << name << " already defined!" << "\n";
-    //exit(1);
+    //snprintf(errorMessage, ERROR_BUFFER, "Variable '%s' already defined.", name);
+    //yyerror(errorMessage);
   }
-
-
-/*
-1) sprawdz czy zmienna jest juz zadeklarowan
-2a) jesli jest to zwroc blad
-2b) jesli nie to wrzuc do tablicy symboli
-*/
 }
+
 void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
-  std::cout << "MAP START" << "\n";
+  std::cout << "\nMAP START" << "\n";
   for(auto elem : *arraySizesMap) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
@@ -1698,17 +1723,21 @@ void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
 
 void declareAnArray(std::string name, int arraySize) {
   if (!isVariableAlreadyInMap(&variablesMap, name)) {
-    std::cout << "Declaring new array: " << name << " of size: " << arraySize << "\n";
-    variablesMap[name] = 0;
+
+    currentMemoryIndex++;
+    std::cout << "Declaring new array '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
+
+    variablesMap[name] = currentMemoryIndex; // the beggining of an array
     initializedVariablesMap[name] = true;
     arraysMap[name] = arraySize;
+    currentMemoryIndex += arraySize - 1; //without the first one
     displayArraySizesMap(&arraysMap);
+    std::cout << " and ending at " << currentMemoryIndex << "\n";
   } else {
-    //throw an error
     std::cout << "Array " << name << " already defined!" << "\n";
-    //exit(1);
+    //snprintf(errorMessage, ERROR_BUFFER, "Variable '%s' already defined.", name);
+    //yyerror(errorMessage);
   }
-
 }
 
 bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name) {
@@ -1725,8 +1754,15 @@ bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string
   }
 }
 
+
+void showAllocatedMemoryIndexes() {
+  for (int i = 0; i < 10; i++) {
+    std::cout << "index:" << i << " allocated for computing variables\n";
+  }
+}
+
 void finish() {
-  std::cout << " map size: " << variablesMap.size() << "\n";
+  std::cout << "number of variables + tokens = " << variablesMap.size() << "\n";
   displayMap(&variablesMap);
 }
 
