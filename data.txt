@@ -1,9 +1,8 @@
 VAR
- a b c d e f g h
+ a b c d
 BEGIN
-  a := 5;
-  b := 5;
-  c := 5;
-  d := 5;
-  a := 10;
+  WRITE d;
+  WRITE a;
+  WRITE c;
+  WRITE b;
 END

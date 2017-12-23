@@ -1,5 +1,4 @@
 %option yylineno
-
 %{
 
 #include "gram.tab.hpp"
@@ -55,7 +54,7 @@ WHITESPACES   [ \t\r\n]+
 }
 
 {NUMBER}      {
-    yylval.num = atoi(yytext);
+    yylval.string = (char *)strdup(yytext);
     return(num);
 }
 

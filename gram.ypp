@@ -57,6 +57,8 @@
   // int yylex();
   void yyerror (char* msg);
 
+
+
   /*===================================================*/
   /*                      FUNCTIONS                    */
   /*===================================================*/
@@ -78,7 +80,7 @@
   void showAllocatedMemoryIndexes();
 
   void pushCodeWithAddress(std::string opCode, int number);
-
+  void pushCode(std::string opCode);
 
 %}
 
@@ -102,7 +104,7 @@
 // operations
 %token ADD SUB MUL DIV MOD
 // numbers and variables
-%token <num> num
+%token <string> num
 %token <string> PID
 %token SEM
 // right and left brackets used for arrays
@@ -125,12 +127,14 @@ vdeclarations   : vdeclarations  PID {
                 }
 
                 | vdeclarations  PID LEFT_BR num RIGHT_BR {
-                  declareAnArray($2, $4);
+                  int arraySize = atoi($4);
+                  declareAnArray($2, arraySize);
                 }
                 | {
                   // std::cout << "No variables declared" << "\n";
                 }
 ;
+
 commands     : commands  command { }
              | command           { }
 
@@ -138,7 +142,7 @@ commands     : commands  command { }
 command      : identifier  ASSGN  expression SEM {
                 std::string variableName = $<string>1;
                 if (!isVariableAlreadyInMap(&variablesMap, variableName)) { //variable is not declared
-                  std::cout << "Variable "<< $<string>1 <<" not declared!" << "\n";
+                  std::cout << "Error [line "<< "]: Variable "<< $<string>1 <<" not declared!" << "\n";
                   exit(1);
                 } else {
                   int variableAddress = variablesMap[variableName];
@@ -151,10 +155,39 @@ command      : identifier  ASSGN  expression SEM {
              | FOR  PID  FROM  value TO  value DO  commands  ENDFOR
              | FOR  PID  FROM  value  DOWNTO  value DO  commands  ENDFOR
              | READ  identifier SEM {
-
+               std::string variableName = $<string>2;
+               if (!isVariableAlreadyInMap(&variablesMap, variableName)) { //variable is not declared
+                 std::cout << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared!" << "\n";
+                 exit(1);
+               } else {
+                 int variableAddress = variablesMap[variableName];
+                //  pushCodeWithAddress("STORE", variableAddress);
+                 pushCode("GET");
+                 if (isVariableAlreadyInMap(&arraysMap, variableName)) {
+                   std::cout << "I'm an array!" << "\n";
+                 } else {
+                   int variableAddress = variablesMap[variableName];
+                   std::cout << "I'm a variable, with adress : "<< variableAddress <<"\n";
+                 }
+               }
              }
-             | WRITE  value SEM {
-
+             | WRITE value SEM {
+               std::string variableName = $<string>2;
+               if (!isVariableAlreadyInMap(&variablesMap, variableName)) { //variable is not declared
+                 std::cout << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared!" << "\n";
+                 exit(1);
+               } else {
+                 int variableAddress = variablesMap[variableName];
+                //  pushCodeWithAddress("STORE", variableAddress);
+                 if (isVariableAlreadyInMap(&arraysMap, variableName)) {
+                   std::cout << "I'm an array!" << "\n";
+                   std::cout << "Yet not implemented\n";
+                 } else {
+                   int variableAddress = variablesMap[variableName];
+                   pushCodeWithAddress("LOAD", variableAddress);
+                   pushCode("PUT");
+                 }
+               }
              }
 ;
 expression   : value {
@@ -195,6 +228,7 @@ void declareAVariable(std::string name) {
   } else {
     //throw an error
     std::cout << "Variable " << name << " already defined!" << "\n";
+    exit(1);
     //snprintf(errorMessage, ERROR_BUFFER, "Variable '%s' already defined.", name);
     //yyerror(errorMessage);
   }
@@ -269,8 +303,8 @@ void displayCommandVector(std::vector<std::string> *commands) {
 /*                 GENERATING CODE                   */
 /*===================================================*/
 
-void pushCode(std::string opCode, int number) {
-
+void pushCode(std::string opCode) {
+  commandsVector.push_back(opCode);
 }
 
 void pushCodeWithAddress(std::string opCode, int number) {
