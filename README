@@ -20,4 +20,4 @@ Bison
 
 bison gram.ypp -d 
 
-g++ gram.tab.c lex.yy.c -o parse
+g++ gram.tab.c lex.yy.c -o parse -std=c++11

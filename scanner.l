@@ -18,15 +18,12 @@ WHITESPACES   [ \t\r\n]+
 {WHITESPACES} {  }
 
 "VAR"         {
-  // printf("VAR");/
   return(VAR);
 }
 "BEGIN"       {
-  // printf("BEGIN");
   return(BEG);
 }
 "END"         {
-  // printf("END");
   return(END);
  }
 

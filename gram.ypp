@@ -282,6 +282,8 @@ void showAllocatedMemoryIndexes() {
 void finish() {
   std::cout << "number of variables + tokens = " << variablesMap.size() << "\n";
   // displayMap(&variablesMap);
+
+  pushCode("HALT");
   displayCommandVector(&commandsVector);
 }
 
