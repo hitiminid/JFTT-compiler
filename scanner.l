@@ -17,15 +17,9 @@ WHITESPACES   [ \t\r\n]+
 
 {WHITESPACES} {  }
 
-"VAR"         {
-  return(VAR);
-}
-"BEGIN"       {
-  return(BEG);
-}
-"END"         {
-  return(END);
- }
+"VAR"         {  return(VAR);        }
+"BEGIN"       {  return(BEG);        }
+"END"         {  return(END);        }
 
 "IF"          { return(IF);          }
 "THEN"        { return(THEN);        }

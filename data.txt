@@ -1,8 +1,5 @@
 VAR
  a b c d
 BEGIN
-  WRITE d;
-  WRITE a;
-  WRITE c;
-  WRITE b;
+ a := 5;
 END
