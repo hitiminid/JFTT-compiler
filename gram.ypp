@@ -144,6 +144,7 @@ commands     : commands  command { }
 
 command      : identifier  ASSGN  expression SEM {
                 std::string variableName = $<string>1;
+
                 if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
                   std::cout << "Error [line "<< "]: Variable "<< $<string>1 <<" not declared!" << "\n";
                   exit(1);
@@ -153,7 +154,7 @@ command      : identifier  ASSGN  expression SEM {
                   pushCodeWithAddress("STORE", variableAddress);
                 }
              }
-             | IF  condition {} THEN  commands {}  ELSE  commands  ENDIF {}
+             | IF  condition THEN  commands ELSE  commands  ENDIF {}
              | IF  condition  THEN  commands  ENDIF
              | WHILE  condition  DO  commands  ENDWHILE
              | FOR  PID  FROM  value TO  value DO  commands  ENDFOR
@@ -187,10 +188,24 @@ command      : identifier  ASSGN  expression SEM {
                  if (isVariableInMap(&arraysMap, variableName)) {
                    std::cout << "I'm an array!" << "\n";
                    std::cout << "Yet not implemented\n";
-                 } else {
+                 } else { // variable is declared and initialized
+
+                   //todo: find a way to determine type
+
+                   // if it's a number
+
+                   // if it's a variable
                    int variableAddress = variablesMap[variableName];
+                   pushCode("ZERO");
                    pushCodeWithAddress("LOAD", variableAddress);
                    pushCode("PUT");
+
+                   // if it's an array
+
+
+
+
+
                  }
                }
              }

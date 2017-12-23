@@ -134,7 +134,7 @@
   void declareAnArray(std::string name, int arraySize);
 
   // function used for determining whether variable is declared
-  bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name);
+  bool isVariableInMap(std::map<std::string, int> *mapToSearch, std::string name);
 
   // debug function performed at the end of parsing
   void finish();
@@ -552,9 +552,9 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyrline[] =
 {
        0,   124,   124,   124,   128,   132,   136,   141,   142,   145,
-     156,   157,   158,   159,   160,   161,   179,   198,   206,   207,
-     208,   209,   210,   212,   213,   214,   215,   216,   217,   219,
-     222,   237,   238,   239
+     157,   158,   159,   160,   161,   162,   180,   213,   221,   222,
+     223,   224,   225,   227,   228,   229,   230,   231,   232,   234,
+     237,   252,   253,   254
 };
 #endif
 
@@ -1447,7 +1447,8 @@ yyreduce:
 #line 145 "gram.ypp" /* yacc.c:1646  */
     {
                 std::string variableName = (yyvsp[-3].string);
-                if (!isVariableAlreadyInMap(&variablesMap, variableName)) { //variable is not declared
+
+                if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
                   std::cout << "Error [line "<< "]: Variable "<< (yyvsp[-3].string) <<" not declared!" << "\n";
                   exit(1);
                 } else {
@@ -1456,22 +1457,28 @@ yyreduce:
                   pushCodeWithAddress("STORE", variableAddress);
                 }
              }
-#line 1460 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1461 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 10:
+#line 157 "gram.ypp" /* yacc.c:1646  */
+    {}
+#line 1467 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 161 "gram.ypp" /* yacc.c:1646  */
+#line 162 "gram.ypp" /* yacc.c:1646  */
     {
                /*todo: doesn't work*/
                std::string variableName = (yyvsp[-1].string);
-               if (!isVariableAlreadyInMap(&variablesMap, variableName)) { //variable is not declared
+               if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
                  std::cout << "Error [line "<< "]: Variable "<< (yyvsp[-1].string) <<" not declared!" << "\n";
                  exit(1);
                } else {
                  int variableAddress = variablesMap[variableName];
                 //  pushCodeWithAddress("STORE", variableAddress);
                  pushCode("GET");
-                 if (isVariableAlreadyInMap(&arraysMap, variableName)) {
+                 if (isVariableInMap(&arraysMap, variableName)) {
                    std::cout << "I'm an array!" << "\n";
                  } else {
                    int variableAddress = variablesMap[variableName];
@@ -1479,34 +1486,48 @@ yyreduce:
                  }
                }
              }
-#line 1483 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1490 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 179 "gram.ypp" /* yacc.c:1646  */
+#line 180 "gram.ypp" /* yacc.c:1646  */
     {
                std::string variableName = (yyvsp[-1].string);
-               if (!isVariableAlreadyInMap(&variablesMap, variableName)) { //variable is not declared
+               if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
                  std::cout << "Error [line "<< "]: Variable "<< (yyvsp[-1].string) <<" not declared!" << "\n";
                  exit(1);
                } else {
                  int variableAddress = variablesMap[variableName];
                 //  pushCodeWithAddress("STORE", variableAddress);
-                 if (isVariableAlreadyInMap(&arraysMap, variableName)) {
+                 if (isVariableInMap(&arraysMap, variableName)) {
                    std::cout << "I'm an array!" << "\n";
                    std::cout << "Yet not implemented\n";
-                 } else {
+                 } else { // variable is declared and initialized
+
+                   //todo: find a way to determine type
+
+                   // if it's a number
+
+                   // if it's a variable
                    int variableAddress = variablesMap[variableName];
+                   pushCode("ZERO");
                    pushCodeWithAddress("LOAD", variableAddress);
                    pushCode("PUT");
+
+                   // if it's an array
+
+
+
+
+
                  }
                }
              }
-#line 1506 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1527 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 198 "gram.ypp" /* yacc.c:1646  */
+#line 213 "gram.ypp" /* yacc.c:1646  */
     {
                 /*
                 if it's a number then load it directly to the accumulator
@@ -1515,56 +1536,56 @@ yyreduce:
 
                 pushCodeWithAddress("LOAD", 123);
               }
-#line 1519 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1540 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 206 "gram.ypp" /* yacc.c:1646  */
+#line 221 "gram.ypp" /* yacc.c:1646  */
     {}
-#line 1525 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1546 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 207 "gram.ypp" /* yacc.c:1646  */
+#line 222 "gram.ypp" /* yacc.c:1646  */
     {}
-#line 1531 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1552 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 208 "gram.ypp" /* yacc.c:1646  */
+#line 223 "gram.ypp" /* yacc.c:1646  */
     {}
-#line 1537 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1558 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 209 "gram.ypp" /* yacc.c:1646  */
+#line 224 "gram.ypp" /* yacc.c:1646  */
     {}
-#line 1543 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1564 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 210 "gram.ypp" /* yacc.c:1646  */
+#line 225 "gram.ypp" /* yacc.c:1646  */
     {}
-#line 1549 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1570 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 219 "gram.ypp" /* yacc.c:1646  */
+#line 234 "gram.ypp" /* yacc.c:1646  */
     {
                 generateNumber((yyvsp[0].string));
              }
-#line 1557 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1578 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 222 "gram.ypp" /* yacc.c:1646  */
+#line 237 "gram.ypp" /* yacc.c:1646  */
     {
                std::string variableName = (yyvsp[0].string);
-               if (!isVariableAlreadyInMap(&variablesMap, variableName)) { // not declared
+               if (!isVariableInMap(&variablesMap, variableName)) { // not declared
                   std::cout << "variable " << variableName << " NOT \n";
                } else {
                  // variable is declared
-                 if(isVariableAlreadyInMap(&initializedVariablesMap, variableName)) {
+                 if(isVariableInMap(&initializedVariablesMap, variableName)) {
                   std::cout << "Variable " << variableName << " declared but not initialized\n";
                   exit(1);
                 } else {
@@ -1572,11 +1593,11 @@ yyreduce:
                 }
                }
              }
-#line 1576 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1597 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1580 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1601 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1804,11 +1825,11 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 241 "gram.ypp" /* yacc.c:1906  */
+#line 256 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
-  if (!isVariableAlreadyInMap(&variablesMap, name)) {
+  if (!isVariableInMap(&variablesMap, name)) {
     currentMemoryIndex++;
     variablesMap[name] = currentMemoryIndex;
     initializedVariablesMap[name] = false;
@@ -1831,7 +1852,7 @@ void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
 }
 
 void declareAnArray(std::string name, int arraySize) {
-  if (!isVariableAlreadyInMap(&variablesMap, name)) {
+  if (!isVariableInMap(&variablesMap, name)) {
 
     currentMemoryIndex++;
     std::cout << "Declaring new array '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
@@ -1847,7 +1868,7 @@ void declareAnArray(std::string name, int arraySize) {
   }
 }
 
-bool isVariableAlreadyInMap(std::map<std::string, int> *mapToSearch, std::string name) {
+bool isVariableInMap(std::map<std::string, int> *mapToSearch, std::string name) {
 //  std::cout << "DEBUG" << "\n";
 
   if ( (*mapToSearch).find(name) == (*mapToSearch).end() ) {

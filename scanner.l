@@ -11,15 +11,23 @@ extern "C" int yylex();
 NUMBER        [0-9]+
 IDENTIFIER    [_a-z]+
 WHITESPACES   [ \t\r\n]+
+%x COMMENT
 
 %%
 
+"(" 	      { BEGIN(COMMENT);         }
+<COMMENT>")"  { BEGIN(INITIAL);      }
+<COMMENT>.    {                      }
+<COMMENT>"\n" {                      }
 
-{WHITESPACES} {  }
 
-"VAR"         {  return(VAR);        }
-"BEGIN"       {  return(BEG);        }
-"END"         {  return(END);        }
+<COMMENT><<EOF>> { printf("Error: unterminated comment\n"); yyterminate(); }
+
+{WHITESPACES} {                      }
+
+"VAR"         { return(VAR);         }
+"BEGIN"       { return(BEG);         }
+"END"         { return(END);         }
 
 "IF"          { return(IF);          }
 "THEN"        { return(THEN);        }
@@ -67,7 +75,7 @@ WHITESPACES   [ \t\r\n]+
 "["           { return(LEFT_BR);     }
 "]"           { return(RIGHT_BR);    }
 
-.             {printf(" x ");}
+.             {                      }
 %%
 
 int yywrap(void) {
