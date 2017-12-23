@@ -15,6 +15,7 @@ WHITESPACES   [ \t\r\n]+
 
 %%
 
+
 {WHITESPACES} {  }
 
 "VAR"         {

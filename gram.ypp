@@ -144,7 +144,6 @@ command      : identifier  ASSGN  expression SEM {
                   int variableAddress = variablesMap[variableName];
                   pushCodeWithAddress("STORE", variableAddress);
                 }
-
              }
              | IF  condition  THEN  commands  ELSE  commands  ENDIF
              | IF  condition  THEN  commands  ENDIF
@@ -159,7 +158,11 @@ command      : identifier  ASSGN  expression SEM {
              }
 ;
 expression   : value {
-
+                /*
+                if it's a number then load it directly to the accumulator
+                otherwise find an adress and THEN load it
+                */
+                pushCodeWithAddress("LOAD", 123);
               }
              | value ADD value {}
              | value SUB value {}
@@ -219,8 +222,6 @@ void declareAnArray(std::string name, int arraySize) {
     std::cout << " and ending at " << currentMemoryIndex << "\n";
   } else {
     std::cout << "Array " << name << " already defined!" << "\n";
-    //snprintf(errorMessage, ERROR_BUFFER, "Variable '%s' already defined.", name);
-    //yyerror(errorMessage);
   }
 }
 
@@ -256,15 +257,12 @@ void displayMap(std::map<std::string, int>* mapToDisplay) {
   }
 }
 
-
 void displayCommandVector(std::vector<std::string> *commands) {
   int vectorSize = commands->size();
 
   for (int i=0; i < vectorSize; i++) {
-    std::cout << commands->at(i) << " ";
+    std::cout << commands->at(i) << "\n";
   }
-  // for (std::vector<char>::const_iterator i = commands.begin(); i != commands.end(); ++i)
-  //   std::cout << *i << ' ';
 }
 
 /*===================================================*/

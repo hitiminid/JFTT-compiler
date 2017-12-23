@@ -164,10 +164,7 @@
 # define YYERROR_VERBOSE 0
 #endif
 
-/* In a future release of Bison, this section will be replaced
-   by #include "gram.tab.hpp".  */
-#ifndef YY_YY_GRAM_TAB_HPP_INCLUDED
-# define YY_YY_GRAM_TAB_HPP_INCLUDED
+
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -228,7 +225,7 @@ union YYSTYPE
     char* string;
     int   num;
 
-#line 232 "gram.tab.cpp" /* yacc.c:355  */
+#line 229 "gram.tab.cpp" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -239,11 +236,11 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_GRAM_TAB_HPP_INCLUDED  */
+
 
 /* Copy the second part of user declarations.  */
 
-#line 247 "gram.tab.cpp" /* yacc.c:358  */
+#line 244 "gram.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -545,9 +542,9 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyrline[] =
 {
        0,   119,   119,   119,   123,   127,   130,   134,   135,   138,
-     149,   150,   151,   152,   153,   154,   157,   161,   164,   165,
-     166,   167,   168,   170,   171,   172,   173,   174,   175,   177,
-     178,   180,   181,   182
+     148,   149,   150,   151,   152,   153,   156,   160,   167,   168,
+     169,   170,   171,   173,   174,   175,   176,   177,   178,   180,
+     181,   183,   184,   185
 };
 #endif
 
@@ -1388,7 +1385,7 @@ yyreduce:
         case 2:
 #line 119 "gram.ypp" /* yacc.c:1646  */
     {showAllocatedMemoryIndexes();}
-#line 1392 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1389 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
@@ -1396,7 +1393,7 @@ yyreduce:
     {
                   finish();
                 }
-#line 1400 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1397 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
@@ -1404,7 +1401,7 @@ yyreduce:
     {
                   declareAVariable((yyvsp[0].string));
                 }
-#line 1408 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1405 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
@@ -1412,7 +1409,7 @@ yyreduce:
     {
                   declareAnArray((yyvsp[-3].string), (yyvsp[-1].num));
                 }
-#line 1416 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1413 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
@@ -1420,19 +1417,19 @@ yyreduce:
     {
                   // std::cout << "No variables declared" << "\n";
                 }
-#line 1424 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1421 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
 #line 134 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1430 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1427 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
 #line 135 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1436 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1433 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
@@ -1446,67 +1443,70 @@ yyreduce:
                   int variableAddress = variablesMap[variableName];
                   pushCodeWithAddress("STORE", variableAddress);
                 }
-
              }
-#line 1452 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1448 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 154 "gram.ypp" /* yacc.c:1646  */
+#line 153 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1460 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1456 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 157 "gram.ypp" /* yacc.c:1646  */
+#line 156 "gram.ypp" /* yacc.c:1646  */
     {
 
              }
-#line 1468 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1464 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 161 "gram.ypp" /* yacc.c:1646  */
+#line 160 "gram.ypp" /* yacc.c:1646  */
     {
-
+                /*
+                if it's a number then load it directly to the accumulator
+                otherwise find an adress and THEN load it
+                */
+                pushCodeWithAddress("LOAD", 123);
               }
 #line 1476 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 164 "gram.ypp" /* yacc.c:1646  */
+#line 167 "gram.ypp" /* yacc.c:1646  */
     {}
 #line 1482 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 165 "gram.ypp" /* yacc.c:1646  */
+#line 168 "gram.ypp" /* yacc.c:1646  */
     {}
 #line 1488 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 166 "gram.ypp" /* yacc.c:1646  */
+#line 169 "gram.ypp" /* yacc.c:1646  */
     {}
 #line 1494 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 167 "gram.ypp" /* yacc.c:1646  */
+#line 170 "gram.ypp" /* yacc.c:1646  */
     {}
 #line 1500 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 168 "gram.ypp" /* yacc.c:1646  */
+#line 171 "gram.ypp" /* yacc.c:1646  */
     {}
 #line 1506 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 178 "gram.ypp" /* yacc.c:1646  */
+#line 181 "gram.ypp" /* yacc.c:1646  */
     {   }
 #line 1512 "gram.tab.cpp" /* yacc.c:1646  */
     break;
@@ -1740,7 +1740,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 184 "gram.ypp" /* yacc.c:1906  */
+#line 187 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
@@ -1779,8 +1779,6 @@ void declareAnArray(std::string name, int arraySize) {
     std::cout << " and ending at " << currentMemoryIndex << "\n";
   } else {
     std::cout << "Array " << name << " already defined!" << "\n";
-    //snprintf(errorMessage, ERROR_BUFFER, "Variable '%s' already defined.", name);
-    //yyerror(errorMessage);
   }
 }
 
@@ -1816,15 +1814,12 @@ void displayMap(std::map<std::string, int>* mapToDisplay) {
   }
 }
 
-
 void displayCommandVector(std::vector<std::string> *commands) {
   int vectorSize = commands->size();
 
   for (int i=0; i < vectorSize; i++) {
-    std::cout << commands->at(i) << " ";
+    std::cout << commands->at(i) << "\n";
   }
-  // for (std::vector<char>::const_iterator i = commands.begin(); i != commands.end(); ++i)
-  //   std::cout << *i << ' ';
 }
 
 /*===================================================*/
