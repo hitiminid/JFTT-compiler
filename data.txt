@@ -2,4 +2,7 @@ VAR
  a b c d
 BEGIN
  a := 5;
+ b := a;
+ WRITE a;
+ WRITE b;
 END
