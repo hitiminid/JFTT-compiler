@@ -5,8 +5,10 @@
   #include <cstdlib>
   #include <iostream>
 
+  #include <cstring>
   #include <string>
   #include <map>
+  #include <bitset>
   #include <vector>
   #include <stdio.h>
   #include <stdlib.h>
@@ -40,17 +42,22 @@
 	std::vector<std::string> commandsVector;
 
   /* declaredVariables */
-  /* (name :: string, adress :: int) */
-  /* (name :: string, pair of pointer and memory adress :: int) */
-  std::map<std::string, int> variablesMap;
+  /* <nazwa, adres w pamięci> */
+  std::map<std::string, int> variablesAddressesMap;
+
+  /*
+  tablice moge zapisywać jakoś w postaci
+  [nazwa_tablicy]::[numer_komorki]
+  */
+  std::map<std::string, std::string> variableValueMap;
 
   /* each initialized variable */
-  /* (name :: string, isInitialized :: boolean) */
+  // <nazwa, czy zainicjalizowane>
   std::map<std::string, bool> initializedVariablesMap;
 
   /* each array's size */
   /* if a variable is in here then it's an array - useful when determining type of a data*/
-  /* (name :: string, arraySize :: int) */
+  // <nazwa, rozmiar tablicy>
   std::map<std::string, int> arraysMap;
 
 
@@ -67,7 +74,7 @@
   void declareAnArray(std::string name, int arraySize);
 
   // function used for determining whether variable is declared
-  bool isVariableInMap(std::map<std::string, int> *mapToSearch, std::string name);
+  bool isVariableDeclared(std::map<std::string, int> *mapToSearch, std::string name);
 
   bool isVariableInitialized(std::map<std::string, bool>* initializedMap, std::string variableName);
 
@@ -82,7 +89,6 @@
 
   void pushCodeWithAddress(std::string opCode, int number);
   void pushCode(std::string opCode);
-
 
   void generateNumber(std::string);
 
@@ -122,8 +128,8 @@
 
 %%
 
-program         : VAR {showAllocatedMemoryIndexes();} vdeclarations BEG commands END {
-                  //finish();
+program         : VAR {/*showAllocatedMemoryIndexes();*/} vdeclarations BEG commands END {
+                  finish();
                 }
 
 vdeclarations   : vdeclarations  PID {
@@ -145,16 +151,14 @@ commands     : commands  command { }
 
 command      : identifier  ASSGN  expression SEM {
                 std::string variableName = $<string>1;
-
-                if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
+                if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                   std::cout << "Error [line "<< "]: Variable "<< $<string>1 <<" not declared!" << "\n";
                   exit(1);
                 } else { // variable is declared
                   // find an adress
-                  int variableAddress = variablesMap[variableName];
+                  int variableAddress = variablesAddressesMap[variableName];
                   // set as initialized
                   initializedVariablesMap[variableName] = true;
-                  //
                   pushCodeWithAddress("STORE", variableAddress);
                 }
              }
@@ -166,18 +170,21 @@ command      : identifier  ASSGN  expression SEM {
              | READ  identifier SEM {
                /*todo: doesn't work*/
                std::string variableName = $<string>2;
-               if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
+               if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                  std::cout << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared!" << "\n";
                  exit(1);
                } else {
-                 int variableAddress = variablesMap[variableName];
+                 int variableAddress = variablesAddressesMap[variableName];
                 //  pushCodeWithAddress("STORE", variableAddress);
+                 pushCode("ZERO");
                  pushCode("GET");
-                 if (isVariableInMap(&arraysMap, variableName)) {
+
+                 if (isVariableDeclared(&arraysMap, variableName)) {
                    std::cout << "I'm an array!" << "\n";
                  } else {
-                   int variableAddress = variablesMap[variableName];
-                   std::cout << "I'm a variable, with adress : "<< variableAddress <<"\n";
+                   int variableAddress = variablesAddressesMap[variableName];
+                   // std::cout << "I'm a variable, with adress : "<< variableAddress <<"\n";
+                   pushCodeWithAddress("STORE", variableAddress);
                  }
                }
              }
@@ -186,44 +193,38 @@ command      : identifier  ASSGN  expression SEM {
                std::cout << "hello my name is: " << variableName << "\n";
                displayInitializedMap(&initializedVariablesMap);
                //std::cout << "hello there\n";
+               pushCode("++++ WRITE START ++++");
 
-               if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
-                 std::cout << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared!" << "\n";
-                 exit(1);
-               } else { // at this point we know that variable is declared, what about being initialized?
-                 int variableAddress = variablesMap[variableName];
-
+               if (isVariableDeclared(&variablesAddressesMap, variableName)) {
+                 // at this point we know that variable is declared, what about being initialized?
+                 int variableAddress = variablesAddressesMap[variableName];
                  //std::cout << "hello there 2 \n";
                  std::cout << "checking if " << variableName << " is initialized\n";
-
-                 //if (!isVariableInMap(&initializedVariablesMap, variableName)) { //checking if it's initialized
+                 //if (!isVariableDeclared(&initializedVariablesMap, variableName)) { //checking if it's initialized
                  if (!isVariableInitialized(&initializedVariablesMap, variableName)) { //checking if it's initialized
-                  //checking whether value is initialized should be performed via checking whether it's true or false,
-                  //not whether it's in an array
                   std::cout << "Variable " << variableName << " not initialized\n";
-
                 } else {
                   std::cout << variableName << " is initialized\n"; //wrong message,
-
                   //  pushCodeWithAddress("STORE", variableAddress);
-                  if (isVariableInMap(&arraysMap, variableName)) {
+                  if (isVariableDeclared(&arraysMap, variableName)) {
                     std::cout << "I'm an array!" << "\n";
                     std::cout << "Yet not implemented\n";
 
                   } else {
                     // variable is declared and initialized
-
-
                     //todo: find a way to determine type
                     // if it's a number
                     // if it's a variable
-                    // int variableAddress = variablesMap[variableName];
+                    // int variableAddress = variablesAddressesMap[variableName];
                     pushCode("ZERO");
                     pushCodeWithAddress("LOAD", variableAddress);
                     pushCode("PUT");
                     // if it's an array
                   }
                 }
+               } else { //variable is not declared
+                 std::cout << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared!" << "\n";
+                 exit(1);
                }
              }
 ;
@@ -232,38 +233,42 @@ expression   : value {
                 if it's a number then load it directly to the accumulator
                 otherwise find an adress and THEN load it
                 */
-                //pushCodeWithAddress("LOAD", 123);
+                // pushCodeWithAddress("LOAD", 123);
               }
-             | value ADD value {}
-             | value SUB value {}
-             | value MUL value {}
-             | value DIV value {}
-             | value MOD value {}
+             | value ADD value { }
+             | value SUB value { }
+             | value MUL value { }
+             | value DIV value { }
+             | value MOD value { }
 ;
-condition    : value EQ value
-             | value NEQ value
-             | value LT  value
-             | value GT  value
-             | value LE  value
-             | value GE  value
+condition    : value EQ value  { }
+             | value NEQ value { }
+             | value LT  value { }
+             | value GT  value { }
+             | value LE  value { }
+             | value GE  value { }
 ;
 value        : num {
                 generateNumber($1);
              }
              | identifier {
                std::string variableName = $<string>1;
-               if (!isVariableInMap(&variablesMap, variableName)) {
+               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                  // not declared
                   std::cout << "variable " << variableName << " NOT \n";
                } else {
                  // variable is declared
-                 // if(!isVariableInMap(&initializedVariablesMap, variableName)) {
+                 // if(!isVariableDeclared(&initializedVariablesMap, variableName)) {
                  if(!isVariableInitialized(&initializedVariablesMap, variableName)) {
                   std::cout << "Variable " << variableName << " declared but not initialized\n";
                   exit(1);
                 } else {
                   // and initialized
-                  std::cout << "variable " << variableName << " YES \n";
+                  int variableAddress = variablesAddressesMap[variableName];
+                  std::cout << "variable '" << variableName << "' is declared and initialized\n";
+
+                  pushCode("ZERO");
+                  pushCodeWithAddress("LOAD", variableAddress);
                 }
                }
              }
@@ -275,11 +280,11 @@ identifier   : PID
 %%
 
 void declareAVariable(std::string name) {
-  if (!isVariableInMap(&variablesMap, name)) {
+  if (!isVariableDeclared(&variablesAddressesMap, name)) {
     currentMemoryIndex++;
-    variablesMap[name] = currentMemoryIndex;
+    variablesAddressesMap[name] = currentMemoryIndex;
     initializedVariablesMap[name] = false;
-    std::cout << "Declaring new variable: " << name << " with adress: " << currentMemoryIndex << "\n";
+    std::cout << "Declaring new variable: '" << name << "' with adress: " << currentMemoryIndex << "\n";
   } else {
     //throw an error
     std::cout << "Variable " << name << " already defined!" << "\n";
@@ -290,31 +295,27 @@ void declareAVariable(std::string name) {
 }
 
 void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
-  std::cout << "\nMAP START" << "\n";
   for(auto elem : *arraySizesMap) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
-  std::cout << "MAP END" << "\n";
 }
 
 void declareAnArray(std::string name, int arraySize) {
-  if (!isVariableInMap(&variablesMap, name)) {
+  if (!isVariableDeclared(&variablesAddressesMap, name)) {
 
     currentMemoryIndex++;
-    std::cout << "Declaring new array '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
-
-    variablesMap[name] = currentMemoryIndex; // the beggining of an array
+    std::cout << "Declaring new array     '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
+    variablesAddressesMap[name] = currentMemoryIndex; // the beggining of an array
     initializedVariablesMap[name] = true;
     arraysMap[name] = arraySize;
     currentMemoryIndex += arraySize - 1; //without the first one
-    displayArraySizesMap(&arraysMap);
     std::cout << " and ending at " << currentMemoryIndex << "\n";
   } else {
     std::cout << "Array " << name << " already defined!" << "\n";
   }
 }
 
-bool isVariableInMap(std::map<std::string, int> *mapToSearch, std::string name) {
+bool isVariableDeclared(std::map<std::string, int> *mapToSearch, std::string name) {
   if ( (*mapToSearch).find(name) == (*mapToSearch).end() ) {
     // not found
     return false;
@@ -332,9 +333,8 @@ void showAllocatedMemoryIndexes() {
 }
 
 void finish() {
-  std::cout << "number of variables + tokens = " << variablesMap.size() << "\n";
-  // displayMap(&variablesMap);
-
+  //std::cout << "number of variables + tokens = " << variablesAddressesMap.size() << "\n";
+  // displayMap(&variablesAddressesMap);
   pushCode("HALT");
   displayCommandVector(&commandsVector);
 }
@@ -351,10 +351,8 @@ void displayInitializedMap(std::map<std::string, bool>* map) {
   }
 }
 
-
 bool isVariableInitialized(std::map<std::string, bool>* initializedMap, std::string variableName) {
   // mozna w sumie przerobic
-
   if ( (*initializedMap).find(variableName) == (*initializedMap).end() ) { // not found
     return false;
   } else { // found
@@ -368,7 +366,6 @@ bool isVariableInitialized(std::map<std::string, bool>* initializedMap, std::str
 
 void displayCommandVector(std::vector<std::string> *commands) {
   int vectorSize = commands->size();
-
   for (int i=0; i < vectorSize; i++) {
     std::cout << commands->at(i) << "\n";
   }
@@ -389,9 +386,38 @@ void pushCodeWithAddress(std::string opCode, int number) {
 }
 
 void generateNumber(std::string number) {
-  std::string space = " ";
-  std::string whole = "GENERATING NUMBER:" + space + number;
-  commandsVector.push_back(whole);
+  /*  ZAPISANIE liczby W PAMIĘCI
+    1) wyzerowanie akumulatora
+    2) wygenerowanie liczby (w akumulatorze)
+    3) znalezenie komorki do ktorej mamy to zapisac - [x]
+    4) STORE [x]
+  */
+
+  /*
+  Dostajemy liczbę w postaci
+  */
+
+  int no = std::stoi(number);
+  std::cout << "DEC: " << no << "\n";
+  std::string bin = std::bitset<5>(no).to_string(); //to binary
+  // should i trim it?
+  //todo: trimming binary
+  std::cout<< bin <<"\n";
+  int limit = bin.length()-1;
+  int i;
+  pushCode("ZERO");
+
+  for(i = 0; i < limit; ++i) {
+    if(bin[i] == '1') {
+      pushCode("INC");
+    }
+  //
+    if(i < (limit - 1)) {
+      pushCode("SHL");
+    }
+  }
+
+
 }
 
 /*===================================================*/

@@ -70,8 +70,10 @@
   #include <cstdlib>
   #include <iostream>
 
+  #include <cstring>
   #include <string>
   #include <map>
+  #include <bitset>
   #include <vector>
   #include <stdio.h>
   #include <stdlib.h>
@@ -105,17 +107,22 @@
 	std::vector<std::string> commandsVector;
 
   /* declaredVariables */
-  /* (name :: string, adress :: int) */
-  /* (name :: string, pair of pointer and memory adress :: int) */
-  std::map<std::string, int> variablesMap;
+  /* <nazwa, adres w pamięci> */
+  std::map<std::string, int> variablesAddressesMap;
+
+  /*
+  tablice moge zapisywać jakoś w postaci
+  [nazwa_tablicy]::[numer_komorki]
+  */
+  std::map<std::string, std::string> variableValueMap;
 
   /* each initialized variable */
-  /* (name :: string, isInitialized :: boolean) */
+  // <nazwa, czy zainicjalizowane>
   std::map<std::string, bool> initializedVariablesMap;
 
   /* each array's size */
   /* if a variable is in here then it's an array - useful when determining type of a data*/
-  /* (name :: string, arraySize :: int) */
+  // <nazwa, rozmiar tablicy>
   std::map<std::string, int> arraysMap;
 
 
@@ -132,7 +139,7 @@
   void declareAnArray(std::string name, int arraySize);
 
   // function used for determining whether variable is declared
-  bool isVariableInMap(std::map<std::string, int> *mapToSearch, std::string name);
+  bool isVariableDeclared(std::map<std::string, int> *mapToSearch, std::string name);
 
   bool isVariableInitialized(std::map<std::string, bool>* initializedMap, std::string variableName);
 
@@ -148,11 +155,10 @@
   void pushCodeWithAddress(std::string opCode, int number);
   void pushCode(std::string opCode);
 
-
   void generateNumber(std::string);
 
 
-#line 156 "gram.tab.cpp" /* yacc.c:339  */
+#line 162 "gram.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -229,12 +235,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 91 "gram.ypp" /* yacc.c:355  */
+#line 97 "gram.ypp" /* yacc.c:355  */
 
     char* string;
     int   num;
 
-#line 238 "gram.tab.cpp" /* yacc.c:355  */
+#line 244 "gram.tab.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -251,7 +257,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 255 "gram.tab.cpp" /* yacc.c:358  */
+#line 261 "gram.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -552,10 +558,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   125,   125,   125,   129,   133,   137,   142,   143,   146,
-     161,   162,   163,   164,   165,   166,   184,   230,   237,   238,
-     239,   240,   241,   243,   244,   245,   246,   247,   248,   250,
-     253,   271,   272,   273
+       0,   131,   131,   131,   135,   139,   143,   148,   149,   152,
+     165,   166,   167,   168,   169,   170,   191,   231,   238,   239,
+     240,   241,   242,   244,   245,   246,   247,   248,   249,   251,
+     254,   276,   277,   278
 };
 #endif
 
@@ -1394,229 +1400,264 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 125 "gram.ypp" /* yacc.c:1646  */
-    {showAllocatedMemoryIndexes();}
-#line 1400 "gram.tab.cpp" /* yacc.c:1646  */
+#line 131 "gram.ypp" /* yacc.c:1646  */
+    {/*showAllocatedMemoryIndexes();*/}
+#line 1406 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 125 "gram.ypp" /* yacc.c:1646  */
+#line 131 "gram.ypp" /* yacc.c:1646  */
     {
-                  //finish();
+                  finish();
                 }
-#line 1408 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1414 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 129 "gram.ypp" /* yacc.c:1646  */
+#line 135 "gram.ypp" /* yacc.c:1646  */
     {
                   declareAVariable((yyvsp[0].string));
                 }
-#line 1416 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1422 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 133 "gram.ypp" /* yacc.c:1646  */
+#line 139 "gram.ypp" /* yacc.c:1646  */
     {
                   int arraySize = atoi((yyvsp[-1].string));
                   declareAnArray((yyvsp[-3].string), arraySize);
                 }
-#line 1425 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1431 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 137 "gram.ypp" /* yacc.c:1646  */
+#line 143 "gram.ypp" /* yacc.c:1646  */
     {
                   // std::cout << "No variables declared" << "\n";
                 }
-#line 1433 "gram.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 7:
-#line 142 "gram.ypp" /* yacc.c:1646  */
-    { }
 #line 1439 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 8:
-#line 143 "gram.ypp" /* yacc.c:1646  */
+  case 7:
+#line 148 "gram.ypp" /* yacc.c:1646  */
     { }
 #line 1445 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
+  case 8:
+#line 149 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1451 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
   case 9:
-#line 146 "gram.ypp" /* yacc.c:1646  */
+#line 152 "gram.ypp" /* yacc.c:1646  */
     {
                 std::string variableName = (yyvsp[-3].string);
-
-                if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
+                if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                   std::cout << "Error [line "<< "]: Variable "<< (yyvsp[-3].string) <<" not declared!" << "\n";
                   exit(1);
                 } else { // variable is declared
                   // find an adress
-                  int variableAddress = variablesMap[variableName];
+                  int variableAddress = variablesAddressesMap[variableName];
                   // set as initialized
                   initializedVariablesMap[variableName] = true;
-                  //
                   pushCodeWithAddress("STORE", variableAddress);
                 }
              }
-#line 1465 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1469 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 161 "gram.ypp" /* yacc.c:1646  */
+#line 165 "gram.ypp" /* yacc.c:1646  */
     {}
-#line 1471 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1475 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 166 "gram.ypp" /* yacc.c:1646  */
+#line 170 "gram.ypp" /* yacc.c:1646  */
     {
                /*todo: doesn't work*/
                std::string variableName = (yyvsp[-1].string);
-               if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
+               if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                  std::cout << "Error [line "<< "]: Variable "<< (yyvsp[-1].string) <<" not declared!" << "\n";
                  exit(1);
                } else {
-                 int variableAddress = variablesMap[variableName];
+                 int variableAddress = variablesAddressesMap[variableName];
                 //  pushCodeWithAddress("STORE", variableAddress);
+                 pushCode("ZERO");
                  pushCode("GET");
-                 if (isVariableInMap(&arraysMap, variableName)) {
+
+                 if (isVariableDeclared(&arraysMap, variableName)) {
                    std::cout << "I'm an array!" << "\n";
                  } else {
-                   int variableAddress = variablesMap[variableName];
+                   int variableAddress = variablesAddressesMap[variableName];
                    std::cout << "I'm a variable, with adress : "<< variableAddress <<"\n";
+                   pushCodeWithAddress("STORE", variableAddress);
                  }
                }
              }
-#line 1494 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1501 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 184 "gram.ypp" /* yacc.c:1646  */
+#line 191 "gram.ypp" /* yacc.c:1646  */
     {
                std::string variableName = (yyvsp[-1].string);
                std::cout << "hello my name is: " << variableName << "\n";
                displayInitializedMap(&initializedVariablesMap);
                //std::cout << "hello there\n";
+               pushCode("++++ WRITE START ++++");
 
-               if (!isVariableInMap(&variablesMap, variableName)) { //variable is not declared
-                 std::cout << "Error [line "<< "]: Variable "<< (yyvsp[-1].string) <<" not declared!" << "\n";
-                 exit(1);
-               } else { // at this point we know that variable is declared, what about being initialized?
-                 int variableAddress = variablesMap[variableName];
-
+               if (isVariableDeclared(&variablesAddressesMap, variableName)) {
+                 // at this point we know that variable is declared, what about being initialized?
+                 int variableAddress = variablesAddressesMap[variableName];
                  //std::cout << "hello there 2 \n";
                  std::cout << "checking if " << variableName << " is initialized\n";
-
-                 //if (!isVariableInMap(&initializedVariablesMap, variableName)) { //checking if it's initialized
+                 //if (!isVariableDeclared(&initializedVariablesMap, variableName)) { //checking if it's initialized
                  if (!isVariableInitialized(&initializedVariablesMap, variableName)) { //checking if it's initialized
-                  //checking whether value is initialized should be performed via checking whether it's true or false,
-                  //not whether it's in an array
                   std::cout << "Variable " << variableName << " not initialized\n";
-
                 } else {
                   std::cout << variableName << " is initialized\n"; //wrong message,
-
                   //  pushCodeWithAddress("STORE", variableAddress);
-                  if (isVariableInMap(&arraysMap, variableName)) {
+                  if (isVariableDeclared(&arraysMap, variableName)) {
                     std::cout << "I'm an array!" << "\n";
                     std::cout << "Yet not implemented\n";
 
                   } else {
                     // variable is declared and initialized
-
-
                     //todo: find a way to determine type
                     // if it's a number
                     // if it's a variable
-                    // int variableAddress = variablesMap[variableName];
+                    // int variableAddress = variablesAddressesMap[variableName];
                     pushCode("ZERO");
                     pushCodeWithAddress("LOAD", variableAddress);
                     pushCode("PUT");
                     // if it's an array
                   }
                 }
+               } else { //variable is not declared
+                 std::cout << "Error [line "<< "]: Variable "<< (yyvsp[-1].string) <<" not declared!" << "\n";
+                 exit(1);
                }
              }
-#line 1544 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1545 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 230 "gram.ypp" /* yacc.c:1646  */
+#line 231 "gram.ypp" /* yacc.c:1646  */
     {
                 /*
                 if it's a number then load it directly to the accumulator
                 otherwise find an adress and THEN load it
                 */
-                //pushCodeWithAddress("LOAD", 123);
+                // pushCodeWithAddress("LOAD", 123);
               }
-#line 1556 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1557 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 237 "gram.ypp" /* yacc.c:1646  */
-    {}
-#line 1562 "gram.tab.cpp" /* yacc.c:1646  */
+#line 238 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1563 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 238 "gram.ypp" /* yacc.c:1646  */
-    {}
-#line 1568 "gram.tab.cpp" /* yacc.c:1646  */
+#line 239 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1569 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 239 "gram.ypp" /* yacc.c:1646  */
-    {}
-#line 1574 "gram.tab.cpp" /* yacc.c:1646  */
+#line 240 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1575 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 240 "gram.ypp" /* yacc.c:1646  */
-    {}
-#line 1580 "gram.tab.cpp" /* yacc.c:1646  */
+#line 241 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1581 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 241 "gram.ypp" /* yacc.c:1646  */
-    {}
-#line 1586 "gram.tab.cpp" /* yacc.c:1646  */
+#line 242 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1587 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 23:
+#line 244 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1593 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 245 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1599 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 246 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1605 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 26:
+#line 247 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1611 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 248 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1617 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 28:
+#line 249 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1623 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 250 "gram.ypp" /* yacc.c:1646  */
+#line 251 "gram.ypp" /* yacc.c:1646  */
     {
                 generateNumber((yyvsp[0].string));
              }
-#line 1594 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1631 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 253 "gram.ypp" /* yacc.c:1646  */
+#line 254 "gram.ypp" /* yacc.c:1646  */
     {
                std::string variableName = (yyvsp[0].string);
-               if (!isVariableInMap(&variablesMap, variableName)) {
+               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                  // not declared
                   std::cout << "variable " << variableName << " NOT \n";
                } else {
                  // variable is declared
-                 // if(!isVariableInMap(&initializedVariablesMap, variableName)) {
+                 // if(!isVariableDeclared(&initializedVariablesMap, variableName)) {
                  if(!isVariableInitialized(&initializedVariablesMap, variableName)) {
                   std::cout << "Variable " << variableName << " declared but not initialized\n";
                   exit(1);
                 } else {
                   // and initialized
-                  std::cout << "variable " << variableName << " YES \n";
+                  int variableAddress = variablesAddressesMap[variableName];
+                  std::cout << "variable '" << variableName << "' is declared and initialized\n";
+
+                  pushCode("ZERO");
+                  pushCodeWithAddress("LOAD", variableAddress);
                 }
                }
              }
-#line 1616 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1657 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1620 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1661 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1844,15 +1885,15 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 275 "gram.ypp" /* yacc.c:1906  */
+#line 280 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
-  if (!isVariableInMap(&variablesMap, name)) {
+  if (!isVariableDeclared(&variablesAddressesMap, name)) {
     currentMemoryIndex++;
-    variablesMap[name] = currentMemoryIndex;
+    variablesAddressesMap[name] = currentMemoryIndex;
     initializedVariablesMap[name] = false;
-    std::cout << "Declaring new variable: " << name << " with adress: " << currentMemoryIndex << "\n";
+    std::cout << "Declaring new variable: '" << name << "' with adress: " << currentMemoryIndex << "\n";
   } else {
     //throw an error
     std::cout << "Variable " << name << " already defined!" << "\n";
@@ -1863,31 +1904,27 @@ void declareAVariable(std::string name) {
 }
 
 void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
-  std::cout << "\nMAP START" << "\n";
   for(auto elem : *arraySizesMap) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
-  std::cout << "MAP END" << "\n";
 }
 
 void declareAnArray(std::string name, int arraySize) {
-  if (!isVariableInMap(&variablesMap, name)) {
+  if (!isVariableDeclared(&variablesAddressesMap, name)) {
 
     currentMemoryIndex++;
-    std::cout << "Declaring new array '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
-
-    variablesMap[name] = currentMemoryIndex; // the beggining of an array
+    std::cout << "Declaring new array     '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
+    variablesAddressesMap[name] = currentMemoryIndex; // the beggining of an array
     initializedVariablesMap[name] = true;
     arraysMap[name] = arraySize;
     currentMemoryIndex += arraySize - 1; //without the first one
-    displayArraySizesMap(&arraysMap);
     std::cout << " and ending at " << currentMemoryIndex << "\n";
   } else {
     std::cout << "Array " << name << " already defined!" << "\n";
   }
 }
 
-bool isVariableInMap(std::map<std::string, int> *mapToSearch, std::string name) {
+bool isVariableDeclared(std::map<std::string, int> *mapToSearch, std::string name) {
   if ( (*mapToSearch).find(name) == (*mapToSearch).end() ) {
     // not found
     return false;
@@ -1905,9 +1942,8 @@ void showAllocatedMemoryIndexes() {
 }
 
 void finish() {
-  std::cout << "number of variables + tokens = " << variablesMap.size() << "\n";
-  // displayMap(&variablesMap);
-
+  //std::cout << "number of variables + tokens = " << variablesAddressesMap.size() << "\n";
+  // displayMap(&variablesAddressesMap);
   pushCode("HALT");
   displayCommandVector(&commandsVector);
 }
@@ -1924,10 +1960,8 @@ void displayInitializedMap(std::map<std::string, bool>* map) {
   }
 }
 
-
 bool isVariableInitialized(std::map<std::string, bool>* initializedMap, std::string variableName) {
   // mozna w sumie przerobic
-
   if ( (*initializedMap).find(variableName) == (*initializedMap).end() ) { // not found
     return false;
   } else { // found
@@ -1937,12 +1971,10 @@ bool isVariableInitialized(std::map<std::string, bool>* initializedMap, std::str
       return false;
     }
   }
-
 }
 
 void displayCommandVector(std::vector<std::string> *commands) {
   int vectorSize = commands->size();
-
   for (int i=0; i < vectorSize; i++) {
     std::cout << commands->at(i) << "\n";
   }
@@ -1963,9 +1995,38 @@ void pushCodeWithAddress(std::string opCode, int number) {
 }
 
 void generateNumber(std::string number) {
-  std::string space = " ";
-  std::string whole = "GENERATING NUMBER:" + space + number;
-  commandsVector.push_back(whole);
+  /*  ZAPISANIE liczby W PAMIĘCI
+    1) wyzerowanie akumulatora
+    2) wygenerowanie liczby (w akumulatorze)
+    3) znalezenie komorki do ktorej mamy to zapisac - [x]
+    4) STORE [x]
+  */
+
+  /*
+  Dostajemy liczbę w postaci
+  */
+
+  int no = std::stoi(number);
+  std::cout << "DEC: " << no << "\n";
+  std::string bin = std::bitset<5>(no).to_string(); //to binary
+  // should i trim it?
+  //todo: trimming binary
+  std::cout<< bin <<"\n";
+  int limit = bin.length()-1;
+  int i;
+  pushCode("ZERO");
+
+  for(i = 0; i < limit; ++i) {
+    if(bin[i] == '1') {
+      pushCode("INC");
+    }
+  //
+    if(i < (limit - 1)) {
+      pushCode("SHL");
+    }
+  }
+
+
 }
 
 /*===================================================*/

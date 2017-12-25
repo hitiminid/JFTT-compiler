@@ -1,8 +1,7 @@
 VAR
- a b c d
+ a b c[10] d
 BEGIN
- a := 5;
- b := a;
- WRITE a;
- WRITE b;
+ READ a;
+ READ b;
+ READ d;
 END
