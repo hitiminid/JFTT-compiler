@@ -1,4 +1,17 @@
 %{
+
+  /* ========================================= */
+  /*               NOTATKI                     */
+  /* ========================================= */
+  /*
+    czy powinienem wyliczać offset raz czy na żądanie?
+
+
+
+    [ ] inicjalizowanie tablic
+  */
+
+
   // code
   // #include <stdio.h>
   // #include <stdlib.h>
@@ -34,7 +47,11 @@
   /*===================================================*/
 
 
+
+  bool isDebugOn = false;
+
   int accumulator;
+  int currentArrayIndex;
   char errorMessage[ERROR_BUFFER];
 
 
@@ -91,6 +108,7 @@
   void pushCode(std::string opCode);
 
   void generateNumber(std::string);
+  int computeRequiredMemoryCell(std::string variableName, int currentArrayIndex);
 
 %}
 
@@ -180,45 +198,47 @@ command      : identifier  ASSGN  expression SEM {
                  pushCode("GET");
 
                  if (isVariableDeclared(&arraysMap, variableName)) {
-                   std::cout << "I'm an array!" << "\n";
+                   if (isDebugOn) {
+                     std::cout << "I'm an array!" << "\n";
+                     std::cout << "Yet not implemented\n"<< currentArrayIndex;
+                   }
+                   int requiredCell = computeRequiredMemoryCell(variableName, currentArrayIndex);
+                   //is variable initialized
+                   pushCodeWithAddress("STORE", requiredCell);
                  } else {
                    int variableAddress = variablesAddressesMap[variableName];
                    // std::cout << "I'm a variable, with adress : "<< variableAddress <<"\n";
                    pushCodeWithAddress("STORE", variableAddress);
+                   initializedVariablesMap[variableName] = true; // just in case we set it as initialized
                  }
                }
              }
              | WRITE value SEM {
                std::string variableName = $<string>2;
-               std::cout << "hello my name is: " << variableName << "\n";
-               displayInitializedMap(&initializedVariablesMap);
-               //std::cout << "hello there\n";
-               pushCode("++++ WRITE START ++++");
 
                if (isVariableDeclared(&variablesAddressesMap, variableName)) {
                  // at this point we know that variable is declared, what about being initialized?
                  int variableAddress = variablesAddressesMap[variableName];
-                 //std::cout << "hello there 2 \n";
-                 std::cout << "checking if " << variableName << " is initialized\n";
-                 //if (!isVariableDeclared(&initializedVariablesMap, variableName)) { //checking if it's initialized
+                 //std::cout << "checking if " << variableName << " is initialized\n";
                  if (!isVariableInitialized(&initializedVariablesMap, variableName)) { //checking if it's initialized
                   std::cout << "Variable " << variableName << " not initialized\n";
+                  exit(1);
                 } else {
-                  std::cout << variableName << " is initialized\n"; //wrong message,
-                  //  pushCodeWithAddress("STORE", variableAddress);
-                  if (isVariableDeclared(&arraysMap, variableName)) {
-                    std::cout << "I'm an array!" << "\n";
-                    std::cout << "Yet not implemented\n";
+                  //std::cout << variableName << " is initialized\n"; //wrong message,
+                   // pushCodeWithAddress("STORE", variableAddress);
+                  if (isVariableDeclared(&arraysMap, variableName)) { // is it an array?
+                    if (isDebugOn) {
+                      std::cout << "I'm an array!" << "\n";
+                      std::cout << "Yet not implemented\n"<< currentArrayIndex;
+                      std::cout  << "\n";
+                    }
+
 
                   } else {
-                    // variable is declared and initialized
-                    //todo: find a way to determine type
-                    // if it's a number
-                    // if it's a variable
-                    // int variableAddress = variablesAddressesMap[variableName];
                     pushCode("ZERO");
                     pushCodeWithAddress("LOAD", variableAddress);
                     pushCode("PUT");
+                    pushCode("###");
                     // if it's an array
                   }
                 }
@@ -235,7 +255,11 @@ expression   : value {
                 */
                 // pushCodeWithAddress("LOAD", 123);
               }
-             | value ADD value { }
+             | value ADD value {
+
+
+
+             }
              | value SUB value { }
              | value MUL value { }
              | value DIV value { }
@@ -258,24 +282,39 @@ value        : num {
                   std::cout << "variable " << variableName << " NOT \n";
                } else {
                  // variable is declared
-                 // if(!isVariableDeclared(&initializedVariablesMap, variableName)) {
                  if(!isVariableInitialized(&initializedVariablesMap, variableName)) {
                   std::cout << "Variable " << variableName << " declared but not initialized\n";
                   exit(1);
                 } else {
                   // and initialized
-                  int variableAddress = variablesAddressesMap[variableName];
-                  std::cout << "variable '" << variableName << "' is declared and initialized\n";
-
-                  pushCode("ZERO");
-                  pushCodeWithAddress("LOAD", variableAddress);
+                  // int variableAddress = variablesAddressesMap[variableName];
+                  // std::cout << "variable '" << variableName << "' is declared and initialized\n";
+                  // pushCode("ZERO");
+                  //pushCodeWithAddress("LOAD [] ", variableAddress);
                 }
                }
              }
 ;
 identifier   : PID
-             | PID LEFT_BR PID RIGHT_BR
-             | PID LEFT_BR num RIGHT_BR
+             | PID LEFT_BR PID RIGHT_BR {
+
+               /* yet to be implemented */
+              /*
+              // znalezc nazwe zmiennej
+              // jej wartosc
+
+              std::string variableName = $3;
+              currentArrayIndex = toDecimal(variableValueMap[variableName]);
+              */
+             }
+             | PID LEFT_BR num RIGHT_BR {
+              currentArrayIndex = atoi($3);
+              /*
+              moze tutaj od razu obliczać offset?????
+
+              */
+              // pushCodeWithAddress("Current", currentArrayIndex);
+             }
 ;
 %%
 
@@ -284,7 +323,7 @@ void declareAVariable(std::string name) {
     currentMemoryIndex++;
     variablesAddressesMap[name] = currentMemoryIndex;
     initializedVariablesMap[name] = false;
-    std::cout << "Declaring new variable: '" << name << "' with adress: " << currentMemoryIndex << "\n";
+    // std::cout << "Declaring new variable: '" << name << "' with adress: " << currentMemoryIndex << "\n";
   } else {
     //throw an error
     std::cout << "Variable " << name << " already defined!" << "\n";
@@ -304,12 +343,16 @@ void declareAnArray(std::string name, int arraySize) {
   if (!isVariableDeclared(&variablesAddressesMap, name)) {
 
     currentMemoryIndex++;
-    std::cout << "Declaring new array     '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
+    if (isDebugOn) {
+      std::cout << "Declaring new array     '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
+    }
     variablesAddressesMap[name] = currentMemoryIndex; // the beggining of an array
     initializedVariablesMap[name] = true;
     arraysMap[name] = arraySize;
     currentMemoryIndex += arraySize - 1; //without the first one
-    std::cout << " and ending at " << currentMemoryIndex << "\n";
+    if (isDebugOn) {
+      std::cout << " and ending at " << currentMemoryIndex << "\n";
+    }
   } else {
     std::cout << "Array " << name << " already defined!" << "\n";
   }
@@ -416,8 +459,16 @@ void generateNumber(std::string number) {
       pushCode("SHL");
     }
   }
+}
 
+int computeRequiredMemoryCell(std::string variableName, int currentArrayIndex) {
 
+  int startingIndex = variablesAddressesMap[variableName];
+  int searchedIndex = startingIndex + currentArrayIndex;
+  if (isDebugOn) {
+    std::cout << "We start at index " << startingIndex << " looking for index " << searchedIndex << "\n";
+  }
+  return searchedIndex;
 }
 
 /*===================================================*/
