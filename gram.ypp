@@ -55,6 +55,14 @@
   char errorMessage[ERROR_BUFFER];
 
 
+  std::string valueFormat1;
+  std::string valueFormat2;
+  std::string expressionType[2];
+  std::string expressionType2[2];
+
+
+
+
   /*vector containing commands*/
 	std::vector<std::string> commandsVector;
 
@@ -109,6 +117,8 @@
 
   void generateNumber(std::string);
   int computeRequiredMemoryCell(std::string variableName, int currentArrayIndex);
+
+  std::string determineDataType(std::string, std::string);
 
 %}
 
@@ -254,8 +264,30 @@ expression   : value {
                 otherwise find an adress and THEN load it
                 */
                 // pushCodeWithAddress("LOAD", 123);
+                valueFormat1 = "number";
+                valueFormat2 = "number";
               }
-             | value ADD value {
+             | value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+             }
+             ADD value {
+
+              std::string variableTypes[4];
+              variableTypes[0] = expressionType[0];
+              variableTypes[1] = expressionType2[0];
+              variableTypes[2] = valueFormat1;
+              variableTypes[3] = valueFormat2;
+
+              std::string types[2];
+              types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+              types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+              if (types[0] == "number" && types[1] == "number") {
+                std::cout << "both are numbers\n";
+              } else if (types[0] == "array" && types[1] == "array") {
+                std::cout << "both are arrays\n";
+              }
 
 
 
@@ -265,7 +297,7 @@ expression   : value {
              | value DIV value { }
              | value MOD value { }
 ;
-condition    : value EQ value  { }
+condition    : value EQ  value { }
              | value NEQ value { }
              | value LT  value { }
              | value GT  value { }
@@ -274,12 +306,15 @@ condition    : value EQ value  { }
 ;
 value        : num {
                 generateNumber($1);
+                valueFormat1 = "number";
+                valueFormat2 = "number";
              }
              | identifier {
                std::string variableName = $<string>1;
                if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                  // not declared
-                  std::cout << "variable " << variableName << " NOT \n";
+                  std::cout << "variable " << variableName << " is not declared! \n";
+                  exit(1);
                } else {
                  // variable is declared
                  if(!isVariableInitialized(&initializedVariablesMap, variableName)) {
@@ -295,7 +330,10 @@ value        : num {
                }
              }
 ;
-identifier   : PID
+identifier   : PID {
+              valueFormat1 = "variable";
+              valueFormat2 = "variable";
+            }
              | PID LEFT_BR PID RIGHT_BR {
 
                /* yet to be implemented */
@@ -306,7 +344,10 @@ identifier   : PID
               std::string variableName = $3;
               currentArrayIndex = toDecimal(variableValueMap[variableName]);
               */
-             }
+
+              valueFormat1 = "array";
+              valueFormat2 = "array";
+           }
              | PID LEFT_BR num RIGHT_BR {
               currentArrayIndex = atoi($3);
               /*
@@ -314,6 +355,9 @@ identifier   : PID
 
               */
               // pushCodeWithAddress("Current", currentArrayIndex);
+
+              valueFormat1 = "number";
+              valueFormat2 = "array";
              }
 ;
 %%
@@ -355,6 +399,7 @@ void declareAnArray(std::string name, int arraySize) {
     }
   } else {
     std::cout << "Array " << name << " already defined!" << "\n";
+    exit(1);
   }
 }
 
@@ -460,6 +505,19 @@ void generateNumber(std::string number) {
     }
   }
 }
+
+std::string determineDataType(std::string a, std::string b) {
+  if (a == "number" && b == "number") {
+    return "number";
+  } else if(a == "variable" && b == "variable") {
+    return "variable";
+  } else if(a == "array" && b == "array") {
+    return "array";
+  } else {
+    return "arrayVar"; //array with a variable
+  }
+}
+
 
 int computeRequiredMemoryCell(std::string variableName, int currentArrayIndex) {
 
