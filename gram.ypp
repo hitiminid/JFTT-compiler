@@ -5,10 +5,7 @@
   /* ========================================= */
   /*
     czy powinienem wyliczać offset raz czy na żądanie?
-
-
-
-    [ ] inicjalizowanie tablic
+    [ ] inicjalizowanie tablic     ----> a := c nie wywala bledu
   */
 
 
@@ -59,9 +56,6 @@
   std::string valueFormat2;
   std::string expressionType[2];
   std::string expressionType2[2];
-
-
-
 
   /*vector containing commands*/
 	std::vector<std::string> commandsVector;
@@ -264,12 +258,11 @@ expression   : value {
                 otherwise find an adress and THEN load it
                 */
                 // pushCodeWithAddress("LOAD", 123);
-                valueFormat1 = "number";
-                valueFormat2 = "number";
               }
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
+               pushCodeWithAddress("STORE", 0);
              }
              ADD value {
 
@@ -283,13 +276,17 @@ expression   : value {
               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
+
+
               if (types[0] == "number" && types[1] == "number") {
                 std::cout << "both are numbers\n";
+
+                pushCode("ADD");
+
+
               } else if (types[0] == "array" && types[1] == "array") {
                 std::cout << "both are arrays\n";
               }
-
-
 
              }
              | value SUB value { }
@@ -335,7 +332,6 @@ identifier   : PID {
               valueFormat2 = "variable";
             }
              | PID LEFT_BR PID RIGHT_BR {
-
                /* yet to be implemented */
               /*
               // znalezc nazwe zmiennej
@@ -350,11 +346,12 @@ identifier   : PID {
            }
              | PID LEFT_BR num RIGHT_BR {
               currentArrayIndex = atoi($3);
-              /*
-              moze tutaj od razu obliczać offset?????
 
-              */
-              // pushCodeWithAddress("Current", currentArrayIndex);
+              std::cout << "starting index " << variablesAddressesMap[$1] << "\n";
+
+              int searchedIndex = variablesAddressesMap[$1] + currentArrayIndex;
+
+              std::cout << "looking for index " << searchedIndex << "\n";
 
               valueFormat1 = "number";
               valueFormat2 = "array";
@@ -481,27 +478,57 @@ void generateNumber(std::string number) {
     4) STORE [x]
   */
 
-  /*
-  Dostajemy liczbę w postaci
-  */
-
-  int no = std::stoi(number);
-  std::cout << "DEC: " << no << "\n";
-  std::string bin = std::bitset<5>(no).to_string(); //to binary
-  // should i trim it?
-  //todo: trimming binary
-  std::cout<< bin <<"\n";
-  int limit = bin.length()-1;
-  int i;
-  pushCode("ZERO");
-
-  for(i = 0; i < limit; ++i) {
-    if(bin[i] == '1') {
-      pushCode("INC");
-    }
+  // int no = std::stoi(number);
+  // std::cout << "DEC: " << no << "\n";
+  // std::string bin = std::bitset<5>(no).to_string(); //to binary
+  // // should i trim it?
+  // //todo: trimming binary
+  // std::cout<< bin <<"\n";
+  // int limit = bin.length()-1;
+  // int i;
+  // pushCode("ZERO");
   //
-    if(i < (limit - 1)) {
+  // for(i = 0; i < limit; ++i) {
+  //   if(bin[i] == '1') {
+  //     pushCode("INC");
+  //   }
+  // //
+  //   if(i < (limit - 1)) {
+  //     pushCode("SHL");
+  //   }
+  // }
+
+  // convert to binary
+
+  std::vector<int> binaryRepresentationStack;
+  long long decimalNumber2 = std::stoi(number);
+  long long decimalNumber = std::stoi(number);
+
+  while(decimalNumber > 0) {
+    if (decimalNumber % 2 == 0) {
+      binaryRepresentationStack.insert(binaryRepresentationStack.begin(),0);
+    } else {
+      binaryRepresentationStack.insert(binaryRepresentationStack.begin(),1);
+    }
+    decimalNumber = decimalNumber / 2;
+  }
+
+  int k = 0;
+  std::cout << decimalNumber2 << "xx\n";
+  pushCode("####");
+  pushCodeWithAddress("NUMBER", decimalNumber2);
+  pushCode("ZERO");
+  for(std::vector<int>::iterator it = binaryRepresentationStack.end(); it != binaryRepresentationStack.begin(); --it) {
+      /* std::cout << *it; ... */
+    int currentNumber = (*it);
+    if (k == 0) {
+      pushCode("INC");
+      k++;
+    } else if (currentNumber == 0) {
       pushCode("SHL");
+    } else if (currentNumber == 1) {
+      pushCode("SHL");
+      pushCode("INC");
     }
   }
 }
