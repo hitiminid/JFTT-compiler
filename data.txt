@@ -2,10 +2,5 @@ VAR
   a b c d
 BEGIN
   a := 10;
-  b := 5;
-  c := 6;
-  d := 1;
-  d := 12;
-  d := 3;
-  d := 14;
+  b := a + a;
 END

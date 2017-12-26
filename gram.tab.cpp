@@ -2135,7 +2135,6 @@ void generateNumber(std::string number) {
   // convert to binary
 
   std::vector<int> binaryRepresentationStack;
-  std::cout << number << " DDDD";
   long long decimalNumber2 = std::stoi(number);
   long long decimalNumber = std::stoi(number);
 
@@ -2151,7 +2150,7 @@ void generateNumber(std::string number) {
   int k = 0;
   std::cout << decimalNumber2 << "xx\n";
   pushCode("####");
-  pushCodeWithAddress("NUMBER", decimalNumber2);
+  // pushCodeWithAddress("NUMBER", decimalNumber2);
   pushCode("ZERO");
   for(std::vector<int>::iterator it = binaryRepresentationStack.end(); it != binaryRepresentationStack.begin(); --it) {
       /* std::cout << *it; ... */
