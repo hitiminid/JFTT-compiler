@@ -1,0 +1,9 @@
+./parse < data.txt
+ZERO
+INC
+STORE 0
+ZERO
+INC
+ADD 0
+STORE 10
+HALT

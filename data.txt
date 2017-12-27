@@ -1,8 +1,7 @@
 VAR
-  a b[2] c d
+  a b c d
 BEGIN
-  d := 5;
-  d := 10;
-  d := 7;
-  d := 0;
+  a := 3;
+  b := a - 2;
+  WRITE b;
 END

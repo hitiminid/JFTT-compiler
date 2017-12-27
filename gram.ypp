@@ -276,7 +276,7 @@ command      : identifier {
                     pushCode("ZERO");
                     pushCodeWithAddress("LOAD", variableAddress);
                     pushCode("PUT");
-                    pushCode("###");
+                    // pushCode("###");
                     // if it's an array
                   }
                 }
@@ -325,9 +325,9 @@ expression   : value {
               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
-              std::cout << "################\n";
-              std::cout << types[0] << " " << types[1] << "\n";
-              std::cout << "################\n";
+              // std::cout << "################\n";
+              // std::cout << types[0] << " " << types[1] << "\n";
+              // std::cout << "################\n";
 
 
               if (types[0] == "number" && types[1] == "number") {
@@ -337,7 +337,7 @@ expression   : value {
               } else if(types[0] == "number" && types[1] == "variable") {
                 // std::cout << "both are arrays\n";
                 // int variableAddress = variablesAddressesMap[secondElementAddress];
-                pushCode("@@@@@");
+                // pushCode("@@@@@");
                 pushCodeWithAddress("LOAD",secondElementAddress);
                 pushCodeWithAddress("ADD", 0);
 
@@ -380,8 +380,10 @@ expression   : value {
                 pushCodeWithAddress("LOAD", secondElementAddress);
                 pushCodeWithAddress("ADD", 0);
               }
-
              }
+             /*##################################################################################*/
+             /*#                                      SUB                                       #*/
+             /*##################################################################################*/
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -401,21 +403,53 @@ expression   : value {
                types[0] = determineDataType(variableTypes[0], variableTypes[1]);
                types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
-               std::cout << "################\n";
-               std::cout << types[0] << " " << types[1] << "\n";
-               std::cout << "################\n";
-
 
                if (types[0] == "number" && types[1] == "number") {
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOAD",  0);
+                 pushCodeWithAddress("SUB",   1);
+               } else if (types[0] == "number" && types[1] == "variable") {
 
-                 pushCodeWithAddress("SUB", 0);
+                 pushCodeWithAddress("LOAD",secondElementAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOAD",  0);
+                 pushCodeWithAddress("SUB",   1);
+               } else if (types[0] == "variable" && types[1] == "number") {
+
+                  pushCodeWithAddress("STORE", 1);
+                  // pushCodeWithAddress("SUCTION", 2137);
+                  pushCodeWithAddress("LOAD",  0);
+                  pushCodeWithAddress("SUB",   1);
                }
-
-
-
-
              }
-             | value MUL value { }
+             /*##################################################################################*/
+             /*#                                      MUL                                       #*/
+             /*##################################################################################*/
+             | value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+               pushCodeWithAddress("STORE", 0);
+               firstElementAddress = equationElementAddress;
+             } MUL value {
+
+               secondElementAddress = equationElementAddress;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               variableTypes[2] = valueFormat1;
+               variableTypes[3] = valueFormat2;
+
+               std::string types[2];
+               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+               if (types[0] == "number" && types[1] == "number") {
+                 pushCodeWithAddress("STORE", 1);
+                 pushCode("MULTIPLYING");
+
+               }
+             }
              | value DIV value { }
              | value MOD value { }
 ;
@@ -543,9 +577,9 @@ void finish() {
   // displayMap(&variablesAddressesMap);
   pushCode("HALT");
 
-  commandsVector.insert(commandsVector.begin(), "#################");
-  commandsVector.insert(commandsVector.begin(), "#      CODE     #");
-  commandsVector.insert(commandsVector.begin(), "#################");
+  // commandsVector.insert(commandsVector.begin(), "#################");
+  // commandsVector.insert(commandsVector.begin(), "#      CODE     #");
+  // commandsVector.insert(commandsVector.begin(), "#################");
 
   displayCommandVector(&commandsVector);
 }
@@ -617,19 +651,6 @@ void generateNumber(std::string number) {
     }
     decimalNumber = decimalNumber / 2;
   }
-
-  int k = 0;
-  // std::cout << decimalNumber2 << "xx\n";
-  //pushCode("####");
-
-  pushCodeWithAddress("####", decimalNumber2);
-
-  std::cout << "BINARY: ";
-  for(std::vector<int>::iterator it = binaryRepresentationStack.begin(); it < binaryRepresentationStack.end(); it++) {
-       std::cout << *it;
-  }
-
-  std::cout <<"\n\n";
 
   pushCode("ZERO");
 
