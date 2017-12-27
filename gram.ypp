@@ -6,6 +6,9 @@
   /*
     czy powinienem wyliczać offset raz czy na żądanie?
     [ ] inicjalizowanie tablic     ----> a := c nie wywala bledu
+    [ ] w tym momencie w mapie zainicjalizowanych mam wrzucane zmienne (var) z flagą 0, pytanie czy warto wrzucać po prostu
+
+
   */
 
 
@@ -46,7 +49,6 @@
   int equationElementAddress;
   int firstElementAddress;
   int secondElementAddress;
-
 
   bool isDebugOn = false;
 
@@ -174,7 +176,13 @@ commands     : commands  command { }
              | command           { }
 ;
 
-command      : identifier  ASSGN  expression SEM {
+command      : identifier {
+                expressionType[0] = valueFormat1;
+                expressionType[1] = valueFormat2;
+
+                // std::cout << leftValueFormat_1 << " *** " << leftValueFormat_2 << "\n";
+
+              } ASSGN  expression SEM {
                 std::string variableName = $<string>1;
                 if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                   std::cout << "Error [line "<< "]: Variable "<< $<string>1 <<" not declared!" << "\n";
@@ -183,7 +191,30 @@ command      : identifier  ASSGN  expression SEM {
                   // find an adress
                   int variableAddress = variablesAddressesMap[variableName];
                   // set as initialized
-                  initializedVariablesMap[variableName] = true;
+                  // std::cout << "INITIALIZING VARIABLES\n";
+                  // std::cout << "curr array index: " << currentArrayIndex<<"\n";
+                  // std::cout << "ADDRESS IS " << currentArrayIndex + variableAddress <<"\n";
+                  // tutaj jesli chce dostac adres tablicowy to robie currentArrayIndex + variableAddress
+
+                  if (expressionType[1] == "array") {
+                    int arraySize = arraysMap[variableName];
+                    if (currentArrayIndex < 0 || currentArrayIndex >= arraySize) {
+                      std::cout << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
+                      exit(1);
+                    }
+                    std::string arrayNameWithIndex = variableName + "#" + std::to_string(currentArrayIndex);
+                    initializedVariablesMap[arrayNameWithIndex] = true;
+                  } else {
+                    // std::cout << "NOPE 1\n\n";
+                    initializedVariablesMap[variableName] = true;
+                  }
+                  // std::cout << "########################\n";
+                  // std::cout << "##     INITIALIZED    ##\n";
+                  // std::cout << "########################\n";
+                  // displayInitializedMap(&initializedVariablesMap);
+                  // std::cout << "########################\n";
+                  // std::cout << "##         END        ##\n";
+                  // std::cout << "########################\n";
                   pushCodeWithAddress("STORE", variableAddress);
                 }
              }
@@ -204,7 +235,7 @@ command      : identifier  ASSGN  expression SEM {
                  pushCode("ZERO");
                  pushCode("GET");
 
-                 if (isVariableDeclared(&arraysMap, variableName)) {
+                 if (isVariableDeclared(&arraysMap, variableName)) {  //todo: a tu nie powinno być initialized???
                    if (isDebugOn) {
                      std::cout << "I'm an array!" << "\n";
                      std::cout << "Yet not implemented\n"<< currentArrayIndex;
@@ -294,7 +325,6 @@ expression   : value {
               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
 
-
               if (types[0] == "number" && types[1] == "number") {
 
                 pushCodeWithAddress("ADD", 0);
@@ -304,7 +334,7 @@ expression   : value {
                 // std::cout << "both are arrays\n";
                 // int variableAddress = variablesAddressesMap[secondElementAddress];
                 pushCode("@@@@@");
-                pushCodeWithAddress("LOAD",secondElementAddress );
+                pushCodeWithAddress("LOAD",secondElementAddress);
                 pushCodeWithAddress("ADD", 0);
 
               } else if (types[0] == "variable" && types[1] == "number") {
@@ -313,7 +343,7 @@ expression   : value {
                 pushCode("**********");
 
                 pushCodeWithAddress("ADD", 0);
-                pushCodeWithAddress("LOAD",secondElementAddress );
+                pushCodeWithAddress("LOAD",secondElementAddress);
 
               } else if (types[0] == "array" && types[1] == "array") {
 
@@ -327,6 +357,10 @@ expression   : value {
 
               } else if (types[0] == "variable" && types[1] == "variable") {
                 pushCode("XXXXXXXX");
+                pushCodeWithAddress("LOAD", firstElementAddress);
+                pushCodeWithAddress("STORE", 0);
+                pushCodeWithAddress("LOAD", secondElementAddress);
+                pushCodeWithAddress("ADD", 0);
               }
 
              }
@@ -389,11 +423,11 @@ identifier   : PID {
              | PID LEFT_BR num RIGHT_BR {
               currentArrayIndex = atoi($3);
 
-              std::cout << "starting index " << variablesAddressesMap[$1] << "\n";
+              // std::cout << "starting index " << variablesAddressesMap[$1] << "\n";
 
               int searchedIndex = variablesAddressesMap[$1] + currentArrayIndex;
 
-              std::cout << "looking for index " << searchedIndex << "\n";
+              // std::cout << "looking for index " << searchedIndex << "\n";
 
               valueFormat1 = "number";
               valueFormat2 = "array";
@@ -430,7 +464,7 @@ void declareAnArray(std::string name, int arraySize) {
       std::cout << "Declaring new array     '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
     }
     variablesAddressesMap[name] = currentMemoryIndex; // the beggining of an array
-    initializedVariablesMap[name] = true;
+    // initializedVariablesMap[name] = true; //todo: is it initialized for real?
     arraysMap[name] = arraySize;
     currentMemoryIndex += arraySize - 1; //without the first one
     if (isDebugOn) {
@@ -540,7 +574,7 @@ void generateNumber(std::string number) {
   }
 
   int k = 0;
-  std::cout << decimalNumber2 << "xx\n";
+  // std::cout << decimalNumber2 << "xx\n";
   //pushCode("####");
   // pushCodeWithAddress("NUMBER", decimalNumber2);
   pushCode("ZERO");
