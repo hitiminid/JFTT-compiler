@@ -15,7 +15,7 @@ WHITESPACES   [ \t\r\n]+
 
 %%
 
-"(" 	      { BEGIN(COMMENT);         }
+"(" 	        { BEGIN(COMMENT);      }
 <COMMENT>")"  { BEGIN(INITIAL);      }
 <COMMENT>.    {                      }
 <COMMENT>"\n" {                      }
