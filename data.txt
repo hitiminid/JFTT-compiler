@@ -1,7 +1,7 @@
 VAR
-  a b c d
+  a b[2] c d
 BEGIN
-  a := 3;
-  b := a - 2;
-  WRITE b;
+  b[0] := 1;
+  b[1] := b[0];
+  WRITE b[1];
 END
