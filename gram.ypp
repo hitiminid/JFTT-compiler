@@ -43,6 +43,9 @@
   /*                     STRUCTURES                    */
   /*===================================================*/
 
+  int equationElementAddress;
+  int firstElementAddress;
+  int secondElementAddress;
 
 
   bool isDebugOn = false;
@@ -258,13 +261,27 @@ expression   : value {
                 otherwise find an adress and THEN load it
                 */
                 // pushCodeWithAddress("LOAD", 123);
+                if (valueFormat1 == "number" && valueFormat2 == "number") {
+                    // do nothing
+                } else if (valueFormat1 == "variable" && valueFormat2 == "variable") {
+                  pushCode("ZERO");
+                  pushCodeWithAddress("LOAD", equationElementAddress); // todo: do poprawki, wstawiłem tylko dla debuggingu, tutaj znajdz adres zmiennej ktorą teraz przypiszemy
+                } else if (valueFormat1 == "number" && valueFormat2 == "array") {
+
+
+                } else if (valueFormat1 == "array" && valueFormat2 == "array"){
+
+                }
+
               }
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
                pushCodeWithAddress("STORE", 0);
+               firstElementAddress = equationElementAddress;
              }
              ADD value {
+              secondElementAddress = equationElementAddress;
 
               std::string variableTypes[4];
               variableTypes[0] = expressionType[0];
@@ -279,13 +296,37 @@ expression   : value {
 
 
               if (types[0] == "number" && types[1] == "number") {
-                std::cout << "both are numbers\n";
 
-                pushCode("ADD");
+                pushCodeWithAddress("ADD", 0);
 
+              } else if(types[0] == "number" && types[1] == "variable") {
+
+                // std::cout << "both are arrays\n";
+                // int variableAddress = variablesAddressesMap[secondElementAddress];
+                pushCode("@@@@@");
+                pushCodeWithAddress("LOAD",secondElementAddress );
+                pushCodeWithAddress("ADD", 0);
+
+              } else if (types[0] == "variable" && types[1] == "number") {
+
+
+                pushCode("**********");
+
+                pushCodeWithAddress("ADD", 0);
+                pushCodeWithAddress("LOAD",secondElementAddress );
 
               } else if (types[0] == "array" && types[1] == "array") {
-                std::cout << "both are arrays\n";
+
+              } else if (types[0] == "array" && types[1] == "number") {
+
+              } else if (types[0] == "number" && types[1] == "array") {
+
+              } else if (types[0] == "array" && types[1] == "variable") {
+
+              } else if (types[0] == "variable" && types[1] == "array") {
+
+              } else if (types[0] == "variable" && types[1] == "variable") {
+                pushCode("XXXXXXXX");
               }
 
              }
@@ -330,6 +371,7 @@ value        : num {
 identifier   : PID {
               valueFormat1 = "variable";
               valueFormat2 = "variable";
+              equationElementAddress = variablesAddressesMap[$1];
             }
              | PID LEFT_BR PID RIGHT_BR {
                /* yet to be implemented */
@@ -421,6 +463,11 @@ void finish() {
   //std::cout << "number of variables + tokens = " << variablesAddressesMap.size() << "\n";
   // displayMap(&variablesAddressesMap);
   pushCode("HALT");
+
+  commandsVector.insert(commandsVector.begin(), "#################");
+  commandsVector.insert(commandsVector.begin(), "#      CODE     #");
+  commandsVector.insert(commandsVector.begin(), "#################");
+
   displayCommandVector(&commandsVector);
 }
 
@@ -478,28 +525,7 @@ void generateNumber(std::string number) {
     4) STORE [x]
   */
 
-  // int no = std::stoi(number);
-  // std::cout << "DEC: " << no << "\n";
-  // std::string bin = std::bitset<5>(no).to_string(); //to binary
-  // // should i trim it?
-  // //todo: trimming binary
-  // std::cout<< bin <<"\n";
-  // int limit = bin.length()-1;
-  // int i;
-  // pushCode("ZERO");
-  //
-  // for(i = 0; i < limit; ++i) {
-  //   if(bin[i] == '1') {
-  //     pushCode("INC");
-  //   }
-  // //
-  //   if(i < (limit - 1)) {
-  //     pushCode("SHL");
-  //   }
-  // }
-
-  // convert to binary
-
+  //convert to binary
   std::vector<int> binaryRepresentationStack;
   long long decimalNumber2 = std::stoi(number);
   long long decimalNumber = std::stoi(number);
@@ -515,7 +541,7 @@ void generateNumber(std::string number) {
 
   int k = 0;
   std::cout << decimalNumber2 << "xx\n";
-  pushCode("####");
+  //pushCode("####");
   // pushCodeWithAddress("NUMBER", decimalNumber2);
   pushCode("ZERO");
   for(std::vector<int>::iterator it = binaryRepresentationStack.end(); it != binaryRepresentationStack.begin(); --it) {
@@ -544,7 +570,6 @@ std::string determineDataType(std::string a, std::string b) {
     return "arrayVar"; //array with a variable
   }
 }
-
 
 int computeRequiredMemoryCell(std::string variableName, int currentArrayIndex) {
 

@@ -1,6 +1,7 @@
 VAR
   a b c d
 BEGIN
-  a := 10;
-  b := a + a;
+  a := 1 + 1;
+  b := 0 + 1;
+  c := a;
 END
