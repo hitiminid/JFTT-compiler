@@ -523,7 +523,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   171
+#define YYLAST   166
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  42
@@ -582,10 +582,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   157,   157,   157,   161,   165,   169,   174,   175,   178,
-     178,   213,   214,   215,   216,   217,   218,   244,   285,   304,
-     304,   463,   463,   640,   641,   642,   644,   645,   646,   647,
-     648,   649,   651,   656,   675,   688,   706
+       0,   157,   157,   157,   161,   169,   177,   182,   183,   186,
+     186,   216,   217,   218,   219,   220,   221,   247,   288,   307,
+     307,   470,   470,   647,   648,   649,   651,   652,   653,   654,
+     655,   656,   658,   663,   683,   696,   716
 };
 #endif
 
@@ -617,10 +617,10 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF -29
+#define YYPACT_NINF -30
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-29)))
+  (!!((Yystate) == (-30)))
 
 #define YYTABLE_NINF -22
 
@@ -631,15 +631,15 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-       4,   -29,    13,   -29,   -29,    -3,   138,   -26,   -21,   -21,
-     -15,   -13,   -21,   -14,     9,   -29,   -29,    -9,   -29,    17,
-     140,   -29,    15,    19,    -5,    10,   -16,   -29,   -29,    23,
-      12,   138,   -21,   -21,   -21,   -21,   -21,   -21,   138,   -21,
-     -29,   -29,    14,    18,   -21,   -29,    57,   -29,   -29,   -29,
-     -29,   -29,   -29,    82,   -11,   -29,   -29,    11,     8,   138,
-     -29,   -29,   -21,   -21,   -29,   -21,   -21,   -21,    22,    27,
-      98,    35,    45,   -29,   -29,   -29,   -21,   -21,   -29,   138,
-     138,   -29,   -29,   116,   127,   -29,   -29
+       3,   -30,    21,    -3,   -30,   133,   -13,   -29,   -29,    -9,
+      -2,   -29,    -1,   133,   -30,   -30,     1,   -30,    30,    84,
+     -30,    27,    25,    11,    15,    -6,    45,   -30,    31,    19,
+     133,   -29,   -29,   -29,   -29,   -29,   -29,   133,   -29,   -30,
+     -30,    22,    26,   -30,   -29,   -30,    10,   -30,   -30,   -30,
+     -30,   -30,   -30,    34,     0,   -30,   -30,    29,   -18,   133,
+     -30,   -30,   -29,   -29,   -30,   -29,   -29,   -29,    37,    33,
+      85,    55,    57,   -30,   -30,   -30,   -29,   -29,   -30,   133,
+     133,   -30,   -30,   111,   122,   -30,   -30
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -647,11 +647,11 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     2,     0,     6,     1,     0,     0,     4,     0,     0,
-       0,     0,     0,    34,     0,     8,     9,     0,    32,     0,
-       0,    33,     0,     0,     0,     0,     0,     3,     7,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-      16,    17,     0,     0,     0,     5,     0,    26,    27,    29,
+       0,     6,     0,     0,     1,     0,     4,     0,     0,     0,
+       0,     0,    34,     2,     8,     9,     0,    32,     0,     0,
+      33,     0,     0,     0,     0,     0,     0,     7,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    16,
+      17,     0,     0,     3,     0,     5,     0,    26,    27,    29,
       31,    28,    30,     0,     0,    36,    35,     0,    18,     0,
       12,    13,     0,     0,    10,     0,     0,     0,     0,     0,
        0,     0,     0,    23,    24,    25,     0,     0,    11,     0,
@@ -661,15 +661,15 @@ static const yytype_uint8 yydefact[] =
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -29,   -29,   -29,   -29,   -28,   -12,   -29,   -29,   -29,   -29,
-      48,    47,    -6
+     -30,   -30,   -30,   -30,   -23,   -11,   -30,   -30,   -30,   -30,
+      61,    49,    -5
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     5,    14,    15,    29,    57,    68,    69,
-      19,    20,    21
+      -1,     2,    26,     3,    13,    14,    28,    57,    68,    69,
+      18,    19,    20
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -677,57 +677,55 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      16,     6,    28,    46,    62,    24,    63,     1,    16,    17,
-      53,    18,    13,     4,    27,     8,    42,    43,    23,     9,
-      13,    26,    10,    30,    31,    16,    38,    11,    12,    40,
-       7,    70,    16,    39,    28,   -19,   -21,    65,    66,    67,
-      16,    28,    13,    44,    41,    64,    79,    16,    45,    76,
-      55,    83,    84,    16,    56,    77,    80,    22,    28,    25,
-       0,     0,     0,     8,    16,    59,    60,     9,     0,     0,
-      10,    28,    28,    16,    16,    11,    12,    16,    16,    47,
-      48,    49,    50,    51,    52,     0,    54,     0,     8,     0,
-      13,    58,     9,     0,    61,    10,     0,     0,     0,     0,
-      11,    12,     0,     0,     8,     0,     0,    78,     9,    71,
-      72,    10,    73,    74,    75,    13,    11,    12,     0,     0,
-       0,     0,     8,    81,    82,     0,     9,     0,     0,    10,
-       0,    13,    85,     8,    11,    12,     0,     9,     0,     0,
-      10,     0,     0,    86,     8,    11,    12,     0,     9,    13,
-       0,    10,     0,     0,     0,     0,    11,    12,     0,     0,
-      13,    32,    33,    34,    35,    36,    37,     0,     0,     0,
-       0,    13
+      15,     5,    27,    17,    12,    23,     1,    46,    15,   -19,
+     -21,    65,    66,    67,    53,    62,     7,    63,    59,    60,
+       8,     4,    16,     9,    22,    15,    41,    42,    10,    11,
+       6,    12,    15,    29,    25,    27,    70,    30,    37,    38,
+       7,    15,    27,    12,     8,    39,    61,     9,    15,    40,
+      43,    44,    10,    11,    15,    45,    83,    84,    55,    27,
+      24,    77,    56,    64,    76,    15,    79,    12,    80,    21,
+       0,     0,    27,    27,    15,    15,     0,     0,    15,    15,
+      47,    48,    49,    50,    51,    52,     0,    54,     0,     0,
+       0,     7,     0,    58,    78,     8,     0,     0,     9,     0,
+       0,     0,     0,    10,    11,    31,    32,    33,    34,    35,
+      36,    71,    72,     0,    73,    74,    75,     7,    12,     0,
+       0,     8,     0,     0,     9,    81,    82,    85,     7,    10,
+      11,     0,     8,     0,     0,     9,     0,     0,    86,     7,
+      10,    11,     0,     8,    12,     0,     9,     0,     0,     0,
+       0,    10,    11,     0,     0,    12,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    12
 };
 
 static const yytype_int8 yycheck[] =
 {
-       6,     4,    14,    31,    15,    11,    17,     3,    14,    35,
-      38,    32,    33,     0,     5,     6,    32,    33,    33,    10,
-      33,    35,    13,    32,     7,    31,    11,    18,    19,    34,
-      33,    59,    38,    14,    46,    27,    28,    29,    30,    31,
-      46,    53,    33,    20,    34,    34,    11,    53,    36,    27,
-      36,    79,    80,    59,    36,    28,    11,     9,    70,    12,
-      -1,    -1,    -1,     6,    70,     8,     9,    10,    -1,    -1,
-      13,    83,    84,    79,    80,    18,    19,    83,    84,    32,
-      33,    34,    35,    36,    37,    -1,    39,    -1,     6,    -1,
-      33,    44,    10,    -1,    12,    13,    -1,    -1,    -1,    -1,
-      18,    19,    -1,    -1,     6,    -1,    -1,     9,    10,    62,
-      63,    13,    65,    66,    67,    33,    18,    19,    -1,    -1,
-      -1,    -1,     6,    76,    77,    -1,    10,    -1,    -1,    13,
-      -1,    33,    16,     6,    18,    19,    -1,    10,    -1,    -1,
-      13,    -1,    -1,    16,     6,    18,    19,    -1,    10,    33,
-      -1,    13,    -1,    -1,    -1,    -1,    18,    19,    -1,    -1,
-      33,    21,    22,    23,    24,    25,    26,    -1,    -1,    -1,
-      -1,    33
+       5,     4,    13,    32,    33,    10,     3,    30,    13,    27,
+      28,    29,    30,    31,    37,    15,     6,    17,     8,     9,
+      10,     0,    35,    13,    33,    30,    32,    33,    18,    19,
+      33,    33,    37,    32,    35,    46,    59,     7,    11,    14,
+       6,    46,    53,    33,    10,    34,    12,    13,    53,    34,
+       5,    20,    18,    19,    59,    36,    79,    80,    36,    70,
+      11,    28,    36,    34,    27,    70,    11,    33,    11,     8,
+      -1,    -1,    83,    84,    79,    80,    -1,    -1,    83,    84,
+      31,    32,    33,    34,    35,    36,    -1,    38,    -1,    -1,
+      -1,     6,    -1,    44,     9,    10,    -1,    -1,    13,    -1,
+      -1,    -1,    -1,    18,    19,    21,    22,    23,    24,    25,
+      26,    62,    63,    -1,    65,    66,    67,     6,    33,    -1,
+      -1,    10,    -1,    -1,    13,    76,    77,    16,     6,    18,
+      19,    -1,    10,    -1,    -1,    13,    -1,    -1,    16,     6,
+      18,    19,    -1,    10,    33,    -1,    13,    -1,    -1,    -1,
+      -1,    18,    19,    -1,    -1,    33,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    33
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    43,    44,     0,    45,     4,    33,     6,    10,
-      13,    18,    19,    33,    46,    47,    54,    35,    32,    52,
-      53,    54,    52,    33,    54,    53,    35,     5,    47,    48,
-      32,     7,    21,    22,    23,    24,    25,    26,    11,    14,
-      34,    34,    32,    33,    20,    36,    46,    53,    53,    53,
+       0,     3,    43,    45,     0,     4,    33,     6,    10,    13,
+      18,    19,    33,    46,    47,    54,    35,    32,    52,    53,
+      54,    52,    33,    54,    53,    35,    44,    47,    48,    32,
+       7,    21,    22,    23,    24,    25,    26,    11,    14,    34,
+      34,    32,    33,     5,    20,    36,    46,    53,    53,    53,
       53,    53,    53,    46,    53,    36,    36,    49,    53,     8,
        9,    12,    15,    17,    34,    29,    30,    31,    50,    51,
       46,    53,    53,    53,    53,    53,    27,    28,     9,    11,
@@ -1427,8 +1425,8 @@ yyreduce:
     {
         case 2:
 #line 157 "gram.ypp" /* yacc.c:1646  */
-    {/*showAllocatedMemoryIndexes();*/}
-#line 1432 "gram.tab.cpp" /* yacc.c:1646  */
+    { /*std::cout << "############################\n\n\n"; displayMap(&variablesAddressesMap)*/;}
+#line 1430 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
@@ -1436,59 +1434,66 @@ yyreduce:
     {
                   finish();
                 }
-#line 1440 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1438 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
 #line 161 "gram.ypp" /* yacc.c:1646  */
     {
                   declareAVariable((yyvsp[0].string));
+
+                  // std::cout << "#####\n";
+                  //
+                  // std::cout << "#####\n";
                 }
-#line 1448 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1450 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 165 "gram.ypp" /* yacc.c:1646  */
+#line 169 "gram.ypp" /* yacc.c:1646  */
     {
                   int arraySize = atoi((yyvsp[-1].string));
                   declareAnArray((yyvsp[-3].string), arraySize);
+
+                  // std::cout << "#####\n";
+                  // displayMap(&variablesAddressesMap);
+                  // std::cout << "#####\n";
                 }
-#line 1457 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1463 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 169 "gram.ypp" /* yacc.c:1646  */
+#line 177 "gram.ypp" /* yacc.c:1646  */
     {
                   // std::cout << "No variables declared" << "\n";
                 }
-#line 1465 "gram.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 7:
-#line 174 "gram.ypp" /* yacc.c:1646  */
-    { }
 #line 1471 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 8:
-#line 175 "gram.ypp" /* yacc.c:1646  */
+  case 7:
+#line 182 "gram.ypp" /* yacc.c:1646  */
     { }
 #line 1477 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 9:
-#line 178 "gram.ypp" /* yacc.c:1646  */
-    {
-                expressionType[0] = valueFormat1;
-                expressionType[1] = valueFormat2;
-                currentArrayIndex_assign  = currentArrayIndex;
+  case 8:
+#line 183 "gram.ypp" /* yacc.c:1646  */
+    { }
+#line 1483 "gram.tab.cpp" /* yacc.c:1646  */
+    break;
 
+  case 9:
+#line 186 "gram.ypp" /* yacc.c:1646  */
+    {
+                expressionType[0]         = valueFormat1;
+                expressionType[1]         = valueFormat2;
+                currentArrayIndex_assign  = currentArrayIndex;
               }
-#line 1488 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1493 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 183 "gram.ypp" /* yacc.c:1646  */
+#line 190 "gram.ypp" /* yacc.c:1646  */
     {
                 std::string variableName = (yyvsp[-4].string);
 
@@ -1498,10 +1503,8 @@ yyreduce:
                   std::cout << "Error [line "<< "]: Variable "<< (yyvsp[-4].string) <<" not declared!" << "\n";
                   exit(1);
                 } else { // variable is declared
-                  // find an adress
                   int variableAddress = variablesAddressesMap[variableName];
-                  // set as initialized
-                  // tutaj jesli chce dostac adres tablicowy to robie currentArrayIndex + variableAddress
+
                   if (expressionType[1] == "array") {
                     int arraySize = arraysMap[variableName];
 
@@ -1509,27 +1512,19 @@ yyreduce:
                       std::cout << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
                       exit(1);
                     }
-                    // std::string arrayNameWithIndex = variableName + "#" + std::to_string(currentArrayIndex_assign);
-                    // initializedVariablesMap[arrayNameWithIndex] = true;
-                    addressToAssign = variableAddress + currentArrayIndex_assign + ARRAY_INDEX_OFFSET;
+                    addressToAssign = variableAddress + currentArrayIndex_assign + 1;
                   } else {
                     initializedVariablesMap[variableName] = true;
-                    addressToAssign = variableAddress + currentArrayIndex_assign;
+                    addressToAssign = variableAddress;
                   }
                   pushCodeWithAddress("STORE", addressToAssign);
                 }
              }
-#line 1523 "gram.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 11:
-#line 213 "gram.ypp" /* yacc.c:1646  */
-    {}
-#line 1529 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1524 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 218 "gram.ypp" /* yacc.c:1646  */
+#line 221 "gram.ypp" /* yacc.c:1646  */
     {
 
                std::string variableName = (yyvsp[-1].string);
@@ -1550,17 +1545,17 @@ yyreduce:
                    pushCodeWithAddress("STORE", requiredCell);
                  } else {
                    int variableAddress = variablesAddressesMap[variableName];
-                   // std::cout << "I'm a variable, with adress : "<< variableAddress <<"\n";
+
                    pushCodeWithAddress("STORE", variableAddress);
                    initializedVariablesMap[variableName] = true; // just in case we set it as initialized
                  }
                }
              }
-#line 1560 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1555 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 244 "gram.ypp" /* yacc.c:1646  */
+#line 247 "gram.ypp" /* yacc.c:1646  */
     {
 
                std::string variableName = (yyvsp[-1].string);
@@ -1592,7 +1587,7 @@ yyreduce:
                   } else {
 
                     // pushCode("ZERO");
-                    pushCodeWithAddress("LOAD", variableAddress + currentArrayIndex);
+                    pushCodeWithAddress("LOAD", variableAddress);
                     pushCode("PUT");
                   }
                 }
@@ -1601,11 +1596,11 @@ yyreduce:
                  exit(1);
                }
              }
-#line 1605 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1600 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 285 "gram.ypp" /* yacc.c:1646  */
+#line 288 "gram.ypp" /* yacc.c:1646  */
     {
                 /*
                 if it's a number then load it directly to the accumulator
@@ -1614,22 +1609,22 @@ yyreduce:
                 // pushCodeWithAddress("LOAD", 123);
                 if (valueFormat1 == "number" && valueFormat2 == "number") {
                     // do nothing
+                    // pushCode("WABBA LUBBA DUB DUB ");
                 } else if (valueFormat1 == "variable" && valueFormat2 == "variable") {
                   pushCode("ZERO");
                   pushCodeWithAddress("LOAD", equationElementAddress); // todo: do poprawki, wstawiłem tylko dla debuggingu, tutaj znajdz adres zmiennej ktorą teraz przypiszemy
                 } else if (valueFormat1 == "number" && valueFormat2 == "array") {
-
 
                 } else if (valueFormat1 == "array" && valueFormat2 == "array"){
 
                 }
 
               }
-#line 1629 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1624 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 304 "gram.ypp" /* yacc.c:1646  */
+#line 307 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -1647,11 +1642,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 0);
                }
              }
-#line 1651 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1646 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 321 "gram.ypp" /* yacc.c:1646  */
+#line 324 "gram.ypp" /* yacc.c:1646  */
     {
 
               secondElementAddress             = equationElementAddress;
@@ -1669,7 +1664,8 @@ yyreduce:
               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
               if (types[0] == "number" && types[1] == "number") { // DONE
-                pushCodeWithAddress("ADD", 0);
+
+                pushCodeWithAddress("ADD",   0);
 
               } else if (types[0] == "number" && types[1] == "variable") { // DONE
 
@@ -1679,7 +1675,8 @@ yyreduce:
               } else if (types[0] == "variable" && types[1] == "number") { // DONE
 
                 pushCodeWithAddress("STORE", 0);
-                pushCodeWithAddress("LOAD", firstElementAddress);
+                pushCodeWithAddress("LOAD",  firstElementAddress);
+                // pushCodeWithAddress("LOADIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIING", firstElementAddress);
                 pushCodeWithAddress("ADD",   0);
 
               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
@@ -1705,6 +1702,16 @@ yyreduce:
                 pushCodeWithAddress("STORE", 3);
                 pushCodeWithAddress("LOADI", 3);
                 pushCodeWithAddress("ADD", secondElementAddress);
+
+              } else if (types[0] == "variable" && types[1] == "array") { // done
+
+                pushCodeWithAddress("LOAD", firstElementAddress);
+                pushCodeWithAddress("STORE", 0);
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 3);
+                pushCodeWithAddress("LOADI", 3);
+                pushCodeWithAddress("ADD",   0);
 
 /*##################################################################################################################*/
               } else if (types[0] == "array" && types[1] == "array") { // done
@@ -1749,14 +1756,6 @@ yyreduce:
                 pushCodeWithAddress("ADD", 0);
 
 
-              } else if (types[0] == "variable" && types[1] == "array") { // done
-
-                pushCodeWithAddress("STORE", 0);
-                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
-                pushCodeWithAddress("STORE", 3);
-                pushCodeWithAddress("LOADI", 3);
-                pushCodeWithAddress("ADD",   0);
 
 
               } else if (types[0] == "arrayVar" && types[1] == "array") { // done
@@ -1791,11 +1790,11 @@ yyreduce:
 
               }
              }
-#line 1795 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1794 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 463 "gram.ypp" /* yacc.c:1646  */
+#line 470 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -1814,11 +1813,11 @@ yyreduce:
                }
 
              }
-#line 1818 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1817 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 480 "gram.ypp" /* yacc.c:1646  */
+#line 487 "gram.ypp" /* yacc.c:1646  */
     {
 
                secondElementAddress             = equationElementAddress;
@@ -1976,77 +1975,78 @@ yyreduce:
 
                }
              }
-#line 1980 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1979 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 640 "gram.ypp" /* yacc.c:1646  */
+#line 647 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1986 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1985 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 641 "gram.ypp" /* yacc.c:1646  */
+#line 648 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1992 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1991 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 642 "gram.ypp" /* yacc.c:1646  */
+#line 649 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1998 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1997 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 644 "gram.ypp" /* yacc.c:1646  */
+#line 651 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 2004 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2003 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 645 "gram.ypp" /* yacc.c:1646  */
+#line 652 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 2010 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2009 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 646 "gram.ypp" /* yacc.c:1646  */
+#line 653 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 2016 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2015 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 647 "gram.ypp" /* yacc.c:1646  */
+#line 654 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 2022 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2021 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 648 "gram.ypp" /* yacc.c:1646  */
+#line 655 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 2028 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2027 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 649 "gram.ypp" /* yacc.c:1646  */
+#line 656 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 2034 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2033 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 651 "gram.ypp" /* yacc.c:1646  */
+#line 658 "gram.ypp" /* yacc.c:1646  */
     {
                 generateNumber((yyvsp[0].string));
                 valueFormat1 = "number";
                 valueFormat2 = "number";
              }
-#line 2044 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2043 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 656 "gram.ypp" /* yacc.c:1646  */
+#line 663 "gram.ypp" /* yacc.c:1646  */
     {
                std::string variableName = (yyvsp[0].string);
+              //  std::cout << variableName << " XD\n";
 
                if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                  // not declared
@@ -2067,7 +2067,7 @@ yyreduce:
     break;
 
   case 34:
-#line 675 "gram.ypp" /* yacc.c:1646  */
+#line 683 "gram.ypp" /* yacc.c:1646  */
     {
               valueFormat1 = "variable";
               valueFormat2 = "variable";
@@ -2085,10 +2085,12 @@ yyreduce:
     break;
 
   case 35:
-#line 688 "gram.ypp" /* yacc.c:1646  */
+#line 696 "gram.ypp" /* yacc.c:1646  */
     {
 
               std::string variableName = (yyvsp[-3].string);
+              // std::cout << variableName << " PID{}\n";
+
 
               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                 std::cout << "variable " << variableName << " is not declared! \n";
@@ -2104,14 +2106,15 @@ yyreduce:
               }
 
            }
-#line 2108 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2110 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 706 "gram.ypp" /* yacc.c:1646  */
+#line 716 "gram.ypp" /* yacc.c:1646  */
     {
 
               std::string variableName = (yyvsp[-3].string);
+
 
               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                 std::cout << "variable " << variableName << " is not declared! \n";
@@ -2131,11 +2134,11 @@ yyreduce:
                 arrayIdentifierAddress  = variablesAddressesMap[(yyvsp[-1].string)]; // is only an address of a variable, not a value!!!
               }
              }
-#line 2135 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2138 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2139 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2142 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2363,14 +2366,16 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 729 "gram.ypp" /* yacc.c:1906  */
+#line 740 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
   if (!isVariableDeclared(&variablesAddressesMap, name)) {
     currentMemoryIndex++;
+    // std::cout << name << " start at " << currentMemoryIndex << "\n";
     variablesAddressesMap[name] = currentMemoryIndex;
     initializedVariablesMap[name] = false;
+    // std::cout << name << " end at " << currentMemoryIndex << "\n";
 
   } else {
     //throw an error
@@ -2389,6 +2394,8 @@ void declareAnArray(std::string name, int arraySize) {
   if (!isVariableDeclared(&variablesAddressesMap, name)) {
 
     currentMemoryIndex++;
+    // std::cout << name << " start at " << currentMemoryIndex << "\n";
+
     int arrayStartPoint = ++currentMemoryIndex;
     generateNumber(std::to_string(arrayStartPoint));
     pushCodeWithAddress("STORE", --arrayStartPoint);
@@ -2397,7 +2404,8 @@ void declareAnArray(std::string name, int arraySize) {
     variablesAddressesMap[name] = currentMemoryIndex; // the beggining of an array
     arrayStartMap[name] = currentMemoryIndex;
     arraysMap[name] = arraySize;
-    currentMemoryIndex += arraySize - 1; //without the first one
+    currentMemoryIndex =  currentMemoryIndex + arraySize; //without the first one
+    // std::cout << name << " end at " << currentMemoryIndex << "\n";
 
   } else {
     std::cout << "Array " << name << " already defined!" << "\n";
@@ -2430,8 +2438,6 @@ void finish() {
   // commandsVector.insert(commandsVector.begin(), "#################");
 
   displayCommandVector(&commandsVector);
-
-  // displayMap(&variablesAddressesMap);
 
 }
 

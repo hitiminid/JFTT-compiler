@@ -37,3 +37,4 @@ BEGIN
   WRITE t; (4)
   WRITE u; (4)
 END
+test
