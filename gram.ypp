@@ -35,6 +35,7 @@
   /*                      VARIABLES                    */
   /*===================================================*/
   int currentMemoryIndex = NUMBER_OF_RESERVED_MEMORY_INDEXES;
+  int numberOfCommands   = 0;
 
   /*===================================================*/
   /*                     STRUCTURES                    */
@@ -429,9 +430,6 @@ expression   : value {
 
                 pushCodeWithAddress("ADD", 0);
 
-
-
-
               } else if (types[0] == "arrayVar" && types[1] == "array") { // done
 
                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
@@ -590,7 +588,9 @@ expression   : value {
 
                } else if (types[0] == "variable" && types[1] == "array") { // done
 
+                 pushCodeWithAddress("LOAD", firstElementAddress);
                  pushCodeWithAddress("STORE", 0);
+
                  pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
                  pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
                  pushCodeWithAddress("STORE", 1);
@@ -648,7 +648,11 @@ expression   : value {
              | value DIV value { }
              | value MOD value { }
 ;
-condition    : value EQ  value { }
+condition    : value EQ  value {
+
+
+
+              }
              | value NEQ value { }
              | value LT  value { }
              | value GT  value { }
@@ -849,12 +853,14 @@ void displayCommandVector(std::vector<std::string> *commands) {
 
 void pushCode(std::string opCode) {
   commandsVector.push_back(opCode);
+  numberOfCommands++;
 }
 
 void pushCodeWithAddress(std::string opCode, int number) {
   std::string space = " ";
   std::string whole = opCode + space + std::to_string(number);
   commandsVector.push_back(whole);
+  numberOfCommands++;
 }
 
 void generateNumber(std::string number) {
