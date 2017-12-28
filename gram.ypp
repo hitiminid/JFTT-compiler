@@ -49,6 +49,7 @@
   int equationElementAddress;
   int firstElementAddress;
   int secondElementAddress;
+  int arrayIdentifierAddress;
 
   bool isDebugOn = false;
 
@@ -182,8 +183,9 @@ command      : identifier {
                 expressionType[1] = valueFormat2;
                 currentArrayIndex_assign  = currentArrayIndex;
 
-              } ASSGN  expression SEM {
+              } ASSGN expression SEM {
                 std::string variableName = $<string>1;
+
                 if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                   std::cout << "Error [line "<< "]: Variable "<< $<string>1 <<" not declared!" << "\n";
                   exit(1);
@@ -199,8 +201,8 @@ command      : identifier {
                       std::cout << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
                       exit(1);
                     }
-                    std::string arrayNameWithIndex = variableName + "#" + std::to_string(currentArrayIndex_assign);
-                    initializedVariablesMap[arrayNameWithIndex] = true;
+                    // std::string arrayNameWithIndex = variableName + "#" + std::to_string(currentArrayIndex_assign);
+                    // initializedVariablesMap[arrayNameWithIndex] = true;
                   } else {
                     initializedVariablesMap[variableName] = true;
                   }
@@ -256,20 +258,18 @@ command      : identifier {
                  int variableAddress = variablesAddressesMap[variableName];
 
                  if (valueFormat2 == "array") { // if it's an array, then we look for [name]:[index]
-                   int arraySize = arraysMap[variableName];
+                  //  int arraySize = arraysMap[variableName];
+                  //  variableName = variableName + "#" + std::to_string(currentArrayIndex);
 
-                   variableName = variableName + "#" + std::to_string(currentArrayIndex);
                  }
 
-                 if (!isVariableInitialized(&initializedVariablesMap, variableName)) { //checking if it's initialized
+                 if (valueFormat2 != "array" && !isVariableInitialized(&initializedVariablesMap, variableName)) { //checking if it's initialized
                   std::cout << "Variable " << variableName << " not initialized\n";
                   exit(1);
                 } else {
                   //std::cout << variableName << " is initialized\n"; //wrong message,
                    // pushCodeWithAddress("STORE", variableAddress);
-
                   if (isVariableDeclared(&arraysMap, variableName)) { // is it an array?
-
                     if (isDebugOn) {
                       std::cout << "I'm an array!" << "\n";
                       std::cout << "Yet not implemented\n"<< currentArrayIndex;
@@ -522,19 +522,13 @@ value        : num {
                   std::cout << "variable " << variableName << " is not declared! \n";
                   exit(1);
                } else { // variable is declared
-                 if (valueFormat2 == "array") { // if it's an array, then we look for [name]:[index]
-                   variableName = variableName + "#" + std::to_string(currentArrayIndex);
-                 }
 
-                 if(!isVariableInitialized(&initializedVariablesMap, variableName)) {
+
+                if(valueFormat2 != "array" && !isVariableInitialized(&initializedVariablesMap, variableName)) {
                   std::cout << "Variable " << variableName << " declared but not initialized\n";
                   exit(1);
                 } else {
-                  // and initialized
-                  // int variableAddress = variablesAddressesMap[variableName];
-                  // std::cout << "variable '" << variableName << "' is declared and initialized\n";
-                  // pushCode("ZERO");
-                  //pushCodeWithAddress("LOAD [] ", variableAddress);
+
                 }
                }
              }
@@ -542,7 +536,14 @@ value        : num {
 identifier   : PID {
               valueFormat1 = "variable";
               valueFormat2 = "variable";
-              equationElementAddress = variablesAddressesMap[$1];
+              std::string variableName = $1;
+
+              if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
+                std::cout << "variable " << variableName << " is not declared! \n";
+                exit(1);
+              } else {
+                equationElementAddress = variablesAddressesMap[$1];
+              }
             }
              | PID LEFT_BR PID RIGHT_BR {
                /* yet to be implemented */
@@ -552,11 +553,10 @@ identifier   : PID {
               std::string variableName = $3;
               currentArrayIndex = toDecimal(variableValueMap[variableName]);
               */
-              valueFormat1           = "array";
-              valueFormat2           = "array";
-              equationElementAddress = variablesAddressesMap[$1];
-              int identifierAddress  = variablesAddressesMap[$3]; // is only an address of a variable, not a value!!!
-              currentArrayIndex      = identifierAddress;
+              valueFormat1            = "array";
+              valueFormat2            = "array";
+              equationElementAddress  = variablesAddressesMap[$1];
+              arrayIdentifierAddress  = variablesAddressesMap[$3]; // is only an address of a variable, not a value!!!
            }
              | PID LEFT_BR num RIGHT_BR {
               currentArrayIndex = atoi($3);
@@ -625,8 +625,6 @@ void showAllocatedMemoryIndexes() {
 }
 
 void finish() {
-  //std::cout << "number of variables + tokens = " << variablesAddressesMap.size() << "\n";
-  // displayMap(&variablesAddressesMap);
   pushCode("HALT");
 
   // commandsVector.insert(commandsVector.begin(), "#################");

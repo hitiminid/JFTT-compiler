@@ -1,10 +1,6 @@
 VAR
-  a b[2] c d
+  a
 BEGIN
-  a := 3;
-  c := 2;
-
-  d := a - c;
-  WRITE d;
-
+  READ a;
+  WRITE a;
 END
