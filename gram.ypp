@@ -325,40 +325,28 @@ expression   : value {
               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
-              if (types[0] == "number" && types[1] == "number") {
+              if (types[0] == "number" && types[1] == "number") { // DONE
 
                 pushCodeWithAddress("ADD", 0);
 
-              } else if (types[0] == "number" && types[1] == "variable") {
+              } else if (types[0] == "number" && types[1] == "variable") { // DONE
 
                 pushCodeWithAddress("LOAD",secondElementAddress);
                 pushCodeWithAddress("ADD", 0);
 
-              } else if (types[0] == "variable" && types[1] == "number") {
+              } else if (types[0] == "variable" && types[1] == "number") { // DONE
 
                 pushCodeWithAddress("ADD", 0);
 
               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
 
-                pushCode("#### ARRAY_var and ARRAY_var ####");
-                pushCodeWithAddress("cell#1 ", firstElementAddress+currentArrayIndex);
-                pushCodeWithAddress("cell#2 ", secondElementAddress+currentArrayIndex_assign);
-
-
-
-
-
-
-              } else if (types[0] == "arrayVar" && types[1] == "number") {
-
+              } else if (types[0] == "arrayVar" && types[1] == "number") { // DONE
 
                 pushCodeWithAddress("STORE", 0);
                 pushCodeWithAddress("LOAD",  secondElementAddress+currentArrayIndex);
                 pushCodeWithAddress("ADD",   0);
 
-              } else if (types[0] == "number" && types[1] == "arrayVar") {
-
-                // pushCode("#### NUMBER and ARRAY ####");
+              } else if (types[0] == "number" && types[1] == "arrayVar") { // DONE
 
                 pushCodeWithAddress("LOAD", secondElementAddress+currentArrayIndex);
                 pushCodeWithAddress("ADD", 0);
@@ -366,9 +354,19 @@ expression   : value {
               } else if (types[0] == "array" && types[1] == "variable") {
                 pushCode("#### ARRAY and VARIABLE ####");
 
-              } else if (types[0] == "variable" && types[1] == "array") {
+              } else if (types[0] == "variable" && types[1] == "arrayVar") {
 
-                pushCode("#### VARIABLE and ARRAY ####");
+                pushCodeWithAddress("LOAD", firstElementAddress);
+                pushCodeWithAddress("STORE", 0);
+                pushCodeWithAddress("LOAD", secondElementAddress+currentArrayIndex);
+                pushCodeWithAddress("ADD", 0);
+
+              } else if (types[0] == "arrayVar" && types[1] == "variable") {
+
+                pushCodeWithAddress("LOAD", firstElementAddress+currentArrayIndex);
+                pushCodeWithAddress("STORE", 0);
+                pushCodeWithAddress("LOAD", secondElementAddress);
+                pushCodeWithAddress("ADD", 0);
 
 
               } else if (types[0] == "variable" && types[1] == "variable") {
@@ -376,6 +374,12 @@ expression   : value {
                 pushCodeWithAddress("STORE", 0);
                 pushCodeWithAddress("LOAD", secondElementAddress);
                 pushCodeWithAddress("ADD", 0);
+
+              } else if (types[0] == "variable" && types[1] == "variable") {
+
+
+              } else if (types[0] == "variable" && types[1] == "variable") {
+
               }
              }
              /*##################################################################################*/

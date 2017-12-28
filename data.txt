@@ -1,20 +1,11 @@
 VAR
   a b[2] c d
 BEGIN
-  b[0] := 1;
-  a    := b[0] + 2;
-  WRITE a;
+  a    := 1;
+  b[0] := 2;
+  c    := a + b[0];
+  WRITE c;
 
-  b[0] := 1;
-  a    := 2 + b[0] ;
-  WRITE a;
-
-  ( zbędne STORE 0 po zapisaniu b[0] := 1;
-  VAR
-    a b[2] c d
-  BEGIN
-    b[0] := 1;
-    a :=  b[0] + 2;
-    WRITE a;
-  END  )
+  c    := b[0] + a;
+  WRITE c;
 END
