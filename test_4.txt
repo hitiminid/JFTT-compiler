@@ -1,0 +1,75 @@
+VAR
+  a b[3] c d
+BEGIN
+  a := 2;
+  b[0] := 2;
+  b[1] := 1;
+  d := 1;
+
+  c := 1 + 1;
+  WRITE c;
+
+  c := 1 + d;
+  WRITE c;
+
+  c := 1 + b[1];
+  WRITE c;
+
+  (
+    c := a + b[d];
+    WRITE c;
+  )
+
+
+
+
+  c := a + 1;
+  WRITE c;
+
+  c := a + d;
+  WRITE c;
+
+  c := a + b[1];
+  WRITE c;
+
+(
+  c := a + b[d];
+  WRITE c;
+)
+
+
+  c := b[1] + 1;
+  WRITE c;
+
+  c := b[1] + d;
+  WRITE c;
+
+  c := b[1] + b[1];
+  WRITE c;
+
+(
+  c := b[1] + b[d];
+  WRITE c;
+)
+
+
+(
+  c := a + 1;
+  WRITE c;
+
+  c := a + d;
+  WRITE c;
+
+  c := a + b[1];
+  WRITE c;
+
+  c := a + b[d];
+  WRITE c;
+)
+
+
+
+
+
+
+END

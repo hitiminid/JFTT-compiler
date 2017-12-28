@@ -4,17 +4,10 @@
   /*               NOTATKI                     */
   /* ========================================= */
   /*
-    czy powinienem wyliczać offset raz czy na żądanie?
     [ ] inicjalizowanie tablic     ----> a := c nie wywala bledu
-    [ ] w tym momencie w mapie zainicjalizowanych mam wrzucane zmienne (var) z flagą 0, pytanie czy warto wrzucać po prostu
-
-
   */
 
-
-  // code
-  // #include <stdio.h>
-  // #include <stdlib.h>
+  //code
   #include <cstdlib>
   #include <iostream>
 
@@ -36,6 +29,7 @@
 
   #define NUMBER_OF_RESERVED_MEMORY_INDEXES 9
   #define ERROR_BUFFER 150
+  #define ARRAY_INDEX_OFFSET 1
 
   /*===================================================*/
   /*                      VARIABLES                    */
@@ -50,6 +44,7 @@
   int firstElementAddress;
   int secondElementAddress;
   int arrayIdentifierAddress;
+  int arrayIndexOfFirstElement;
 
   bool isDebugOn = false;
 
@@ -71,12 +66,6 @@
   /* <nazwa, adres w pamięci> */
   std::map<std::string, int> variablesAddressesMap;
 
-  /*
-  tablice moge zapisywać jakoś w postaci
-  [nazwa_tablicy]::[numer_komorki]
-  */
-  std::map<std::string, std::string> variableValueMap;
-
   /* each initialized variable */
   // <nazwa, czy zainicjalizowane>
   std::map<std::string, bool> initializedVariablesMap;
@@ -86,6 +75,8 @@
   // <nazwa, rozmiar tablicy>
   std::map<std::string, int> arraysMap;
 
+  /* mapa zawiera informacje dotyczace indeksu w ktorym rozpoczyna sie dana mapa*/
+  std::map<std::string, int> arrayStartMap;
 
   // int yylex();
   void yyerror (char* msg);
@@ -186,6 +177,8 @@ command      : identifier {
               } ASSGN expression SEM {
                 std::string variableName = $<string>1;
 
+                int addressToAssign;
+
                 if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                   std::cout << "Error [line "<< "]: Variable "<< $<string>1 <<" not declared!" << "\n";
                   exit(1);
@@ -203,10 +196,12 @@ command      : identifier {
                     }
                     // std::string arrayNameWithIndex = variableName + "#" + std::to_string(currentArrayIndex_assign);
                     // initializedVariablesMap[arrayNameWithIndex] = true;
+                    addressToAssign = variableAddress + currentArrayIndex_assign + ARRAY_INDEX_OFFSET;
                   } else {
                     initializedVariablesMap[variableName] = true;
+                    addressToAssign = variableAddress + currentArrayIndex_assign;
                   }
-                  pushCodeWithAddress("STORE", variableAddress + currentArrayIndex_assign);
+                  pushCodeWithAddress("STORE", addressToAssign);
                 }
              }
              | IF  condition THEN  commands ELSE  commands  ENDIF {}
@@ -215,22 +210,20 @@ command      : identifier {
              | FOR  PID  FROM  value TO  value DO  commands  ENDFOR
              | FOR  PID  FROM  value  DOWNTO  value DO  commands  ENDFOR
              | READ  identifier SEM {
-               /*todo: doesn't work*/
+
                std::string variableName = $<string>2;
+
                if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                  std::cout << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared! #READ" << "\n";
                  exit(1);
+
                } else {
+
                  int variableAddress = variablesAddressesMap[variableName];
-                //  pushCodeWithAddress("STORE", variableAddress);
                  pushCode("ZERO");
                  pushCode("GET");
 
                  if (isVariableDeclared(&arraysMap, variableName)) {  //todo: a tu nie powinno być initialized???
-                   if (isDebugOn) {
-                     std::cout << "I'm an array!" << "\n";
-                     std::cout << "Yet not implemented\n"<< currentArrayIndex;
-                   }
                    int requiredCell = computeRequiredMemoryCell(variableName, currentArrayIndex);
                    //is variable initialized
                    pushCodeWithAddress("STORE", requiredCell);
@@ -243,6 +236,7 @@ command      : identifier {
                }
              }
              | WRITE value SEM {
+
                std::string variableName = $<string>2;
 
                if (isVariableDeclared(&variablesAddressesMap, variableName)) {
@@ -255,12 +249,22 @@ command      : identifier {
                 } else {
 
                   if (isVariableDeclared(&arraysMap, variableName)) { // is it an array?
-                    // std::cout << valueFormat1 << " # " << valueFormat2 << "\n";
                     if (valueFormat1 == "number") { // a[1]
-                      pushCodeWithAddress("LOAD", variableAddress + currentArrayIndex);
+
+                      pushCodeWithAddress("LOAD", variableAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                       pushCode("PUT");
 
                     } else { // a[b]
+                      int startingPoint = variableAddress;
+                      // pushCodeWithAddress("LOAD", variable)
+                      pushCodeWithAddress("LOAD", variablesAddressesMap[variableName]);
+                      pushCodeWithAddress("ADD", arrayIdentifierAddress); // we load value n from a[n]
+                      pushCodeWithAddress("STORE", 0);
+                      // generateNumber(std::to_string(startingPoint)); // we generate index
+                      // pushCodeWithAddress("ADD",   0);
+                      // pushCodeWithAddress("STORE", 0);
+                      pushCodeWithAddress("LOADI", 0);
+                      pushCode("PUT");
 
                     }
                   } else {
@@ -298,8 +302,18 @@ expression   : value {
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
-               pushCodeWithAddress("STORE", 0);
-               firstElementAddress = equationElementAddress;
+              //  pushCodeWithAddress("STORE", 0);
+               firstElementAddress      = equationElementAddress;
+               arrayIndexOfFirstElement = currentArrayIndex;
+              //  firstElementName =
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 0);
+               }
              }
              ADD value {
 
@@ -316,7 +330,6 @@ expression   : value {
               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
               if (types[0] == "number" && types[1] == "number") { // DONE
-
                 pushCodeWithAddress("ADD", 0);
 
               } else if (types[0] == "number" && types[1] == "variable") { // DONE
@@ -330,39 +343,42 @@ expression   : value {
 
               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
 
+                pushCodeWithAddress("LOAD", firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("ADD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+
               } else if (types[0] == "arrayVar" && types[1] == "number") { // DONE
 
                 pushCodeWithAddress("STORE", 0);
-                pushCodeWithAddress("LOAD",  secondElementAddress+currentArrayIndex);
+                pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("ADD",   0);
 
               } else if (types[0] == "number" && types[1] == "arrayVar") { // DONE
 
-                pushCodeWithAddress("LOAD", secondElementAddress+currentArrayIndex);
+                pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("ADD",  0);
 
               } else if (types[0] == "array" && types[1] == "variable") {
                 pushCode("#### ARRAY and VARIABLE ####");
 
+
+
               } else if (types[0] == "variable" && types[1] == "arrayVar") {
 
                 pushCodeWithAddress("LOAD",  firstElementAddress);
-                pushCodeWithAddress("STORE", 0);
-                pushCodeWithAddress("LOAD",  secondElementAddress+currentArrayIndex);
-                pushCodeWithAddress("ADD",   0);
+                pushCodeWithAddress("ADD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
 
               } else if (types[0] == "arrayVar" && types[1] == "variable") {
 
-                pushCodeWithAddress("LOAD",  firstElementAddress+currentArrayIndex);
-                pushCodeWithAddress("STORE", 0);
-                pushCodeWithAddress("LOAD",  secondElementAddress);
-                pushCodeWithAddress("ADD",   0);
+                pushCodeWithAddress("LOAD",  firstElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("ADD",  secondElementAddress);
 
               } else if (types[0] == "variable" && types[1] == "variable") {
+
                 pushCodeWithAddress("LOAD", firstElementAddress);
                 pushCodeWithAddress("STORE", 0);
                 pushCodeWithAddress("LOAD", secondElementAddress);
                 pushCodeWithAddress("ADD", 0);
+
               }
              }
              /*##################################################################################*/
@@ -371,7 +387,10 @@ expression   : value {
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
-               pushCodeWithAddress("STORE", 0);
+              //  pushCodeWithAddress("STORE", 0);
+              /*
+                tutaj najprawdopodobniej był ten zbędny STORE, ale wypadaloby sie temu jeszcze przyjrzec, z farcikiem, elo
+              */
                firstElementAddress = equationElementAddress;
              } SUB value {
 
@@ -410,20 +429,18 @@ expression   : value {
                  pushCodeWithAddress("###########", 123);
 
 
-
-
                } else if (types[0] == "arrayVar" && types[1] == "number") {
 
                 //  pushCodeWithAddress("###########", 2137);
                  pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOAD",  firstElementAddress+currentArrayIndex);
+                 pushCodeWithAddress("LOAD",  firstElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                  pushCodeWithAddress("SUB",   1);
                 //  pushCodeWithAddress("STORE", firstElementAddress+currentArrayIndex);
 
                } else if (types[0] == "number" && types[1] == "arrayVar") {
 
                  pushCodeWithAddress("STORE", 0);
-                 pushCodeWithAddress("LOAD",  secondElementAddress+currentArrayIndex);
+                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                  pushCodeWithAddress("STORE", 1);
                  pushCodeWithAddress("LOAD",  0);
                  pushCodeWithAddress("SUB",   1);
@@ -436,7 +453,7 @@ expression   : value {
 
                  pushCodeWithAddress("LOAD",  firstElementAddress);
                  pushCodeWithAddress("STORE", 0);
-                 pushCodeWithAddress("LOAD",  secondElementAddress+currentArrayIndex);
+                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                  pushCodeWithAddress("STORE", 1);
                  pushCodeWithAddress("LOAD",  0);
                  pushCodeWithAddress("SUB",   1);
@@ -446,7 +463,7 @@ expression   : value {
 
                  pushCodeWithAddress("LOAD",  secondElementAddress);
                  pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOAD",  firstElementAddress+currentArrayIndex);
+                 pushCodeWithAddress("LOAD",  firstElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                  pushCodeWithAddress("STORE", 0);
                  pushCodeWithAddress("LOAD",  0);
                  pushCodeWithAddress("SUB",   1);
@@ -464,29 +481,7 @@ expression   : value {
              /*##################################################################################*/
              /*#                                      MUL                                       #*/
              /*##################################################################################*/
-             | value {
-               expressionType[0]  = valueFormat1;
-               expressionType2[0] = valueFormat2;
-               pushCodeWithAddress("STORE", 0);
-               firstElementAddress = equationElementAddress;
-             } MUL value {
-
-               secondElementAddress = equationElementAddress;
-
-               std::string variableTypes[4];
-               variableTypes[0] = expressionType[0];
-               variableTypes[1] = expressionType2[0];
-               variableTypes[2] = valueFormat1;
-               variableTypes[3] = valueFormat2;
-
-               std::string types[2];
-               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
-               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
-
-               if (types[0] == "number" && types[1] == "number") {
-
-               }
-             }
+             | value MUL value { }
              | value DIV value { }
              | value MOD value { }
 ;
@@ -525,6 +520,7 @@ identifier   : PID {
               valueFormat1 = "variable";
               valueFormat2 = "variable";
               std::string variableName = $1;
+              // variableNameGlobal = $1;
 
               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                 std::cout << "variable " << variableName << " is not declared! \n";
@@ -534,24 +530,39 @@ identifier   : PID {
               }
             }
              | PID LEFT_BR PID RIGHT_BR {
-               /* yet to be implemented */
-              /*
-              // znalezc nazwe zmiennej
-              // jej wartosc
-              std::string variableName = $3;
-              currentArrayIndex = toDecimal(variableValueMap[variableName]);
-              */
-              valueFormat1            = "array";
-              valueFormat2            = "array";
-              equationElementAddress  = variablesAddressesMap[$1];
-              arrayIdentifierAddress  = variablesAddressesMap[$3]; // is only an address of a variable, not a value!!!
+
+              std::string variableName = $1;
+
+              if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
+                std::cout << "variable " << variableName << " is not declared! \n";
+                exit(1);
+              } else {
+                valueFormat1            = "array";
+                valueFormat2            = "array";
+                equationElementAddress  = variablesAddressesMap[$1];
+                arrayIdentifierAddress  = variablesAddressesMap[$3]; // is only an address of a variable, not a value!!!
+              }
+
+              // variableNameGlobal = $1;
            }
              | PID LEFT_BR num RIGHT_BR {
-              currentArrayIndex = atoi($3);
-              equationElementAddress = variablesAddressesMap[$1];
-              int searchedIndex = variablesAddressesMap[$1] + currentArrayIndex;
-              valueFormat1 = "number";
-              valueFormat2 = "array";
+
+              std::string variableName = $1;
+
+              if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
+                std::cout << "variable " << variableName << " is not declared! \n";
+                exit(1);
+              } else {
+                valueFormat1 = "number";
+                valueFormat2 = "array";
+
+                currentArrayIndex = atoi($3);
+
+                equationElementAddress = variablesAddressesMap[$1];
+                int searchedIndex = variablesAddressesMap[$1] + currentArrayIndex;
+                equationElementAddress  = variablesAddressesMap[$1];
+                arrayIdentifierAddress  = variablesAddressesMap[$3]; // is only an address of a variable, not a value!!!
+              }
              }
 ;
 %%
@@ -561,7 +572,7 @@ void declareAVariable(std::string name) {
     currentMemoryIndex++;
     variablesAddressesMap[name] = currentMemoryIndex;
     initializedVariablesMap[name] = false;
-    // std::cout << "Declaring new variable: '" << name << "' with adress: " << currentMemoryIndex << "\n";
+
   } else {
     //throw an error
     std::cout << "Variable " << name << " already defined!" << "\n";
@@ -579,16 +590,16 @@ void declareAnArray(std::string name, int arraySize) {
   if (!isVariableDeclared(&variablesAddressesMap, name)) {
 
     currentMemoryIndex++;
-    if (isDebugOn) {
-      std::cout << "Declaring new array     '" << name << "' of size: " << arraySize << " starting at memIndex " << currentMemoryIndex;
-    }
+    int arrayStartPoint = ++currentMemoryIndex;
+    generateNumber(std::to_string(arrayStartPoint));
+    pushCodeWithAddress("STORE", --arrayStartPoint);
+
+    currentMemoryIndex = currentMemoryIndex -1;
     variablesAddressesMap[name] = currentMemoryIndex; // the beggining of an array
-    // initializedVariablesMap[name] = true; //todo: is it initialized for real?
+    arrayStartMap[name] = currentMemoryIndex;
     arraysMap[name] = arraySize;
     currentMemoryIndex += arraySize - 1; //without the first one
-    if (isDebugOn) {
-      std::cout << " and ending at " << currentMemoryIndex << "\n";
-    }
+
   } else {
     std::cout << "Array " << name << " already defined!" << "\n";
     exit(1);
@@ -620,6 +631,9 @@ void finish() {
   // commandsVector.insert(commandsVector.begin(), "#################");
 
   displayCommandVector(&commandsVector);
+
+  // displayMap(&variablesAddressesMap);
+
 }
 
 void displayMap(std::map<std::string, int>* mapToDisplay) {
