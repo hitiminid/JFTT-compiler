@@ -1,11 +1,11 @@
 VAR
   a b[2] c d
 BEGIN
-  a    := 1;
-  b[0] := 2;
-  c    := a + b[0];
-  WRITE c;
+  (a    := 2;)
+  b[0] := 3;
+  (c    := b[0] - 3;
+  WRITE c;)
 
-  c    := b[0] + a;
+  c    :=  4 - b[0];
   WRITE c;
 END

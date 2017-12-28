@@ -374,12 +374,6 @@ expression   : value {
                 pushCodeWithAddress("STORE", 0);
                 pushCodeWithAddress("LOAD", secondElementAddress);
                 pushCodeWithAddress("ADD", 0);
-
-              } else if (types[0] == "variable" && types[1] == "variable") {
-
-
-              } else if (types[0] == "variable" && types[1] == "variable") {
-
               }
              }
              /*##################################################################################*/
@@ -412,7 +406,7 @@ expression   : value {
 
                } else if (types[0] == "number" && types[1] == "variable") {
 
-                 pushCodeWithAddress("LOAD",secondElementAddress);
+                 pushCodeWithAddress("LOAD", secondElementAddress);
                  pushCodeWithAddress("STORE", 1);
                  pushCodeWithAddress("LOAD",  0);
                  pushCodeWithAddress("SUB",   1);
@@ -421,6 +415,39 @@ expression   : value {
                   pushCodeWithAddress("STORE", 1);
                   pushCodeWithAddress("LOAD",  0);
                   pushCodeWithAddress("SUB",   1);
+
+               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
+                 pushCodeWithAddress("###########", 123);
+               } else if (types[0] == "arrayVar" && types[1] == "number") {
+
+                //  pushCodeWithAddress("###########", 2137);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOAD",  firstElementAddress+currentArrayIndex);
+                 pushCodeWithAddress("SUB",   1);
+                //  pushCodeWithAddress("STORE", firstElementAddress+currentArrayIndex);
+
+               } else if (types[0] == "number" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("STORE", 0);
+                 pushCodeWithAddress("LOAD",  secondElementAddress+currentArrayIndex);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOAD",  0);
+                 pushCodeWithAddress("SUB",   1);
+
+               } else if (types[0] == "array" && types[1] == "variable") {
+                 pushCodeWithAddress("###########", 123);
+
+               } else if (types[0] == "variable" && types[1] == "arrayVar") {
+                 pushCodeWithAddress("###########", 123);
+
+
+               } else if (types[0] == "arrayVar" && types[1] == "variable") {
+                 pushCodeWithAddress("###########", 123);
+
+
+               } else if (types[0] == "variable" && types[1] == "variable") {
+                 pushCodeWithAddress("###########", 123);
+
                }
              }
              /*##################################################################################*/
