@@ -1,6 +1,6 @@
 VAR
-  a
+  a b[3]
 BEGIN
-  READ a;
-  WRITE a;
+  READ b[1];
+  WRITE b[1];
 END

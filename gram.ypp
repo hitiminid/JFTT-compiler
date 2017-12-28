@@ -206,13 +206,6 @@ command      : identifier {
                   } else {
                     initializedVariablesMap[variableName] = true;
                   }
-                  // std::cout << "########################\n";
-                  // std::cout << "##     INITIALIZED    ##\n";
-                  // std::cout << "########################\n";
-                  // displayInitializedMap(&initializedVariablesMap);
-                  // std::cout << "########################\n";
-                  // std::cout << "##         END        ##\n";
-                  // std::cout << "########################\n";
                   pushCodeWithAddress("STORE", variableAddress + currentArrayIndex_assign);
                 }
              }
@@ -254,30 +247,25 @@ command      : identifier {
 
                if (isVariableDeclared(&variablesAddressesMap, variableName)) {
                  // at this point we know that variable is declared, what about being initialized?
-
                  int variableAddress = variablesAddressesMap[variableName];
-
-                 if (valueFormat2 == "array") { // if it's an array, then we look for [name]:[index]
-                  //  int arraySize = arraysMap[variableName];
-                  //  variableName = variableName + "#" + std::to_string(currentArrayIndex);
-
-                 }
 
                  if (valueFormat2 != "array" && !isVariableInitialized(&initializedVariablesMap, variableName)) { //checking if it's initialized
                   std::cout << "Variable " << variableName << " not initialized\n";
                   exit(1);
                 } else {
-                  //std::cout << variableName << " is initialized\n"; //wrong message,
-                   // pushCodeWithAddress("STORE", variableAddress);
+
                   if (isVariableDeclared(&arraysMap, variableName)) { // is it an array?
-                    if (isDebugOn) {
-                      std::cout << "I'm an array!" << "\n";
-                      std::cout << "Yet not implemented\n"<< currentArrayIndex;
-                      std::cout  << "\n";
+                    // std::cout << valueFormat1 << " # " << valueFormat2 << "\n";
+                    if (valueFormat1 == "number") { // a[1]
+                      pushCodeWithAddress("LOAD", variableAddress + currentArrayIndex);
+                      pushCode("PUT");
+
+                    } else { // a[b]
+
                     }
                   } else {
 
-                    pushCode("ZERO");
+                    // pushCode("ZERO");
                     pushCodeWithAddress("LOAD", variableAddress + currentArrayIndex);
                     pushCode("PUT");
                   }
