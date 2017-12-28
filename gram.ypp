@@ -256,7 +256,9 @@ command      : identifier {
                  int variableAddress = variablesAddressesMap[variableName];
 
                  if (valueFormat2 == "array") { // if it's an array, then we look for [name]:[index]
-                  variableName = variableName + "#" + std::to_string(currentArrayIndex);
+                   int arraySize = arraysMap[variableName];
+
+                   variableName = variableName + "#" + std::to_string(currentArrayIndex);
                  }
 
                  if (!isVariableInitialized(&initializedVariablesMap, variableName)) { //checking if it's initialized
@@ -368,7 +370,6 @@ expression   : value {
                 pushCodeWithAddress("LOAD",  secondElementAddress);
                 pushCodeWithAddress("ADD",   0);
 
-
               } else if (types[0] == "variable" && types[1] == "variable") {
                 pushCodeWithAddress("LOAD", firstElementAddress);
                 pushCodeWithAddress("STORE", 0);
@@ -410,6 +411,7 @@ expression   : value {
                  pushCodeWithAddress("STORE", 1);
                  pushCodeWithAddress("LOAD",  0);
                  pushCodeWithAddress("SUB",   1);
+
                } else if (types[0] == "variable" && types[1] == "number") {
 
                   pushCodeWithAddress("STORE", 1);
@@ -418,6 +420,10 @@ expression   : value {
 
                } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
                  pushCodeWithAddress("###########", 123);
+
+
+
+
                } else if (types[0] == "arrayVar" && types[1] == "number") {
 
                 //  pushCodeWithAddress("###########", 2137);
@@ -433,6 +439,7 @@ expression   : value {
                  pushCodeWithAddress("STORE", 1);
                  pushCodeWithAddress("LOAD",  0);
                  pushCodeWithAddress("SUB",   1);
+
 
                } else if (types[0] == "array" && types[1] == "variable") {
                  pushCodeWithAddress("###########", 123);
@@ -456,9 +463,13 @@ expression   : value {
                  pushCodeWithAddress("LOAD",  0);
                  pushCodeWithAddress("SUB",   1);
 
-
                } else if (types[0] == "variable" && types[1] == "variable") {
-                 pushCodeWithAddress("###########", 123);
+                pushCodeWithAddress("LOAD",  firstElementAddress);
+                pushCodeWithAddress("STORE", 0);
+                pushCodeWithAddress("LOAD",  secondElementAddress);
+                pushCodeWithAddress("STORE", 1);
+                pushCodeWithAddress("LOAD",  0);
+                pushCodeWithAddress("SUB",  1);
 
                }
              }
@@ -485,8 +496,6 @@ expression   : value {
                types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
                if (types[0] == "number" && types[1] == "number") {
-                 pushCodeWithAddress("STORE", 1);
-                 pushCode("MULTIPLYING");
 
                }
              }
@@ -543,10 +552,11 @@ identifier   : PID {
               std::string variableName = $3;
               currentArrayIndex = toDecimal(variableValueMap[variableName]);
               */
-              valueFormat1 = "array";
-              valueFormat2 = "array";
+              valueFormat1           = "array";
+              valueFormat2           = "array";
               equationElementAddress = variablesAddressesMap[$1];
-
+              int identifierAddress  = variablesAddressesMap[$3]; // is only an address of a variable, not a value!!!
+              currentArrayIndex      = identifierAddress;
            }
              | PID LEFT_BR num RIGHT_BR {
               currentArrayIndex = atoi($3);
