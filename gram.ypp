@@ -338,22 +338,28 @@ expression   : value {
 
                 pushCodeWithAddress("ADD", 0);
 
-              } else if (types[0] == "array" && types[1] == "array") {
+              } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
 
-                pushCode("#### ARRAY and ARRAY ####");
+                pushCode("#### ARRAY_var and ARRAY_var ####");
+                pushCodeWithAddress("cell#1 ", firstElementAddress+currentArrayIndex);
+                pushCodeWithAddress("cell#2 ", secondElementAddress+currentArrayIndex_assign);
 
 
-              } else if (types[0] == "array" && types[1] == "number") {
 
-                pushCode("#### array and number ####");
 
+
+
+              } else if (types[0] == "arrayVar" && types[1] == "number") {
+
+
+                pushCodeWithAddress("STORE", 0);
+                pushCodeWithAddress("LOAD",  secondElementAddress+currentArrayIndex);
+                pushCodeWithAddress("ADD",   0);
 
               } else if (types[0] == "number" && types[1] == "arrayVar") {
 
                 // pushCode("#### NUMBER and ARRAY ####");
 
-                pushCodeWithAddress("LOAD", firstElementAddress);
-                pushCodeWithAddress("STORE", 0);
                 pushCodeWithAddress("LOAD", secondElementAddress+currentArrayIndex);
                 pushCodeWithAddress("ADD", 0);
 
@@ -496,9 +502,12 @@ identifier   : PID {
               */
               valueFormat1 = "array";
               valueFormat2 = "array";
+              equationElementAddress = variablesAddressesMap[$1];
+
            }
              | PID LEFT_BR num RIGHT_BR {
               currentArrayIndex = atoi($3);
+              equationElementAddress = variablesAddressesMap[$1];
               int searchedIndex = variablesAddressesMap[$1] + currentArrayIndex;
               valueFormat1 = "number";
               valueFormat2 = "array";
