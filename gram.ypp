@@ -304,8 +304,8 @@ expression   : value {
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
-              //  pushCodeWithAddress("STORE", 0);
                firstElementAddress         = equationElementAddress;
+
                arrayIndexOfFirstElement    = currentArrayIndex;
                firstElementName            = variableNameGlobal;
                firstArrayIdentifierAddress = arrayIdentifierAddress;
@@ -428,7 +428,6 @@ expression   : value {
                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("STORE", 0);
 
-
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 3);
@@ -462,9 +461,11 @@ expression   : value {
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
-               firstElementAddress      = equationElementAddress;
-               arrayIndexOfFirstElement = currentArrayIndex;
-               firstElementName         = variableNameGlobal;
+
+               firstElementAddress         = equationElementAddress;
+               arrayIndexOfFirstElement    = currentArrayIndex;
+               firstElementName            = variableNameGlobal;
+               firstArrayIdentifierAddress = arrayIdentifierAddress;
 
                std::string variableTypes[4];
                variableTypes[0] = expressionType[0];
@@ -476,7 +477,9 @@ expression   : value {
 
              } SUB value {
 
-               secondElementAddress = equationElementAddress;
+               secondElementAddress             = equationElementAddress;
+               int secondArrayIdentifierAddress = arrayIdentifierAddress;
+               std::string secondElementName    = variableNameGlobal;
 
                std::string variableTypes[4];
                variableTypes[0] = expressionType[0];
@@ -526,9 +529,88 @@ expression   : value {
                  pushCodeWithAddress("LOAD",  0);
                  pushCodeWithAddress("SUB",   1);
 
+/******************************************************************************************************************/
+               } else if (types[0] == "array" && types[1] == "variable") { // done
 
-               } else if (types[0] == "array" && types[1] == "variable") {
-                 pushCodeWithAddress("###########", 123);
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 3);
+                 pushCodeWithAddress("LOADI", 3);
+                 pushCodeWithAddress("SUB",   secondElementAddress);
+
+               } else if (types[0] == "array" && types[1] == "array") { // done
+
+                 pushCodeWithAddress("LOAD", variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",  firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 0);
+                 pushCodeWithAddress("LOADI", 0);
+                 pushCodeWithAddress("STORE", 0); // value of first element
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 1); // value of second element
+
+                 pushCodeWithAddress("LOAD",  0);
+                 pushCodeWithAddress("SUB",   1);
+
+               } else if (types[0] == "array" && types[1] == "number") { // done
+
+                 pushCodeWithAddress("STORE", 0); // store number value
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   arrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 3);
+                 pushCodeWithAddress("LOADI", 3);
+                 pushCodeWithAddress("SUB",   0);
+
+               } else if (types[0] == "array" && types[1] == "arrayVar") { // done
+
+                 pushCodeWithAddress("LOAD", variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",  firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 0);
+                 pushCodeWithAddress("LOADI", 0);
+                 pushCodeWithAddress("SUB", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+
+               } else if (types[0] == "number" && types[1] == "array") { // done
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 1);
+
+                 pushCodeWithAddress("LOAD",  0);
+                 pushCodeWithAddress("SUB",   1);
+
+
+               } else if (types[0] == "variable" && types[1] == "array") {
+
+                 pushCodeWithAddress("STORE", 0);
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 3);
+                 pushCodeWithAddress("LOADI", 3);
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  0);
+                 pushCodeWithAddress("SUB",   3);
+
+               } else if (types[0] == "arrayVar" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 0);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 3);
+                 pushCodeWithAddress("LOADI", 3);
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  0);
+                 pushCodeWithAddress("SUB",   3);
+
+/******************************************************************************************************************/
 
                } else if (types[0] == "variable" && types[1] == "arrayVar") {
 

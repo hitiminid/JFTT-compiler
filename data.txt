@@ -3,12 +3,10 @@ VAR
 BEGIN
   a    := 1;
   b[1] := 2;
-  c    := 2;
+  c    := 5;
 
-  c := b[1] + b[a];
+  c := b[1] - b[a];
   WRITE c;
-
-
 
 
 END
