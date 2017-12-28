@@ -46,6 +46,11 @@
   int arrayIdentifierAddress;
   int arrayIndexOfFirstElement;
 
+
+  std::string variableNameGlobal;
+  std::string firstElementName;
+
+
   bool isDebugOn = false;
 
   int accumulator;
@@ -255,14 +260,10 @@ command      : identifier {
                       pushCode("PUT");
 
                     } else { // a[b]
-                      int startingPoint = variableAddress;
-                      // pushCodeWithAddress("LOAD", variable)
+
                       pushCodeWithAddress("LOAD", variablesAddressesMap[variableName]);
                       pushCodeWithAddress("ADD", arrayIdentifierAddress); // we load value n from a[n]
                       pushCodeWithAddress("STORE", 0);
-                      // generateNumber(std::to_string(startingPoint)); // we generate index
-                      // pushCodeWithAddress("ADD",   0);
-                      // pushCodeWithAddress("STORE", 0);
                       pushCodeWithAddress("LOADI", 0);
                       pushCode("PUT");
 
@@ -305,7 +306,7 @@ expression   : value {
               //  pushCodeWithAddress("STORE", 0);
                firstElementAddress      = equationElementAddress;
                arrayIndexOfFirstElement = currentArrayIndex;
-              //  firstElementName =
+               firstElementName         = variableNameGlobal;
 
                std::string variableTypes[4];
                variableTypes[0] = expressionType[0];
@@ -358,9 +359,12 @@ expression   : value {
                 pushCodeWithAddress("ADD",  0);
 
               } else if (types[0] == "array" && types[1] == "variable") {
-                pushCode("#### ARRAY and VARIABLE ####");
 
-
+                pushCodeWithAddress("LOAD", variablesAddressesMap[firstElementName]);
+                pushCodeWithAddress("ADD",  arrayIdentifierAddress); // we load value n from a[n]
+                pushCodeWithAddress("STORE", 3);
+                pushCodeWithAddress("LOADI", 3);
+                pushCodeWithAddress("ADD", secondElementAddress);
 
               } else if (types[0] == "variable" && types[1] == "arrayVar") {
 
@@ -387,11 +391,18 @@ expression   : value {
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
-              //  pushCodeWithAddress("STORE", 0);
-              /*
-                tutaj najprawdopodobniej był ten zbędny STORE, ale wypadaloby sie temu jeszcze przyjrzec, z farcikiem, elo
-              */
-               firstElementAddress = equationElementAddress;
+               firstElementAddress      = equationElementAddress;
+               arrayIndexOfFirstElement = currentArrayIndex;
+               firstElementName         = variableNameGlobal;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 0);
+               }
+
              } SUB value {
 
                secondElementAddress = equationElementAddress;
@@ -426,16 +437,15 @@ expression   : value {
                   pushCodeWithAddress("SUB",   1);
 
                } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
-                 pushCodeWithAddress("###########", 123);
 
+                 pushCodeWithAddress("LOAD", firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("SUB",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
 
                } else if (types[0] == "arrayVar" && types[1] == "number") {
 
-                //  pushCodeWithAddress("###########", 2137);
                  pushCodeWithAddress("STORE", 1);
                  pushCodeWithAddress("LOAD",  firstElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                  pushCodeWithAddress("SUB",   1);
-                //  pushCodeWithAddress("STORE", firstElementAddress+currentArrayIndex);
 
                } else if (types[0] == "number" && types[1] == "arrayVar") {
 
@@ -457,7 +467,6 @@ expression   : value {
                  pushCodeWithAddress("STORE", 1);
                  pushCodeWithAddress("LOAD",  0);
                  pushCodeWithAddress("SUB",   1);
-
 
                } else if (types[0] == "arrayVar" && types[1] == "variable") {
 
@@ -520,7 +529,7 @@ identifier   : PID {
               valueFormat1 = "variable";
               valueFormat2 = "variable";
               std::string variableName = $1;
-              // variableNameGlobal = $1;
+              variableNameGlobal = $1;
 
               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                 std::cout << "variable " << variableName << " is not declared! \n";
@@ -539,11 +548,13 @@ identifier   : PID {
               } else {
                 valueFormat1            = "array";
                 valueFormat2            = "array";
+
+                variableNameGlobal = $1;
+
                 equationElementAddress  = variablesAddressesMap[$1];
                 arrayIdentifierAddress  = variablesAddressesMap[$3]; // is only an address of a variable, not a value!!!
               }
 
-              // variableNameGlobal = $1;
            }
              | PID LEFT_BR num RIGHT_BR {
 
@@ -553,8 +564,11 @@ identifier   : PID {
                 std::cout << "variable " << variableName << " is not declared! \n";
                 exit(1);
               } else {
+
                 valueFormat1 = "number";
                 valueFormat2 = "array";
+
+                variableNameGlobal = $1;
 
                 currentArrayIndex = atoi($3);
 
