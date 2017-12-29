@@ -1,19 +1,10 @@
 VAR
-  a b c d[3]
+  a
 BEGIN
   a := 1;
-  d[1] := 2;
-
-  READ  c;
-  WRITE c;
-
-  READ  d[1];
-  WRITE d[1];
-
-  a := 2;
-
-  READ  d[a];
-  WRITE  d[a];
-
+  
+  IF 1 = 2 THEN
+    WRITE a;
+  ENDIF
 
 END
