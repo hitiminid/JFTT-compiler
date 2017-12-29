@@ -9,7 +9,7 @@ BEGIN
   true  := 1;
   false := 1;
 
-
+(
   IF 4 > 2 THEN
     WRITE true;
   ENDIF
@@ -18,5 +18,27 @@ BEGIN
   IF 4 > 4 THEN
     WRITE true;
   ENDIF
+
+  IF 4 >= 4 THEN
+    WRITE true;
+  ENDIF
+)
+
+  IF 4 >= c[1] THEN
+    WRITE true;
+  ENDIF
+
+  IF 4 > c[1] THEN
+    WRITE true;
+  ENDIF
+
+  IF 4 >= c[a] THEN
+    WRITE true;
+  ENDIF
+  
+  IF 4 > c[a] THEN
+    WRITE true;
+  ENDIF
+
 
 END
