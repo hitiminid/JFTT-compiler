@@ -1,21 +1,21 @@
 VAR
-  a
+  a b[2]
 BEGIN
 
   a    := 1;
+  b[0] := 1;
 
   IF 1 = 1 THEN
     a := a + 1;
     WRITE a;
-    IF 2 = a THEN
-      WRITE a;
-    ENDIF
   ENDIF
 
 
   (
 
-
+  IF 1 = a THEN
+    WRITE a;
+  ENDIF
 
   IF a = a THEN
     a := a + 1;

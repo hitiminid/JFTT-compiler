@@ -212,9 +212,13 @@ command      : identifier {
              | IF  condition THEN  commands ELSE  commands  ENDIF
              | IF  condition  THEN  commands  ENDIF {
 
-               int commandLine = numberOfCommands;
-               std::pair<int, int> abc = std::make_pair(numberOfCommands-3, numberOfCommands + 2);
+               std::pair<int, int> abc = jumpStack.top();
+               jumpStack.pop();
+               abc.second = numberOfCommands;
+              //  std::pair<int, int> abc = std::make_pair(numberOfCommands, numberOfCommands);
+              //  std::cout << abc.first <<" # " << abc.second << "\n";
                jumpStack.emplace(abc);
+
 
              }
              | WHILE  condition  DO  commands  ENDWHILE
@@ -1162,15 +1166,20 @@ void showAllocatedMemoryIndexes() {
 
 void finish() {
   pushCode("HALT");
-  changeJumpValue();
+  std::stack<std::pair<int, int>> temp = jumpStack;
 
-  // std::stack<std::pair<int, int>> temp = jumpStack;
+
+  // std::cout << jumpStack.size() << "\n\n\n\n\n\n\n";
   // for (int i = 0; i < jumpStack.size(); i++) {
   //   std::pair<int, int> abc = temp.top();
   //   temp.pop();
   //   // std::cout << " SIZE " << temp.size() << "\n";
   //   std::cout << abc.first << " " << abc.second << "\n";
   // }
+
+  changeJumpValue();
+
+
 
   displayCommandVector(&commandsVector);
   // std::cout << numberOfCommands <<" #####\n";
@@ -1213,36 +1222,28 @@ void displayCommandVector(std::vector<std::string> *commands) {
 
 void pushCode(std::string opCode) {
   commandsVector.push_back(opCode);
-  // if (opCode != "HALT") {
     numberOfCommands++;
-  // }
 }
 
 void pushCodeWithAddress(std::string opCode, int number) {
   std::string space = " ";
   std::string whole = opCode + space + std::to_string(number);
   commandsVector.push_back(whole);
-  // if (opCode != "JUMP") {
-    numberOfCommands++;
-  // }
+  if (opCode == "JUMP") {
+    int commandLine = numberOfCommands;
+    std::pair<int, int> abc = std::make_pair(numberOfCommands, numberOfCommands);
+    // std::cout << abc.first <<" # " << abc.second << "\n";
+    jumpStack.emplace(abc);
+  }
+  numberOfCommands++;
+
 }
 
 void changeJumpValue() {
   std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
   // std::cout << commandsVector.size() << "####\n";
   int a = 0;
-  // std::cout << jumpStack.size() << " aaaaaaaaaaaaaaaaaaa\n";
-  // for (int i = commandsVector.size(); i >= 0 ; i--) {
-  //   if (commandsVector[i].find(placeholder) != std::string::npos) {// w sumie to moge szukac jumpów
-  //     a++;
-  //     int startingIndex = 0;
-  //     int finishIndex   = commandsVector[i].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
-  //     std::string address = std::to_string(jumpStack.top().second);
-  //     jumpStack.pop();
-  //     commandsVector[i] = commandsVector[i].substr(startingIndex, finishIndex) + address;
-  //     break;
-  //   }
-  // }
+
   int jumpStackSize = jumpStack.size();
 
   for (int i = 0; i < jumpStackSize; i++) {
