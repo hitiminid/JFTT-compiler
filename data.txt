@@ -4,18 +4,13 @@ BEGIN
 
   a    := 1;
 
-  IF 1 = 2 THEN
+  IF 1 < 2 THEN
     WRITE a;
-  ELSE
-    a := a + 1;
-    WRITE a;
-    IF a = a THEN
-      WRITE a;
-    ENDIF
   ENDIF
 
 
-
-
+  IF 1 < 123 THEN
+    WRITE a;
+  ENDIF
 
 END
