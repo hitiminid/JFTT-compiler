@@ -209,17 +209,39 @@ command      : identifier {
                   pushCodeWithAddress("STORE", addressToAssign);
                 }
              }
-             | IF  condition THEN  commands ELSE  commands  ENDIF
-             | IF  condition  THEN  commands  ENDIF {
+             | IF  condition THEN commands {
+               pushCodeWithAddress("JUMP", JUMP_PLACEHOLDER_ADDRESS);
 
+             } ELSE {
+
+               std::pair<int, int> secondJump = jumpStack.top();
+               jumpStack.pop();
+              //  std::cout << secondJump.second << " ***\n";
+
+               std::pair<int, int> firstJump  = jumpStack.top();
+               jumpStack.pop();
+
+               firstJump.second = numberOfCommands;
+
+               jumpStack.emplace(firstJump);
+               jumpStack.emplace(secondJump);
+
+             } commands  ENDIF {
+
+               std::pair<int, int> abc = jumpStack.top();
+               jumpStack.pop();
+               abc.second = numberOfCommands;
+               jumpStack.emplace(abc);
+
+              }
+
+             | IF  condition  THEN  commands  ENDIF {
                std::pair<int, int> abc = jumpStack.top();
                jumpStack.pop();
                abc.second = numberOfCommands;
               //  std::pair<int, int> abc = std::make_pair(numberOfCommands, numberOfCommands);
               //  std::cout << abc.first <<" # " << abc.second << "\n";
                jumpStack.emplace(abc);
-
-
              }
              | WHILE  condition  DO  commands  ENDWHILE
              | FOR  PID  FROM  value TO  value DO  commands  ENDFOR
@@ -1166,9 +1188,7 @@ void showAllocatedMemoryIndexes() {
 
 void finish() {
   pushCode("HALT");
-  std::stack<std::pair<int, int>> temp = jumpStack;
-
-
+  // std::stack<std::pair<int, int>> temp = jumpStack;
   // std::cout << jumpStack.size() << "\n\n\n\n\n\n\n";
   // for (int i = 0; i < jumpStack.size(); i++) {
   //   std::pair<int, int> abc = temp.top();
@@ -1178,9 +1198,6 @@ void finish() {
   // }
 
   changeJumpValue();
-
-
-
   displayCommandVector(&commandsVector);
   // std::cout << numberOfCommands <<" #####\n";
 }
@@ -1236,7 +1253,6 @@ void pushCodeWithAddress(std::string opCode, int number) {
     jumpStack.emplace(abc);
   }
   numberOfCommands++;
-
 }
 
 void changeJumpValue() {

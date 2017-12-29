@@ -4,52 +4,18 @@ BEGIN
 
   a    := 1;
 
-  IF 1 = 1 THEN
+  IF 1 = 2 THEN
+    WRITE a;
+  ELSE
     a := a + 1;
     WRITE a;
-    IF 2 = a THEN
+    IF a = a THEN
       WRITE a;
     ENDIF
   ENDIF
 
 
-  (
 
 
 
-  IF a = a THEN
-    a := a + 1;
-    WRITE a+2;
-  ENDIF
-
-  IF a = b[0] THEN
-    a := a + 1;
-    WRITE a;
-  ENDIF
-
-  IF b[0] = a THEN
-    a := a + 1;
-    WRITE a;
-  ENDIF
-
-  IF a = b[a] THEN
-    a := a + 1;
-    WRITE a;
-  ENDIF
-
-  IF b[a] = a THEN
-    a := a + 1;
-    WRITE a;
-  ENDIF
-
-  IF b[0] = b[0] THEN
-    a := a + 1;
-    WRITE a;
-  ENDIF
-
-  IF b[a] = b[a] THEN
-    a := a + 1;
-    WRITE a;
-  ENDIF
-)
 END
