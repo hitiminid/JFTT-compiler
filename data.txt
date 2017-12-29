@@ -1,16 +1,35 @@
 VAR
-  a
+  a b true false
 BEGIN
 
   a    := 1;
+  b    := 2;
+
+  true  := 1;
+  false := 1;
+
 
   IF 1 < 2 THEN
-    WRITE a;
+    WRITE true;
+  ENDIF
+
+  IF 1 < b THEN
+    WRITE true;
+  ENDIF
+
+  IF 1 < 2 THEN
+    WRITE true;
   ENDIF
 
 
-  IF 1 < 123 THEN
-    WRITE a;
+  IF b < 2 THEN
+    WRITE true;
   ENDIF
+
+  IF 1 < 2 THEN
+    WRITE true;
+  ENDIF
+
+
 
 END

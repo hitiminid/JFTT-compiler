@@ -1089,8 +1089,6 @@ condition    : value {
                  pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
                  pushCodeWithAddress("STORE", 1);
                  pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
-                 //pushCodeWithAddress("STORE", 3); // zapisuje ja sobie w rejestrze podrecznym
-                 //pushCodeWithAddress("LOAD", 3);
                  pushCode("INC");
 
                  pushCodeWithAddress("SUB", secondElementAddress);
@@ -1098,7 +1096,16 @@ condition    : value {
 
 
                } else if (types[0] == "array" && types[1] == "array") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
                  pushCode("INC");
+
+                 pushCodeWithAddress("SUB",   3);
 
                } else if (types[0] == "array" && types[1] == "number") {
 
@@ -1188,11 +1195,186 @@ condition    : value {
 
                pushCodeWithAddress("JZERO", numberOfCommands + 2);
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
-
-
              }
              | value GT  value { }
-             | value LE  value { }
+             | value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+
+               firstElementAddress         = equationElementAddress;
+               arrayIndexOfFirstElement    = currentArrayIndex;
+               firstElementName            = variableNameGlobal;
+               firstArrayIdentifierAddress = arrayIdentifierAddress;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 2);
+               }
+              } LE  value {
+
+               secondElementAddress             = equationElementAddress;
+               int secondArrayIdentifierAddress = arrayIdentifierAddress;
+               std::string secondElementName    = variableNameGlobal;
+               int arrayIndexOfSecondElement    = currentArrayIndex;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               variableTypes[2] = valueFormat1;
+               variableTypes[3] = valueFormat2;
+
+               std::string types[2];
+               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+               if (types[0] == "number" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3); // saving second number to cell
+
+                 pushCodeWithAddress("LOAD", 2); // a
+                 pushCodeWithAddress("SUB",  3); // (a+1) - b
+
+               } else if (types[0] == "number" && types[1] == "variable") {
+
+
+                pushCodeWithAddress("LOAD", firstElementAddress);
+
+                pushCodeWithAddress("SUB", secondElementAddress);
+
+               } else if (types[0] == "variable" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+
+                 pushCodeWithAddress("LOAD", firstElementAddress);
+
+                 pushCodeWithAddress("SUB",  3);
+
+               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress  + arrayIndexOfFirstElement  + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("SUB",   secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+
+               } else if (types[0] == "arrayVar" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD", firstElementAddress  + arrayIndexOfFirstElement  + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("SUB", 3);
+
+
+               } else if (types[0] == "number" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD", 2);
+                 pushCodeWithAddress("SUB",   secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+
+               } else if (types[0] == "array" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
+                 //pushCodeWithAddress("STORE", 3); // zapisuje ja sobie w rejestrze podrecznym
+                 //pushCodeWithAddress("LOAD", 3);
+
+                 pushCodeWithAddress("SUB", secondElementAddress);
+
+
+
+               } else if (types[0] == "array" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
+
+                 pushCodeWithAddress("SUB",   3);
+
+               } else if (types[0] == "array" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+
+                 pushCodeWithAddress("SUB",   3);
+
+               } else if (types[0] == "array" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
+
+                 pushCodeWithAddress("SUB", secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+
+               } else if (types[0] == "number" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  2);
+                 pushCodeWithAddress("SUB", 3);
+
+               } else if (types[0] == "variable" && types[1] == "array") {
+
+                  pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                  pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                  pushCodeWithAddress("STORE", 1);
+                  pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
+                  pushCodeWithAddress("STORE", 3);
+
+                  pushCodeWithAddress("LOAD", firstElementAddress);
+                  pushCodeWithAddress("SUB",  3);
+
+               } else if (types[0] == "arrayVar" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+                 pushCodeWithAddress("SUB",  3);
+
+
+               } else if (types[0] == "variable" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD", firstElementAddress);
+                 pushCodeWithAddress("SUB",  secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+
+               } else if (types[0] == "arrayVar" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD", firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+                 pushCodeWithAddress("SUB",  secondElementAddress);
+
+
+               } else if (types[0] == "variable" && types[1] == "variable") {
+                 pushCodeWithAddress("LOAD", firstElementAddress);
+
+                 pushCodeWithAddress("SUB", secondElementAddress);
+               }
+
+               pushCodeWithAddress("JZERO", numberOfCommands + 2);
+               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
+             }
              | value GE  value { }
 ;
 value        : num {
