@@ -5,8 +5,8 @@
   /* ========================================= */
   /*
     [ ] inicjalizowanie tablic     ----> a := c nie wywala bledu
+    [ ] PRECEDENS DLA MODULO
   */
-
   //code
   #include <cstdlib>
   #include <iostream>
@@ -155,25 +155,16 @@
 
 %%
 
-program         : VAR  vdeclarations  BEG commands{ /*std::cout << "############################\n\n\n"; displayMap(&variablesAddressesMap)*/;} END {
+program         : VAR  vdeclarations  BEG commands END {
                   finish();
                 }
 
 vdeclarations   : vdeclarations  PID {
                   declareAVariable($2);
-
-                  // std::cout << "#####\n";
-                  //
-                  // std::cout << "#####\n";
                 }
-
                 | vdeclarations  PID LEFT_BR num RIGHT_BR {
                   int arraySize = atoi($4);
                   declareAnArray($2, arraySize);
-
-                  // std::cout << "#####\n";
-                  // displayMap(&variablesAddressesMap);
-                  // std::cout << "#####\n";
                 }
                 | {
                   // std::cout << "No variables declared" << "\n";
@@ -226,17 +217,32 @@ command      : identifier {
                if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                  std::cout << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared! #READ" << "\n";
                  exit(1);
-
                } else {
 
                  int variableAddress = variablesAddressesMap[variableName];
                  pushCode("ZERO");
                  pushCode("GET");
 
-                 if (isVariableDeclared(&arraysMap, variableName)) {  //todo: a tu nie powinno być initialized???
-                   int requiredCell = computeRequiredMemoryCell(variableName, currentArrayIndex);
-                   //is variable initialized
+                 if (isVariableDeclared(&arraysMap, variableName)) {
+                   //todo: a tu nie powinno być initialized???
+                  int requiredCell;
+                  if (valueFormat1 == "number") { // a[1]
+
+                   requiredCell = computeRequiredMemoryCell(variableName, currentArrayIndex);
                    pushCodeWithAddress("STORE", requiredCell);
+
+                 } else { // a[n]
+
+                   pushCodeWithAddress("STORE", 0);
+
+                   pushCodeWithAddress("LOAD", variablesAddressesMap[variableName]);
+                   pushCodeWithAddress("ADD",  arrayIdentifierAddress); // we load value n from a[n]
+                   pushCodeWithAddress("STORE", 1);
+
+                   pushCodeWithAddress("LOAD",  0);
+                   pushCodeWithAddress("STOREI", 1);
+                 }
+
                  } else {
                    int variableAddress = variablesAddressesMap[variableName];
 
@@ -351,7 +357,6 @@ expression   : value {
 
                 pushCodeWithAddress("STORE", 0);
                 pushCodeWithAddress("LOAD",  firstElementAddress);
-                // pushCodeWithAddress("LOADIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIING", firstElementAddress);
                 pushCodeWithAddress("ADD",   0);
 
               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
@@ -918,7 +923,7 @@ int computeRequiredMemoryCell(std::string variableName, int currentArrayIndex) {
   if (isDebugOn) {
     std::cout << "We start at index " << startingIndex << " looking for index " << searchedIndex << "\n";
   }
-  return searchedIndex;
+  return searchedIndex + ARRAY_INDEX_OFFSET;
 }
 
 /*===================================================*/
