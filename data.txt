@@ -3,7 +3,11 @@ VAR
 BEGIN
   a := 1;
 
-  IF a = 1 THEN
+  IF 1 = 1 THEN
+    WRITE a;
+  ENDIF
+
+  IF 1 = a THEN
     WRITE a;
   ENDIF
 
