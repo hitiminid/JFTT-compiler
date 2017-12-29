@@ -2,8 +2,8 @@ VAR
   a
 BEGIN
   a := 1;
-  
-  IF 1 = 2 THEN
+
+  IF a = 1 THEN
     WRITE a;
   ENDIF
 

@@ -14,7 +14,8 @@
   #include <cstring>
   #include <string>
   #include <map>
-  #include <bitset>
+  //#include <bitset>
+  #include <stack>
   #include <vector>
   #include <stdio.h>
   #include <stdlib.h>
@@ -30,6 +31,9 @@
   #define NUMBER_OF_RESERVED_MEMORY_INDEXES 9
   #define ERROR_BUFFER 150
   #define ARRAY_INDEX_OFFSET 1
+  #define JUMP_PLACEHOLDER_ADDRESS -3000
+
+
 
   /*===================================================*/
   /*                      VARIABLES                    */
@@ -82,13 +86,7 @@
   // <nazwa, rozmiar tablicy>
   std::map<std::string, int> arraysMap;
 
-  /* mapa zawiera informacje dotyczace indeksu w ktorym rozpoczyna sie dana mapa*/
-  std::map<std::string, int> arrayStartMap;
-
-
-  std::vector<int> jumpStack;
-
-
+  std::stack<std::pair<int, int>> jumpStack;
 
   // int yylex();
   void yyerror (char* msg);
@@ -155,7 +153,7 @@
 
 
 %left '-' '+'
-%left '*' '/'
+%left '*' '/' '%'
 // where is modulo ???
 %right '^' // do I need it?
 
@@ -212,7 +210,12 @@ command      : identifier {
                 }
              }
              | IF  condition THEN  commands ELSE  commands  ENDIF
-             | IF  condition  THEN  commands  ENDIF
+             | IF  condition  THEN  commands  ENDIF {
+               int commandLine = numberOfCommands + 1;
+               jumpStack.push(std::make_pair(numberOfCommands - 2, numberOfCommands+1));
+              //  pushCodeWithAddress("TUTAJ KONCZY SIE IF ", commandLine);
+
+             }
              | WHILE  condition  DO  commands  ENDWHILE
              | FOR  PID  FROM  value TO  value DO  commands  ENDFOR
              | FOR  PID  FROM  value  DOWNTO  value DO  commands  ENDFOR
@@ -398,7 +401,6 @@ expression   : value {
                 pushCodeWithAddress("LOADI", 3);
                 pushCodeWithAddress("ADD",   0);
 
-/*##################################################################################################################*/
               } else if (types[0] == "array" && types[1] == "array") { // done
 
                 pushCodeWithAddress("LOAD", variablesAddressesMap[firstElementName]);
@@ -450,8 +452,6 @@ expression   : value {
                 pushCodeWithAddress("STORE", 3);
                 pushCodeWithAddress("LOADI", 3);
                 pushCodeWithAddress("ADD",   0);
-
-/*##################################################################################################################*/
 
               } else if (types[0] == "variable" && types[1] == "arrayVar") {
 
@@ -544,7 +544,6 @@ expression   : value {
                  pushCodeWithAddress("STORE", 0);
                  pushCodeWithAddress("SUB",   secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
 
-/******************************************************************************************************************/
                } else if (types[0] == "array" && types[1] == "variable") { // done
 
                  pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
@@ -621,8 +620,6 @@ expression   : value {
                  pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                  pushCodeWithAddress("SUB",   1);
 
-/******************************************************************************************************************/
-
                } else if (types[0] == "variable" && types[1] == "arrayVar") {
 
                  pushCodeWithAddress("LOAD",  firstElementAddress);
@@ -658,6 +655,26 @@ expression   : value {
              | value DIV value { }
              | value MOD value { }
 ;
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+/*##################################################################################*/
+
+
 condition    : value {
                 expressionType[0]  = valueFormat1;
                 expressionType2[0] = valueFormat2;
@@ -674,6 +691,7 @@ condition    : value {
                 if (type == "number") {
                   pushCodeWithAddress("STORE", 2);
                 }
+
               } EQ  value {
 
                 secondElementAddress             = equationElementAddress;
@@ -704,7 +722,7 @@ condition    : value {
                   pushCodeWithAddress("LOAD", 3);
                   pushCodeWithAddress("SUB",  2);
 
-                  pushCodeWithAddress("ADD", 0);
+                  pushCodeWithAddress("ADD",   0);
 
                 } else if (types[0] == "number" && types[1] == "variable") {
 
@@ -734,7 +752,6 @@ condition    : value {
                   pushCodeWithAddress("SUB",  firstElementAddress);
 
                   pushCodeWithAddress("ADD", 0);
-
 
 
 
@@ -910,7 +927,7 @@ condition    : value {
                   pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
                   pushCodeWithAddress("STORE", 3); // zapisuje ja sobie w rejestrze podrecznym
 
-                  pushCodeWithAddress("LOAD",  );
+                  pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                   pushCodeWithAddress("SUB",   3);
                   pushCodeWithAddress("STORE", 0);
 
@@ -953,12 +970,51 @@ condition    : value {
                   pushCodeWithAddress("SUB",   firstElementAddress);
 
                   pushCodeWithAddress("ADD", 0);
-
                 }
 
-
+                pushCodeWithAddress("JZERO", numberOfCommands + 2);
+                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
               }
-             | value NEQ value { }
+             | value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+
+               firstElementAddress         = equationElementAddress;
+               arrayIndexOfFirstElement    = currentArrayIndex;
+               firstElementName            = variableNameGlobal;
+               firstArrayIdentifierAddress = arrayIdentifierAddress;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 2);
+               }
+             }
+             NEQ value {
+
+               secondElementAddress             = equationElementAddress;
+               int secondArrayIdentifierAddress = arrayIdentifierAddress;
+               std::string secondElementName    = variableNameGlobal;
+               int arrayIndexOfSecondElement    = currentArrayIndex;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               variableTypes[2] = valueFormat1;
+               variableTypes[3] = valueFormat2;
+
+               std::string types[2];
+               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+               if (types[0] == "number" && types[1] == "number") {
+
+
+               }
+
+             }
              | value LT  value { }
              | value GT  value { }
              | value LE  value { }
@@ -971,7 +1027,6 @@ value        : num {
              }
              | identifier {
                std::string variableName = $<string>1;
-              //  std::cout << variableName << " XD\n";
 
                if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                  // not declared
@@ -1079,7 +1134,6 @@ void declareAnArray(std::string name, int arraySize) {
 
     currentMemoryIndex = currentMemoryIndex -1;
     variablesAddressesMap[name] = currentMemoryIndex; // the beggining of an array
-    arrayStartMap[name] = currentMemoryIndex;
     arraysMap[name] = arraySize;
     currentMemoryIndex =  currentMemoryIndex + arraySize; //without the first one
     // std::cout << name << " end at " << currentMemoryIndex << "\n";
@@ -1107,7 +1161,18 @@ void showAllocatedMemoryIndexes() {
 
 void finish() {
   pushCode("HALT");
+  changeJumpValue();
+
+  // std::stack<std::pair<int, int>> temp = jumpStack;
+  // for (int i = 0; i < jumpStack.size(); i++) {
+  //   std::pair<int, int> abc = temp.top();
+  //   temp.pop();
+  //   std::cout << " SIZE " << temp.size() << "\n";
+  //   std::cout << abc.first << " " << abc.second << "\n";
+  // }
+
   displayCommandVector(&commandsVector);
+  // std::cout << numberOfCommands <<" #####\n";
 }
 
 void displayMap(std::map<std::string, int>* mapToDisplay) {
@@ -1147,22 +1212,33 @@ void displayCommandVector(std::vector<std::string> *commands) {
 
 void pushCode(std::string opCode) {
   commandsVector.push_back(opCode);
-  numberOfCommands++;
+  if (opCode != "HALT") {
+    numberOfCommands++;
+  }
 }
 
 void pushCodeWithAddress(std::string opCode, int number) {
   std::string space = " ";
   std::string whole = opCode + space + std::to_string(number);
   commandsVector.push_back(whole);
-  numberOfCommands++;
+  if (opCode != "JUMP") {
+    numberOfCommands++;
+  }
 }
 
-
 void changeJumpValue() {
-
-
-
-
+  std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
+  for (int i = 0; i < commandsVector.size(); i++) {
+    if ( commandsVector[i].find(placeholder) != std::string::npos) {// w sumie to moge szukac jumpów
+      int startingIndex = 0;
+      // std::cout << commandsVector[i] << " XD\n";
+      int finishIndex   = commandsVector[i].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
+      std::string address = std::to_string(jumpStack.top().second);
+      jumpStack.pop();
+      commandsVector[i] = commandsVector[i].substr(startingIndex, finishIndex) + address;
+      break;
+    }
+  }
 }
 
 void generateNumber(std::string number) {
