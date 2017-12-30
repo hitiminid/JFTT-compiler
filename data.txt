@@ -1,19 +1,25 @@
 VAR
-  a
+  a b
 BEGIN
 
   a := 1;
+  b := 2;
 
-  (
-    IF a < 5 THEN
-      WRITE a;
-      a := a + 1;
-    ENDIF
-  )
-
-  WHILE a < 5 DO
+  IF 1 = 1 THEN
     WRITE a;
-    a := a + 1;
-  ENDWHILE
+
+    IF 1 = 1 THEN
+      WRITE a;
+    ENDIF
+
+    IF 1 = 1 THEN
+      WRITE a;
+    ENDIF
+
+    IF 1 = 1 THEN
+      WRITE a;
+    ENDIF
+
+  ENDIF
 
 END

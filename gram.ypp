@@ -209,43 +209,51 @@ command      : identifier {
                   pushCodeWithAddress("STORE", addressToAssign);
                 }
              }
+
+
+
+
              | IF  condition THEN commands {
                pushCodeWithAddress("JUMP", JUMP_PLACEHOLDER_ADDRESS);
 
              } ELSE {
+              //  changeJumpValu/e();
 
-               std::pair<int, int> secondJump = jumpStack.top();
-               jumpStack.pop();
-              //  std::cout << secondJump.second << " ***\n";
-
-               std::pair<int, int> firstJump  = jumpStack.top();
-               jumpStack.pop();
-
-               firstJump.second = numberOfCommands;
-
-               jumpStack.emplace(firstJump);
-               jumpStack.emplace(secondJump);
+              //  std::pair<int, int> secondJump = jumpStack.top();
+              //  jumpStack.pop();
+              // //  std::cout << secondJump.second << " ***\n";
+              //
+              //  std::pair<int, int> firstJump  = jumpStack.top();
+              //  jumpStack.pop();
+              //
+              //  firstJump.second = numberOfCommands;
+              //
+              //  jumpStack.emplace(firstJump);
+              //  jumpStack.emplace(secondJump);
 
              } commands  ENDIF {
 
-               std::pair<int, int> abc = jumpStack.top();
-               jumpStack.pop();
-               abc.second = numberOfCommands;
-               jumpStack.emplace(abc);
+              //  changeJumpValue();
+
+              //  std::pair<int, int> abc = jumpStack.top();
+              //  jumpStack.pop();
+              //  abc.second = numberOfCommands;
+              //  jumpStack.emplace(abc);
 
               }
 
              | IF  condition  THEN  commands  ENDIF {
-               std::pair<int, int> abc = jumpStack.top();
-               jumpStack.pop();
-               abc.second = numberOfCommands;
-              //  std::pair<int, int> abc = std::make_pair(numberOfCommands, numberOfCommands);
-              //  std::cout << abc.first <<" # " << abc.second << "\n";
-               jumpStack.emplace(abc);
+              //  std::cout << numberOfCommands <<" haha \n" ;
+               changeJumpValue();
+              //  std::pair<int, int> abc = jumpStack.top();
+              //  jumpStack.pop();
+              //  abc.second = numberOfCommands;
+              // //  std::pair<int, int> abc = std::make_pair(numberOfCommands, numberOfCommands);
+              // //  std::cout << abc.first <<" # " << abc.second << "\n";
+              //  jumpStack.emplace(abc);
              }
 
              | WHILE condition DO  commands ENDWHILE {
-              //  pushCodeWithAddress("currently at", numberOfCommands);
                pushCodeWithAddress("JUMP", JUMP_PLACEHOLDER_ADDRESS);
 
                std::pair<int, int> firstJump = jumpStack.top();
@@ -276,7 +284,6 @@ command      : identifier {
                  pushCode("GET");
 
                  if (isVariableDeclared(&arraysMap, variableName)) {
-                   //todo: a tu nie powinno być initialized???
                     int requiredCell;
                     if (valueFormat1 == "number") { // a[1]
 
@@ -344,11 +351,7 @@ command      : identifier {
              }
 ;
 expression   : value {
-                /*
-                if it's a number then load it directly to the accumulator
-                otherwise find an adress and THEN load it
-                */
-                // pushCodeWithAddress("LOAD", 123);
+
                 if (valueFormat1 == "number" && valueFormat2 == "number") {
                     // do nothing
                     // pushCode("WABBA LUBBA DUB DUB ");
@@ -694,7 +697,130 @@ expression   : value {
              /*##################################################################################*/
              /*#                                      MUL                                       #*/
              /*##################################################################################*/
-             | value MUL value { }
+             | value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+
+               firstElementAddress         = equationElementAddress;
+               arrayIndexOfFirstElement    = currentArrayIndex;
+               firstElementName            = variableNameGlobal;
+               firstArrayIdentifierAddress = arrayIdentifierAddress;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 2);
+               }
+
+             } MUL value {
+
+               secondElementAddress             = equationElementAddress;
+               int secondArrayIdentifierAddress = arrayIdentifierAddress;
+               std::string secondElementName    = variableNameGlobal;
+               int arrayIndexOfSecondElement    = currentArrayIndex;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               variableTypes[2] = valueFormat1;
+               variableTypes[3] = valueFormat2;
+
+               std::string types[2];
+               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+               if (types[0] == "number" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCode("ZERO");
+                 pushCodeWithAddress("STORE", 4); //REG_EXP_1
+                 pushCodeWithAddress("STORE", 5); //REG_EXP_2
+                 pushCodeWithAddress("STORE", 6); //REG_EXP_3
+                 pushCodeWithAddress("STORE", 7); //REG_EXP_4
+                 pushCodeWithAddress("STORE", 8); //REG_EXP_5
+
+                 /*
+                 #######################################
+                 #      SPRAWDZENIE CZY JEST TO 0      #
+                 #######################################
+                 */
+
+                 /*
+                 (1) zaladuj do akumulatora a
+                 (2) jesli jest zerem to wyjdz z algorytmu
+                 (3) jesli nie, to sprawdz b
+                 (4) jesli b jest zerem to wyzeruj akumulator i wyjdz z algorytmu
+                 */
+
+                 pushCodeWithAddress("LOAD",  2);                   // (1)
+                 pushCodeWithAddress("JZERO", numberOfCommands+38); // (2)
+                 pushCodeWithAddress("LOAD",  3);                   // (3)
+                 pushCodeWithAddress("JZERO", numberOfCommands+2);  // (4)
+                //  int currentPoint = numberOfCommands;
+                 pushCodeWithAddress("JUMP",  numberOfCommands+3);  // (5)
+                 pushCode("ZERO");                                  // tutaj wskakuje (4)
+                 pushCodeWithAddress("JUMP",  numberOfCommands+321);  // wyzerowalem akk => wyskocz poza algorytm
+
+                 //tutaj wskakuje (5) - tu zaczyna sie algorytm
+                 pushCodeWithAddress("LOAD",  2);
+                 pushCodeWithAddress("STORE", 5); // REG_EXP_2
+
+                 pushCode("ZERO");
+                 pushCodeWithAddress("STORE", 2);
+                 pushCodeWithAddress("STORE", 6); // REG_EXP_3
+
+                 int jump1 = numberOfCommands;
+
+                 pushCodeWithAddress("LOAD", 4);
+                 pushCodeWithAddress("JODD", numberOfCommands+2);
+                 pushCodeWithAddress("JUMP", numberOfCommands+8);
+
+                 pushCodeWithAddress("LOAD",  6);
+                 pushCodeWithAddress("STORE", 7);
+
+                 pushCodeWithAddress("LOAD",  5);
+                 pushCodeWithAddress("STORE", 8);
+
+                 int jump2 = numberOfCommands;
+
+                 pushCodeWithAddress("LOAD",  7);
+                 pushCodeWithAddress("JZERO", numberOfCommands+4);
+
+
+                 pushCodeWithAddress("LOAD",  8);
+                 pushCode("SHL");
+                 pushCodeWithAddress("STORE",  8);
+
+
+                 pushCodeWithAddress("LOAD",  7);
+                 pushCode("DEC");
+                 pushCodeWithAddress("STORE",  7);
+
+                 pushCodeWithAddress("JUMP", jump2);
+
+
+                 pushCodeWithAddress("LOAD",  2);
+                 pushCodeWithAddress("ADD",   8);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD", 6);
+                 pushCode("INC");
+                 pushCodeWithAddress("STORE", 6);
+
+
+                 pushCodeWithAddress("LOAD",  4);
+                 pushCode("SHR");
+                 pushCodeWithAddress("STORE", 4);
+
+                 pushCodeWithAddress("JZERO", numberOfCommands+2);
+                 pushCodeWithAddress("JUMP", jump1);
+
+               }
+
+             }
              | value DIV value { }
              | value MOD value { }
 ;
@@ -833,7 +959,6 @@ condition    : value {
                   pushCodeWithAddress("SUB",   secondElementAddress);
                   pushCodeWithAddress("STORE", 0);
 
-
                   //compute b - a
                   pushCodeWithAddress("LOAD", secondElementAddress);
                   pushCodeWithAddress("SUB",  3);
@@ -850,18 +975,15 @@ condition    : value {
 
                   pushCodeWithAddress("STORE", 3); // zapisuje ja sobie w rejestrze podrecznym
 
-
                   pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
                   pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
                   pushCodeWithAddress("STORE", 2);
                   pushCodeWithAddress("LOADI", 2); // w tym momencie mam dostęp do wartości b[n]
                   pushCodeWithAddress("STORE", 4); // zapisuje ja sobie w rejestrze podrecznym
 
-
                   pushCodeWithAddress("LOAD",  3);  //pewnie zbedne
                   pushCodeWithAddress("SUB",   4);
                   pushCodeWithAddress("STORE", 0);
-
 
                   //compute b - a
                   pushCodeWithAddress("LOAD", 4);
@@ -872,7 +994,6 @@ condition    : value {
                 } else if (types[0] == "array" && types[1] == "number") {
 
                   pushCodeWithAddress("STORE", 4);
-
                   //compute a - b
                   pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
                   pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
@@ -937,7 +1058,6 @@ condition    : value {
                   pushCodeWithAddress("SUB",   3);
                   pushCodeWithAddress("STORE", 0);
 
-
                   pushCodeWithAddress("LOAD",  3);
                   pushCodeWithAddress("SUB",   firstElementAddress);
 
@@ -999,7 +1119,94 @@ condition    : value {
                 pushCodeWithAddress("JZERO", numberOfCommands + 2);
                 pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
               }
-             | value { } NEQ value { }
+             | value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+
+               firstElementAddress         = equationElementAddress;
+               arrayIndexOfFirstElement    = currentArrayIndex;
+               firstElementName            = variableNameGlobal;
+               firstArrayIdentifierAddress = arrayIdentifierAddress;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 2);
+               }
+             } NEQ value {
+
+
+               secondElementAddress             = equationElementAddress;
+               int secondArrayIdentifierAddress = arrayIdentifierAddress;
+               std::string secondElementName    = variableNameGlobal;
+               int arrayIndexOfSecondElement    = currentArrayIndex;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               variableTypes[2] = valueFormat1;
+               variableTypes[3] = valueFormat2;
+
+               std::string types[2];
+               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+               if (types[0] == "number" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+                 //checking a - b
+                 pushCodeWithAddress("LOAD",  2);
+                 pushCodeWithAddress("SUB",   3);
+                 pushCodeWithAddress("STORE", 0);
+                 // result of a - b is now in cell no. 0
+
+                 //computing b - a
+                 pushCodeWithAddress("LOAD", 3);
+                 pushCodeWithAddress("SUB",  2);
+
+                 pushCodeWithAddress("ADD",   0);
+
+               } else if (types[0] == "number" && types[1] == "variable") {
+
+               } else if (types[0] == "variable" && types[1] == "number") {
+
+               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
+
+               } else if (types[0] == "arrayVar" && types[1] == "number") {
+
+               } else if (types[0] == "number" && types[1] == "arrayVar") {
+
+               } else if (types[0] == "array" && types[1] == "variable") {
+
+               } else if (types[0] == "array" && types[1] == "array") {
+
+               } else if (types[0] == "array" && types[1] == "number") {
+
+               } else if (types[0] == "array" && types[1] == "arrayVar") {
+
+               } else if (types[0] == "number" && types[1] == "array") {
+
+               } else if (types[0] == "variable" && types[1] == "array") {
+
+               } else if (types[0] == "arrayVar" && types[1] == "array") {
+
+               } else if (types[0] == "variable" && types[1] == "arrayVar") {
+
+               } else if (types[0] == "arrayVar" && types[1] == "variable") {
+
+               } else if (types[0] == "variable" && types[1] == "variable") {
+
+               }
+
+               pushCodeWithAddress("JZERO", numberOfCommands + 2);
+               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
+
+
+
+
+             }
              | value {
 
                expressionType[0]  = valueFormat1;
@@ -1853,8 +2060,7 @@ void finish() {
   //   // std::cout << " SIZE " << temp.size() << "\n";
   //   std::cout << abc.first << " " << abc.second << "\n";
   // }
-
-  changeJumpValue();
+  // changeJumpValue();
   displayCommandVector(&commandsVector);
 }
 
@@ -1924,7 +2130,8 @@ void changeJumpValue() {
     jumpStack.pop();
     // std::cout << "1: " << topElement.first << " 2: " << topElement.second << "\n";
     int destinationAddress = topElement.first;
-    int destinationValue   = topElement.second;
+    // int destinationValue   = topElement.second;
+    int destinationValue   = numberOfCommands;
 
     // int startingIndex                  = 0;
     int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
