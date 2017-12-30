@@ -1,10 +1,12 @@
 VAR
   a
 BEGIN
-  a := 0;
+  a := 1;
 
-  IF a <> 1 THEN
+  IF a = 2 THEN
+    WRITE a;
+  ELSE
+    WRITE a;
     WRITE a;
   ENDIF
-
 END
