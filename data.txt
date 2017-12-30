@@ -1,25 +1,10 @@
 VAR
-  a b
+  a
 BEGIN
+  a := 0;
 
-  a := 1;
-  b := 2;
-
-  IF 1 = 1 THEN
+  IF a <> 1 THEN
     WRITE a;
-
-    IF 1 = 1 THEN
-      WRITE a;
-    ENDIF
-
-    IF 1 = 1 THEN
-      WRITE a;
-    ENDIF
-
-    IF 1 = 1 THEN
-      WRITE a;
-    ENDIF
-
   ENDIF
 
 END
