@@ -131,6 +131,7 @@
 
   void changeJumpValue(int value);
   void changeJumpValueForLoop();
+  void changeElseValue(int value);
 %}
 
 %union {
@@ -222,21 +223,34 @@ command      : identifier {
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
              | IF  condition THEN commands {
 
-               pushCodeWithAddress("JUMP", JUMP_PLACEHOLDER_ADDRESS);
-               elseStack.emplace(numberOfCommands);
-
 
              } ELSE {
 
+              //  std::cout << "number " << numberOfCommands;
+
+               pushCodeWithAddress("JUMP", 21373);
+
+               changeJumpValue();
+
             } commands {
-
-              changeJumpValue();
-
+              // elseStack.emplace(numberOfCommands);
+              // int returnA = elseStack.top();
               elseStack.emplace(numberOfCommands);
-              int returnA = elseStack.top();
-              changeJumpValue();
-            } ENDIF {
 
+            } ENDIF {
+              // std::cout << jumpStack.size();
+              std::stack<std::pair<int, int>> tempStack = jumpStack;
+
+              for (int i = 0; i < jumpStack.size(); i++) {
+                std::pair<int,int> topElement = tempStack.top();
+                tempStack.pop();
+                // std::cout << "1: " << topElement.first << " 2: " << topElement.second << "\n";
+              }
+
+              int returnA = elseStack.top();
+              elseStack.pop();
+              // std::cout << returnA << " KNOCK HIM OUT" << "\n";
+              changeElseValue(returnA);
             }
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -2108,9 +2122,15 @@ void pushCodeWithAddress(std::string opCode, int number) {
   std::string space = " ";
   std::string whole = opCode + space + std::to_string(number);
   commandsVector.push_back(whole);
-  if (opCode == "JUMP" && number == JUMP_PLACEHOLDER_ADDRESS) {
-    std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
-    jumpStack.emplace(newJumpPosition);
+  if (opCode == "JUMP" ) {
+    if (number == JUMP_PLACEHOLDER_ADDRESS) {
+      std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
+      jumpStack.emplace(newJumpPosition);
+    } else if (number == 21373) {
+      // std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
+      elseStack.emplace(numberOfCommands);
+    }
+
   }
   numberOfCommands++;
 }
@@ -2131,37 +2151,58 @@ void changeJumpValue() {
 
 }
 
-void changeJumpValueForLoop() {
-  std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
-  int jumpStackSize = jumpStack.size();
-
-  for (int i = 0; i < jumpStackSize; i++) {
-    std::pair<int,int> topElement = jumpStack.top();
-    jumpStack.pop();
-    int destinationAddress = topElement.first;
-    int destinationValue   = numberOfCommands;
-    // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
-
-    int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
-    std::string address                = std::to_string(++destinationValue);
-    commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
-  }
-}
+// void changeJumpValueForLoop() {
+//   std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
+//   int jumpStackSize = jumpStack.size();
+//
+//   for (int i = 0; i < jumpStackSize; i++) {
+//     std::pair<int,int> topElement = jumpStack.top();
+//     jumpStack.pop();
+//     int destinationAddress = topElement.first;
+//     int destinationValue   = numberOfCommands;
+//     // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
+//
+//     int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
+//     std::string address                = std::to_string(++destinationValue);
+//     commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
+//   }
+// }
 
 void changeJumpValue(int value) {
   std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
 
-  std::pair<int,int> topElement = jumpStack.top();
-  jumpStack.pop();
-  int destinationAddress = topElement.first;
-  int destinationValue   = value;
-  // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
+  if (jumpStack.size() > 0) {
+    std::pair<int,int> topElement = jumpStack.top();
+    jumpStack.pop();
+    int destinationAddress = topElement.first;
+    int destinationValue   = value;
+    // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
 
-  int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
-  std::string address                = std::to_string(destinationValue);
-  commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
+    int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
+    std::string address                = std::to_string(destinationValue);
+    commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
+  }
 
 }
+
+void changeElseValue(int value) {
+  std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
+
+  if (elseStack.size() > 0) {
+    // std::cout << "XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDd";
+    int topElement = elseStack.top();
+    elseStack.pop();
+    int destinationAddress = topElement;
+    int destinationValue   = value;
+    // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
+
+    int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
+    std::string address                = std::to_string(destinationValue);
+    commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
+  }
+}
+
+
 
 void generateNumber(std::string number) {
 

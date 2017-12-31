@@ -1,9 +1,9 @@
 VAR
   a
 BEGIN
-  a := 1;
+  a := 2;
 
-  IF a = 2 THEN
+  IF a = 3 THEN
     WRITE a;
   ELSE
     WRITE a;
