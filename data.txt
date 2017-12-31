@@ -1,12 +1,10 @@
 VAR
-  a
+  a b c[3]
 BEGIN
-  a := 2;
 
-  IF a = 3 THEN
-    WRITE a;
-  ELSE
-    WRITE a;
-    WRITE a;
-  ENDIF
+  a := 1;
+
+  c[a] := 2 + 2;
+  WRITE c[a];
+
 END

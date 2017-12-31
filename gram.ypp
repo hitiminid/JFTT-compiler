@@ -63,6 +63,7 @@
   int currentArrayIndex;
   int currentArrayIndex_assign;
   char errorMessage[ERROR_BUFFER];
+  int currentArrayAssignAddress;
 
 
   std::string valueFormat1;
@@ -132,6 +133,9 @@
   void changeJumpValue(int value);
   void changeJumpValueForLoop();
   void changeElseValue(int value);
+
+  void setEquationAttributes();
+
 %}
 
 %union {
@@ -192,30 +196,53 @@ command      : identifier {
                 expressionType[0]         = valueFormat1;
                 expressionType[1]         = valueFormat2;
                 currentArrayIndex_assign  = currentArrayIndex;
-              } ASSGN expression SEM {
-                std::string variableName = $<string>1;
+                currentArrayAssignAddress = arrayIdentifierAddress;
+                // std::cout << currentArrayAssignAddress << " XDDDD";
 
+              } ASSGN expression SEM {
+
+                std::string variableName = $<string>1;
                 int addressToAssign;
 
                 if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
                   std::cout << "Error [line "<< "]: Variable "<< $<string>1 <<" not declared!" << "\n";
                   exit(1);
                 } else { // variable is declared
+
                   int variableAddress = variablesAddressesMap[variableName];
 
                   if (expressionType[1] == "array") {
+
                     int arraySize = arraysMap[variableName];
 
-                    if (currentArrayIndex < 0 || currentArrayIndex >= arraySize) {
-                      std::cout << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
-                      exit(1);
+                    if (expressionType[0] == "array") { // a[n]
+                      pushCodeWithAddress("STORE", 8); // zapisz akumulator w pamieci
+                      pushCodeWithAddress("LOAD",  currentArrayAssignAddress); // ladujemy adres a
+                      pushCodeWithAddress("STORE", 9); // 10
+
+                      pushCodeWithAddress("LOAD",  variableAddress);
+                      pushCodeWithAddress("ADD",   9);
+                      pushCodeWithAddress("STORE", 1);
+
+                      pushCodeWithAddress("LOAD",   8);
+                      pushCodeWithAddress("STOREI", 1); // ladujemy adres
+
+                    } else {
+
+                      if (currentArrayIndex < 0 || currentArrayIndex >= arraySize) {
+                        std::cout << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
+                        exit(1);
+                      }
+                      addressToAssign = variableAddress + currentArrayIndex_assign + 1;
+                      pushCodeWithAddress("STORE", addressToAssign);
+
                     }
-                    addressToAssign = variableAddress + currentArrayIndex_assign + 1;
                   } else {
                     initializedVariablesMap[variableName] = true;
                     addressToAssign = variableAddress;
+                    pushCodeWithAddress("STORE", addressToAssign);
+
                   }
-                  pushCodeWithAddress("STORE", addressToAssign);
                 }
              }
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -225,26 +252,18 @@ command      : identifier {
 
 
              } ELSE {
-
-              //  std::cout << "number " << numberOfCommands;
-
                pushCodeWithAddress("JUMP", 21373);
-
                changeJumpValue();
 
             } commands {
-              // elseStack.emplace(numberOfCommands);
-              // int returnA = elseStack.top();
               elseStack.emplace(numberOfCommands);
 
             } ENDIF {
-              // std::cout << jumpStack.size();
               std::stack<std::pair<int, int>> tempStack = jumpStack;
 
               for (int i = 0; i < jumpStack.size(); i++) {
                 std::pair<int,int> topElement = tempStack.top();
                 tempStack.pop();
-                // std::cout << "1: " << topElement.first << " 2: " << topElement.second << "\n";
               }
 
               int returnA = elseStack.top();
@@ -266,10 +285,8 @@ command      : identifier {
              } condition DO commands ENDWHILE {
                 int returnAddress = returnStack.top();
                 returnStack.pop();
-                // changeJumpValue(returnAddress);
-               pushCodeWithAddress("JUMP", returnAddress);
-
-               changeJumpValue();
+                pushCodeWithAddress("JUMP", returnAddress);
+                changeJumpValue();
              }
              | FOR  PID  FROM  value TO  value DO  commands  ENDFOR
              | FOR  PID  FROM  value  DOWNTO  value DO  commands  ENDFOR
@@ -751,75 +768,6 @@ expression   : value {
                  #######################################
                  */
 
-                 /*
-                 (1) zaladuj do akumulatora a
-                 (2) jesli jest zerem to wyjdz z algorytmu
-                 (3) jesli nie, to sprawdz b
-                 (4) jesli b jest zerem to wyzeruj akumulator i wyjdz z algorytmu
-                 */
-
-                 pushCodeWithAddress("LOAD",  2);                   // (1)
-                 pushCodeWithAddress("JZERO", numberOfCommands+38); // (2)
-                 pushCodeWithAddress("LOAD",  3);                   // (3)
-                 pushCodeWithAddress("JZERO", numberOfCommands+2);  // (4)
-                //  int currentPoint = numberOfCommands;
-                 pushCodeWithAddress("JUMP",  numberOfCommands+3);  // (5)
-                 pushCode("ZERO");                                  // tutaj wskakuje (4)
-                 pushCodeWithAddress("JUMP",  numberOfCommands+321);  // wyzerowalem akk => wyskocz poza algorytm
-
-                 //tutaj wskakuje (5) - tu zaczyna sie algorytm
-                 pushCodeWithAddress("LOAD",  2);
-                 pushCodeWithAddress("STORE", 5); // REG_EXP_2
-
-                 pushCode("ZERO");
-                 pushCodeWithAddress("STORE", 2);
-                 pushCodeWithAddress("STORE", 6); // REG_EXP_3
-
-                 int jump1 = numberOfCommands;
-
-                 pushCodeWithAddress("LOAD", 4);
-                 pushCodeWithAddress("JODD", numberOfCommands+2);
-                 pushCodeWithAddress("JUMP", numberOfCommands+8);
-
-                 pushCodeWithAddress("LOAD",  6);
-                 pushCodeWithAddress("STORE", 7);
-
-                 pushCodeWithAddress("LOAD",  5);
-                 pushCodeWithAddress("STORE", 8);
-
-                 int jump2 = numberOfCommands;
-
-                 pushCodeWithAddress("LOAD",  7);
-                 pushCodeWithAddress("JZERO", numberOfCommands+4);
-
-
-                 pushCodeWithAddress("LOAD",  8);
-                 pushCode("SHL");
-                 pushCodeWithAddress("STORE",  8);
-
-
-                 pushCodeWithAddress("LOAD",  7);
-                 pushCode("DEC");
-                 pushCodeWithAddress("STORE",  7);
-
-                 pushCodeWithAddress("JUMP", jump2);
-
-
-                 pushCodeWithAddress("LOAD",  2);
-                 pushCodeWithAddress("ADD",   8);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("LOAD", 6);
-                 pushCode("INC");
-                 pushCodeWithAddress("STORE", 6);
-
-
-                 pushCodeWithAddress("LOAD",  4);
-                 pushCode("SHR");
-                 pushCodeWithAddress("STORE", 4);
-
-                 pushCodeWithAddress("JZERO", numberOfCommands+2);
-                 pushCodeWithAddress("JUMP", jump1);
 
                }
 
@@ -1401,6 +1349,8 @@ condition    : value {
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
              }
              | value {
+
+
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
 
