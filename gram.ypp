@@ -3,10 +3,12 @@
   /* ========================================= */
   /*               NOTATKI                     */
   /* ========================================= */
+
   /*
     [ ] inicjalizowanie tablic     ----> a := c nie wywala bledu
     [ ] PRECEDENS DLA MODULO
   */
+
   //code
   #include <cstdlib>
   #include <iostream>
@@ -14,7 +16,6 @@
   #include <cstring>
   #include <string>
   #include <map>
-  //#include <bitset>
   #include <stack>
   #include <vector>
   #include <stdio.h>
@@ -23,21 +24,20 @@
   extern "C" int yylex();
   extern "C" int yyparse();
 
-  // variables
   /*===================================================*/
   /*                      CONSTANTS                    */
   /*===================================================*/
 
-  #define NUMBER_OF_LAST_RESERVED_MEMORY_INDEX 9
+  #define NUMBER_OF_LAST_RESERVED_MEMORY_INDEX 10
   #define ERROR_BUFFER 150
   #define ARRAY_INDEX_OFFSET 1
   #define JUMP_PLACEHOLDER_ADDRESS -3000
 
 
-
   /*===================================================*/
   /*                      VARIABLES                    */
   /*===================================================*/
+
   int currentMemoryIndex = NUMBER_OF_LAST_RESERVED_MEMORY_INDEX;
   int numberOfCommands   = 0;
 
@@ -64,6 +64,8 @@
   int currentArrayIndex_assign;
   char errorMessage[ERROR_BUFFER];
   int currentArrayAssignAddress;
+
+  int iteratorsAddress;
 
 
   std::string valueFormat1;
@@ -216,15 +218,15 @@ command      : identifier {
                     int arraySize = arraysMap[variableName];
 
                     if (expressionType[0] == "array") { // a[n]
-                      pushCodeWithAddress("STORE", 8); // zapisz akumulator w pamieci
+                      pushCodeWithAddress("STORE", 7); // zapisz akumulator w pamieci
                       pushCodeWithAddress("LOAD",  currentArrayAssignAddress); // ladujemy adres a
-                      pushCodeWithAddress("STORE", 9); // 10
+                      pushCodeWithAddress("STORE", 7); // 10
 
                       pushCodeWithAddress("LOAD",  variableAddress);
-                      pushCodeWithAddress("ADD",   9);
+                      pushCodeWithAddress("ADD",   7);
                       pushCodeWithAddress("STORE", 1);
 
-                      pushCodeWithAddress("LOAD",   8);
+                      pushCodeWithAddress("LOAD",   7);
                       pushCodeWithAddress("STOREI", 1); // ladujemy adres
 
                     } else {
@@ -276,7 +278,7 @@ command      : identifier {
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-             | IF  condition  THEN  commands  ENDIF {
+             | IF condition  THEN  commands  ENDIF {
                changeJumpValue();
              }
 
@@ -288,8 +290,111 @@ command      : identifier {
                 pushCodeWithAddress("JUMP", returnAddress);
                 changeJumpValue();
              }
-             | FOR  PID  FROM  value TO  value DO  commands  ENDFOR
-             | FOR  PID  FROM  value  DOWNTO  value DO  commands  ENDFOR
+
+             /*###################################################################*/
+             /*#################                FOR                 ##############*/
+             /*###################################################################*/
+
+             | FOR PID {
+
+               // pętla for moze miec jako iterator tylko i wylacznie nowa zmienna
+               std::string iteratorsName = $2;
+               if (isVariableDeclared(&variablesAddressesMap, iteratorsName)) {
+                 std::cout << iteratorsName << " has been used previously in program! \n";
+                 exit(1);
+               } else {
+                 declareAVariable(iteratorsName);
+               }
+
+             } FROM value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+
+               firstElementAddress         = equationElementAddress;
+               arrayIndexOfFirstElement    = currentArrayIndex;
+               firstElementName            = variableNameGlobal;
+               firstArrayIdentifierAddress = arrayIdentifierAddress;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 8);
+               }
+
+             } TO value {
+               secondElementAddress             = equationElementAddress;
+               int secondArrayIdentifierAddress = arrayIdentifierAddress;
+               std::string secondElementName    = variableNameGlobal;
+               int arrayIndexOfSecondElement    = currentArrayIndex;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               variableTypes[2] = valueFormat1;
+               variableTypes[3] = valueFormat2;
+
+               std::string types[2];
+               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+               iteratorsAddress = variablesAddressesMap[$2];
+
+               if (types[0] == "number" && types[1] == "number") {
+
+                //  std::cout << "num num\n";
+
+                 pushCodeWithAddress("SUB",   8);
+                 pushCodeWithAddress("STORE", 8);
+
+
+               } else if (types[0] == "number" && types[1] == "variable") {
+
+                 std::cout << "num var\n";
+
+               } else if (types[0] == "variable" && types[1] == "number") {
+
+                 std::cout << "var num\n";
+
+               }
+
+               pushCode("ZERO");
+               pushCodeWithAddress("STORE", iteratorsAddress);
+
+                // declareAVariable($2);
+
+            } DO {
+              returnStack.emplace(numberOfCommands);
+
+              //zaladuj wartosc i, odejmij
+              pushCodeWithAddress("LOAD", iteratorsAddress);
+              pushCodeWithAddress("SUB", 8);
+
+              pushCodeWithAddress("JZERO", numberOfCommands + 2);
+              pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
+
+             } commands ENDFOR {
+
+               int returnAddress = returnStack.top();
+               returnStack.pop();
+               pushCodeWithAddress("JUMP", returnAddress);
+               changeJumpValue();
+
+
+               // usun ze zmiennych
+               variablesAddressesMap.erase($2);
+             }
+
+
+             | FOR  PID {
+                // std::cout << "haha";
+             } FROM  value DOWNTO {
+              //  std::cout << "welp";
+             } value DO  commands  ENDFOR {
+              //  std::cout << "welp";
+             }
              | READ  identifier SEM {
 
                std::string variableName = $<string>2;
@@ -754,13 +859,6 @@ expression   : value {
                if (types[0] == "number" && types[1] == "number") {
 
                  pushCodeWithAddress("STORE", 3);
-
-                 pushCode("ZERO");
-                 pushCodeWithAddress("STORE", 4); //REG_EXP_1
-                 pushCodeWithAddress("STORE", 5); //REG_EXP_2
-                 pushCodeWithAddress("STORE", 6); //REG_EXP_3
-                 pushCodeWithAddress("STORE", 7); //REG_EXP_4
-                 pushCodeWithAddress("STORE", 8); //REG_EXP_5
 
                  /*
                  #######################################
@@ -1543,7 +1641,7 @@ condition    : value {
                if (type == "number") {
                  pushCodeWithAddress("STORE", 2);
                }
-              } LE  value {
+              } LE value {
 
                secondElementAddress             = equationElementAddress;
                int secondArrayIdentifierAddress = arrayIdentifierAddress;
@@ -1879,7 +1977,6 @@ value        : num {
                   exit(1);
                } else { // variable is declared
 
-
                 if(valueFormat2 != "array" && !isVariableInitialized(&initializedVariablesMap, variableName)) {
                   std::cout << "Variable " << variableName << " declared but not initialized\n";
                   exit(1);
@@ -2056,18 +2153,6 @@ void pushCode(std::string opCode) {
   // }
 }
 
-
-void performJump(std::string stackType) {
-  // if (stackType == "IF") {
-  //   jumpStack.emplace(numberOfCommands);
-  // } else if ("LOOP") {
-  //   returnStack.emplace(numberOfCommands);
-  // } else {
-  //   elseStack.emplace(numberOfCommands);
-  // }
-
-}
-
 void pushCodeWithAddress(std::string opCode, int number) {
   std::string space = " ";
   std::string whole = opCode + space + std::to_string(number);
@@ -2100,23 +2185,6 @@ void changeJumpValue() {
   commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
 
 }
-
-// void changeJumpValueForLoop() {
-//   std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
-//   int jumpStackSize = jumpStack.size();
-//
-//   for (int i = 0; i < jumpStackSize; i++) {
-//     std::pair<int,int> topElement = jumpStack.top();
-//     jumpStack.pop();
-//     int destinationAddress = topElement.first;
-//     int destinationValue   = numberOfCommands;
-//     // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
-//
-//     int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
-//     std::string address                = std::to_string(++destinationValue);
-//     commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
-//   }
-// }
 
 void changeJumpValue(int value) {
   std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
