@@ -14,9 +14,14 @@ BEGIN
   tablica[7] := 7;
   tablica[8] := 8;
 
-  FOR i FROM 2 TO 5 DO
+  FOR i FROM 0 TO 3 DO
     WRITE tablica[i];
+
+      FOR j FROM 2 TO 5 DO
+        WRITE a;
+      ENDFOR
   ENDFOR
+
 
 
 END
