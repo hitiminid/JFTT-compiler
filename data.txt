@@ -1,10 +1,20 @@
-VAR
-a b
-BEGIN
-  a := 1;
+( powinno wypisac 0,1,2,3,4 - wypisuje 0,1,2,3,4,5 )
 
-  FOR i FROM 10 TO 15 DO
-    WRITE a;
-  ENDFOR
+VAR
+  a b tab[5] separator
+BEGIN
+
+  a         := 0;
+  b         := 5;
+  separator := 10000;
+  tab[0]    := 0;
+  tab[1]    := 1;
+  tab[2]    := 2;
+  tab[3]    := 3;
+  tab[4]    := 4;
+
+  WRITE tab[5];
+
+
 
 END
