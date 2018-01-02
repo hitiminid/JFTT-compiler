@@ -97,6 +97,9 @@
   std::stack<int> elseStack;
 
 
+  std::stack<int> forStack;
+
+
   // int yylex();
   void yyerror (char* msg);
 
@@ -325,6 +328,204 @@ command      : identifier {
                }
 
              } TO value {
+
+               secondElementAddress             = equationElementAddress;
+               int secondArrayIdentifierAddress = arrayIdentifierAddress;
+               std::string secondElementName    = variableNameGlobal;
+               int arrayIndexOfSecondElement    = currentArrayIndex;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               variableTypes[2] = valueFormat1;
+               variableTypes[3] = valueFormat2;
+
+               std::string types[2];
+               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+               iteratorsAddress = variablesAddressesMap[$2];
+
+               if (types[0] == "number" && types[1] == "number") {
+
+                 pushCodeWithAddress("SUB",  8);
+
+               } else if (types[0] == "number" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD", secondElementAddress);
+                 pushCodeWithAddress("SUB",  8);
+
+               } else if (types[0] == "variable" && types[1] == "number") {
+
+                 pushCodeWithAddress("SUB",  8);
+
+              } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
+
+                pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("SUB",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+              } else if (types[0] == "arrayVar" && types[1] == "number") {
+
+                pushCodeWithAddress("SUB",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+              } else if (types[0] == "number" && types[1] == "arrayVar") {
+
+                pushCodeWithAddress("LOAD", secondElementAddress  + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("SUB",  8);
+
+              } else if (types[0] == "array" && types[1] == "variable") {
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", 9);
+
+                pushCodeWithAddress("LOAD", secondElementAddress);
+                pushCodeWithAddress("SUB",  9);
+
+              } else if (types[0] == "array" && types[1] == "array") {
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", 9);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 1);
+                pushCodeWithAddress("LOADI", 1);
+
+                pushCodeWithAddress("SUB", 9);
+
+              } else if (types[0] == "array" && types[1] == "number") {
+
+                pushCodeWithAddress("STORE", 9);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", 8);
+
+                pushCodeWithAddress("LOAD", 9);
+                pushCodeWithAddress("SUB",  8);
+
+              } else if (types[0] == "array" && types[1] == "arrayVar") {
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", 8);
+
+                pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("LOAD", 9);
+                pushCodeWithAddress("SUB",  8);
+
+              } else if (types[0] == "number" && types[1] == "array") {
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+
+                pushCodeWithAddress("SUB", 8);
+
+              } else if (types[0] == "variable" && types[1] == "array") {
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+
+                pushCodeWithAddress("SUB", firstElementAddress);
+
+              } else if (types[0] == "arrayVar" && types[1] == "array") {
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("SUB",   firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+              } else if (types[0] == "variable" && types[1] == "arrayVar") {
+
+                pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("SUB", firstElementAddress);
+
+
+              } else if (types[0] == "arrayVar" && types[1] == "variable") {
+
+                pushCodeWithAddress("LOAD", secondElementAddress);
+                pushCodeWithAddress("SUB",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+              } else if (types[0] == "variable" && types[1] == "variable") {
+
+                pushCodeWithAddress("LOAD", secondElementAddress);
+                pushCodeWithAddress("SUB", firstElementAddress);
+              }
+
+              pushCodeWithAddress("STORE", 8);
+
+              pushCode("ZERO");
+              pushCodeWithAddress("STORE", iteratorsAddress);
+                // declareAVariable($2);
+
+            } DO {
+              returnStack.emplace(numberOfCommands);
+
+              //zaladuj wartosc i, odejmij
+              pushCodeWithAddress("LOAD", iteratorsAddress);
+              pushCodeWithAddress("SUB", 8);
+
+              pushCodeWithAddress("JZERO", numberOfCommands + 2);
+              pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
+
+             } commands ENDFOR {
+
+              pushCodeWithAddress("LOAD", iteratorsAddress);
+              pushCode("INC");
+              pushCodeWithAddress("STORE",  iteratorsAddress);
+
+               int returnAddress = returnStack.top();
+               returnStack.pop();
+               pushCodeWithAddress("JUMP", returnAddress);
+               changeJumpValue();
+
+               // usun ze zmiennych
+               variablesAddressesMap.erase($2);
+             }
+
+
+             | FOR PID {
+
+               std::string iteratorsName = $2;
+               if (isVariableDeclared(&variablesAddressesMap, iteratorsName)) {
+                 std::cout << iteratorsName << " has been used previously in program! \n";
+                 exit(1);
+               } else {
+                 declareAVariable(iteratorsName);
+               }
+             } FROM  value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+
+               firstElementAddress         = equationElementAddress;
+               arrayIndexOfFirstElement    = currentArrayIndex;
+               firstElementName            = variableNameGlobal;
+               firstArrayIdentifierAddress = arrayIdentifierAddress;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 8);
+               }
+             } DOWNTO value {
                secondElementAddress             = equationElementAddress;
                int secondArrayIdentifierAddress = arrayIdentifierAddress;
                std::string secondElementName    = variableNameGlobal;
@@ -424,7 +625,6 @@ command      : identifier {
 
               } else if (types[0] == "number" && types[1] == "array") {
 
-
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 10);
@@ -443,7 +643,6 @@ command      : identifier {
 
               } else if (types[0] == "arrayVar" && types[1] == "array") {
 
-
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 10);
@@ -454,7 +653,6 @@ command      : identifier {
 
                 pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("SUB", firstElementAddress);
-
 
               } else if (types[0] == "arrayVar" && types[1] == "variable") {
 
@@ -467,45 +665,32 @@ command      : identifier {
                 pushCodeWithAddress("SUB", firstElementAddress);
               }
 
-              pushCodeWithAddress("STORE", 8);
-
-              pushCode("ZERO");
               pushCodeWithAddress("STORE", iteratorsAddress);
-
-                // declareAVariable($2);
 
             } DO {
               returnStack.emplace(numberOfCommands);
 
               //zaladuj wartosc i, odejmij
               pushCodeWithAddress("LOAD", iteratorsAddress);
-              pushCodeWithAddress("SUB", 8);
+              // pushCodeWithAddress("SUB", 8);
 
               pushCodeWithAddress("JZERO", numberOfCommands + 2);
               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
+            } commands  ENDFOR {
 
-             } commands ENDFOR {
 
-              pushCodeWithAddress("LOAD", iteratorsAddress);
-              pushCode("INC");
-              pushCodeWithAddress("STORE",  iteratorsAddress);
+              pushCodeWithAddress("LOAD",  iteratorsAddress);
+              pushCode("DEC");
+              pushCodeWithAddress("STORE", iteratorsAddress);
 
-               int returnAddress = returnStack.top();
-               returnStack.pop();
-               pushCodeWithAddress("JUMP", returnAddress);
-               changeJumpValue();
+              int returnAddress = returnStack.top();
+              returnStack.pop();
+              pushCodeWithAddress("JUMP", returnAddress);
+              changeJumpValue();
 
                // usun ze zmiennych
-               variablesAddressesMap.erase($2);
-             }
+              variablesAddressesMap.erase($2);
 
-
-             | FOR  PID {
-                // std::cout << "haha";
-             } FROM  value DOWNTO {
-              //  std::cout << "welp";
-             } value DO  commands  ENDFOR {
-              //  std::cout << "welp";
              }
              | READ  identifier SEM {
 
@@ -562,6 +747,7 @@ command      : identifier {
                   if (isVariableDeclared(&arraysMap, variableName)) { // is it an array?
                     if (valueFormat1 == "number") { // a[1]
                       int arraySize = arraysMap[variableName];
+
                       if (currentArrayIndex < 0 || currentArrayIndex >= arraySize) {
                         std::cout << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
                         exit(1);

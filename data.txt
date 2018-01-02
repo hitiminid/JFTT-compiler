@@ -1,20 +1,22 @@
-( powinno wypisac 0,1,2,3,4 - wypisuje 0,1,2,3,4,5 )
-
 VAR
-  a b tab[5] separator
+  a tablica[10]
 BEGIN
 
-  a         := 0;
-  b         := 5;
-  separator := 10000;
-  tab[0]    := 0;
-  tab[1]    := 1;
-  tab[2]    := 2;
-  tab[3]    := 3;
-  tab[4]    := 4;
+  a := 5;
+  tablica[0] := 0;
+  tablica[1] := 1;
+  tablica[2] := 2;
+  tablica[3] := 3;
+  tablica[4] := 4;
+  tablica[5] := 5;
 
-  WRITE tab[5];
+  tablica[6] := 6;
+  tablica[7] := 7;
+  tablica[8] := 8;
 
+  FOR i FROM 2 TO 5 DO
+    WRITE tablica[i];
+  ENDFOR
 
 
 END
