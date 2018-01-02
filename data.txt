@@ -16,14 +16,8 @@ BEGIN
   tablica[7] := 7;
   tablica[8] := 8;
 
-  FOR i FROM 0 TO 3 DO
-    FOR j FROM 0 TO 3 DO
-      IF i = 2 THEN
-        WRITE a;
-      ELSE
-        WRITE b;
-      ENDIF
-    ENDFOR
+  FOR i FROM 3 DOWNTO 0 DO
+    WRITE a;
   ENDFOR
 
 END

@@ -520,19 +520,30 @@ command      : identifier {
               changeJumpValue();
                // usun ze zmiennych
               forStack.pop();
-              variablesAddressesMap.erase($2);
-              initializedVariablesMap.erase($2);
+
+              std::string firstIterator  = $2;
+              std::string secondIterator = $2;
+              secondIterator = secondIterator + "#1";
+
+              variablesAddressesMap.erase(firstIterator);
+              initializedVariablesMap.erase(firstIterator);
+
+              variablesAddressesMap.erase(secondIterator);
+              initializedVariablesMap.erase(secondIterator);
              }
 
              | FOR PID {
-
+               // pętla for moze miec jako iterator tylko i wylacznie nowa zmienna
                std::string iteratorsName = $2;
                if (isVariableDeclared(&variablesAddressesMap, iteratorsName)) {
                  std::cout << iteratorsName << " has been used previously in program! \n";
                  exit(1);
                } else {
                  declareAVariable(iteratorsName);
+                 declareAVariable(iteratorsName+"#1");
+                 initializedVariablesMap[iteratorsName] = true;
                }
+
              } FROM  value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -548,7 +559,8 @@ command      : identifier {
                std::string type = determineDataType(variableTypes[0], variableTypes[1]);
 
                if (type == "number") {
-                 pushCodeWithAddress("STORE", 8);
+                //  pushCodeWithAddress("STORE", 8);
+                 pushCodeWithAddress("STORE", variablesAddressesMap[$2]);
                }
              } DOWNTO value {
                secondElementAddress             = equationElementAddress;
@@ -567,34 +579,48 @@ command      : identifier {
                types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
                iteratorsAddress = variablesAddressesMap[$2];
+               std::string rightIteratorsBoundName = $2;
+               rightIteratorsBoundName = rightIteratorsBoundName + "#1";
+               int secondIteratorsAddress = variablesAddressesMap[rightIteratorsBoundName];
 
                if (types[0] == "number" && types[1] == "number") {
 
-                 pushCodeWithAddress("SUB",  8);
+                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
                } else if (types[0] == "number" && types[1] == "variable") {
 
-                 pushCodeWithAddress("LOAD", secondElementAddress);
-                 pushCodeWithAddress("SUB",  8);
+                 pushCodeWithAddress("LOAD",  secondElementAddress);
+                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
+                //  pushCodeWithAddress("SUB",  8);
                } else if (types[0] == "variable" && types[1] == "number") {
 
-                 pushCodeWithAddress("SUB",  8);
+                //  pushCodeWithAddress("SUB",  8);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  firstElementAddress);
+                pushCodeWithAddress("STORE", iteratorsAddress);
 
               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
 
-                pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                pushCodeWithAddress("SUB",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", iteratorsAddress);
 
               } else if (types[0] == "arrayVar" && types[1] == "number") {
 
-                // pushCodeWithAddress("", );
-                pushCodeWithAddress("SUB",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
 
               } else if (types[0] == "number" && types[1] == "arrayVar") {
 
-                pushCodeWithAddress("LOAD", secondElementAddress  + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
-                pushCodeWithAddress("SUB",  8);
+                pushCodeWithAddress("LOAD",  secondElementAddress  + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
 
               } else if (types[0] == "array" && types[1] == "variable") {
 
@@ -602,10 +628,10 @@ command      : identifier {
                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 10);
                 pushCodeWithAddress("LOADI", 10);
-                pushCodeWithAddress("STORE", 9);
+                pushCodeWithAddress("STORE", iteratorsAddress);
 
-                pushCodeWithAddress("LOAD", secondElementAddress);
-                pushCodeWithAddress("SUB",  9);
+                pushCodeWithAddress("LOAD",  secondElementAddress);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
 
               } else if (types[0] == "array" && types[1] == "array") {
 
@@ -613,27 +639,25 @@ command      : identifier {
                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 10);
                 pushCodeWithAddress("LOADI", 10);
-                pushCodeWithAddress("STORE", 9);
+                pushCodeWithAddress("STORE", iteratorsAddress);
 
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 1);
                 pushCodeWithAddress("LOADI", 1);
 
-                pushCodeWithAddress("SUB", 9);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
 
               } else if (types[0] == "array" && types[1] == "number") {
 
-                pushCodeWithAddress("STORE", 9);
+
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
 
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 10);
                 pushCodeWithAddress("LOADI", 10);
-                pushCodeWithAddress("STORE", 8);
-
-                pushCodeWithAddress("LOAD", 9);
-                pushCodeWithAddress("SUB",  8);
+                pushCodeWithAddress("STORE", iteratorsAddress);
 
               } else if (types[0] == "array" && types[1] == "arrayVar") {
 
@@ -641,11 +665,10 @@ command      : identifier {
                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 10);
                 pushCodeWithAddress("LOADI", 10);
-                pushCodeWithAddress("STORE", 8);
+                pushCodeWithAddress("STORE", iteratorsAddress);
 
-                pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                pushCodeWithAddress("LOAD", 9);
-                pushCodeWithAddress("SUB",  8);
+                pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
 
 
               } else if (types[0] == "number" && types[1] == "array") {
@@ -654,59 +677,74 @@ command      : identifier {
                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 10);
                 pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
 
-                pushCodeWithAddress("SUB", 8);
 
               } else if (types[0] == "variable" && types[1] == "array") {
 
+                pushCodeWithAddress("LOAD",  firstElementAddress);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 10);
                 pushCodeWithAddress("LOADI", 10);
-
-                pushCodeWithAddress("SUB", firstElementAddress);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
 
               } else if (types[0] == "arrayVar" && types[1] == "array") {
 
+
+                pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
                 pushCodeWithAddress("STORE", 10);
                 pushCodeWithAddress("LOADI", 10);
-                pushCodeWithAddress("SUB",   firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
 
               } else if (types[0] == "variable" && types[1] == "arrayVar") {
 
-                pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                pushCodeWithAddress("SUB", firstElementAddress);
+                pushCodeWithAddress("LOAD", firstElementAddress);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
 
               } else if (types[0] == "arrayVar" && types[1] == "variable") {
 
+                pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
                 pushCodeWithAddress("LOAD", secondElementAddress);
-                pushCodeWithAddress("SUB",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("LOAD", secondIteratorsAddress);
 
               } else if (types[0] == "variable" && types[1] == "variable") {
 
-                pushCodeWithAddress("LOAD", secondElementAddress);
-                pushCodeWithAddress("SUB", firstElementAddress);
-              }
+                pushCodeWithAddress("LOAD",  firstElementAddress);
+                pushCodeWithAddress("STORE", iteratorsAddress);
 
-              pushCodeWithAddress("STORE", iteratorsAddress);
+                pushCodeWithAddress("LOAD",  secondElementAddress);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+              }
+              forStack.emplace(iteratorsAddress);
 
             } DO {
-              returnStack.emplace(numberOfCommands);
 
+              returnStack.emplace(numberOfCommands);
               //zaladuj wartosc i, odejmij
-              pushCodeWithAddress("LOAD", iteratorsAddress);
-              // pushCodeWithAddress("SUB", 8);
+              int address = forStack.top();
+
+              pushCodeWithAddress("LOAD", address);
+              pushCodeWithAddress("SUB",  address+1);
 
               pushCodeWithAddress("JZERO", numberOfCommands + 2);
               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
-            } commands  ENDFOR {
-
-              pushCodeWithAddress("LOAD",  iteratorsAddress);
+            } commands ENDFOR {
+              pushCodeWithAddress("LOAD",  forStack.top());
               pushCode("DEC");
-              pushCodeWithAddress("STORE", iteratorsAddress);
+              pushCodeWithAddress("STORE", forStack.top());
 
               int returnAddress = returnStack.top();
               returnStack.pop();
@@ -714,8 +752,17 @@ command      : identifier {
               changeJumpValue();
 
                // usun ze zmiennych
-              variablesAddressesMap.erase($2);
+              forStack.pop();
 
+              std::string firstIterator  = $2;
+              std::string secondIterator = $2;
+              secondIterator = secondIterator + "#1";
+
+              variablesAddressesMap.erase(firstIterator);
+              initializedVariablesMap.erase(firstIterator);
+
+              variablesAddressesMap.erase(secondIterator);
+              initializedVariablesMap.erase(secondIterator);
              }
              | READ  identifier SEM {
 
