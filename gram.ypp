@@ -308,6 +308,7 @@ command      : identifier {
                } else {
                  declareAVariable(iteratorsName);
                  declareAVariable(iteratorsName+"#1");
+                 initializedVariablesMap[iteratorsName] = true;
                }
              } FROM value {
                expressionType[0]  = valueFormat1;
@@ -346,103 +347,155 @@ command      : identifier {
                types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
                iteratorsAddress = variablesAddressesMap[$2];
+               std::string rightIteratorsBoundName = $2;
+               rightIteratorsBoundName = rightIteratorsBoundName + "#1";
+               int secondIteratorsAddress = variablesAddressesMap[rightIteratorsBoundName];
 
                if (types[0] == "number" && types[1] == "number") {
-                 std::string name = $2;
-                 name = name + "#1";
-                 pushCodeWithAddress("STORE", variablesAddressesMap[name]);
-                //  pushCodeWithAddress("SUB",  8);
+
+                 pushCodeWithAddress("STORE", secondIteratorsAddress);
+
                } else if (types[0] == "number" && types[1] == "variable") {
-                //  pushCodeWithAddress("LOAD", secondElementAddress);
+
+                 pushCodeWithAddress("LOAD",  secondElementAddress);
+                 pushCodeWithAddress("STORE", secondIteratorsAddress);
+
                 //  pushCodeWithAddress("SUB",  8);
                } else if (types[0] == "variable" && types[1] == "number") {
+
                 //  pushCodeWithAddress("SUB",  8);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  firstElementAddress);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
-                // pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                // pushCodeWithAddress("SUB",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+                pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
               } else if (types[0] == "arrayVar" && types[1] == "number") {
-                // pushCodeWithAddress("SUB",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+
               } else if (types[0] == "number" && types[1] == "arrayVar") {
-                // pushCodeWithAddress("LOAD", secondElementAddress  + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
-                // pushCodeWithAddress("SUB",  8);
+
+                pushCodeWithAddress("LOAD",  secondElementAddress  + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
               } else if (types[0] == "array" && types[1] == "variable") {
-                // pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
-                // pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
-                // pushCodeWithAddress("STORE", 10);
-                // pushCodeWithAddress("LOADI", 10);
-                // pushCodeWithAddress("STORE", 9);
-                //
-                // pushCodeWithAddress("LOAD", secondElementAddress);
-                // pushCodeWithAddress("SUB",  9);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  secondElementAddress);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
               } else if (types[0] == "array" && types[1] == "array") {
-                // pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
-                // pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
-                // pushCodeWithAddress("STORE", 10);
-                // pushCodeWithAddress("LOADI", 10);
-                // pushCodeWithAddress("STORE", 9);
-                //
-                // pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                // pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
-                // pushCodeWithAddress("STORE", 1);
-                // pushCodeWithAddress("LOADI", 1);
-                //
-                // pushCodeWithAddress("SUB", 9);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 1);
+                pushCodeWithAddress("LOADI", 1);
+
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
               } else if (types[0] == "array" && types[1] == "number") {
-                // pushCodeWithAddress("STORE", 9);
-                //
-                // pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
-                // pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
-                // pushCodeWithAddress("STORE", 10);
-                // pushCodeWithAddress("LOADI", 10);
-                // pushCodeWithAddress("STORE", 8);
-                //
-                // pushCodeWithAddress("LOAD", 9);
-                // pushCodeWithAddress("SUB",  8);
+
+
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
               } else if (types[0] == "array" && types[1] == "arrayVar") {
-                // pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
-                // pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
-                // pushCodeWithAddress("STORE", 10);
-                // pushCodeWithAddress("LOADI", 10);
-                // pushCodeWithAddress("STORE", 8);
-                //
-                // pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                // pushCodeWithAddress("LOAD", 9);
-                // pushCodeWithAddress("SUB",  8);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
+
               } else if (types[0] == "number" && types[1] == "array") {
-                // pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                // pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
-                // pushCodeWithAddress("STORE", 10);
-                // pushCodeWithAddress("LOADI", 10);
-                //
-                // pushCodeWithAddress("SUB", 8);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
+
               } else if (types[0] == "variable" && types[1] == "array") {
-                // pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                // pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
-                // pushCodeWithAddress("STORE", 10);
-                // pushCodeWithAddress("LOADI", 10);
-                //
-                // pushCodeWithAddress("SUB", firstElementAddress);
+
+                pushCodeWithAddress("LOAD",  firstElementAddress);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
               } else if (types[0] == "arrayVar" && types[1] == "array") {
-                // pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                // pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
-                // pushCodeWithAddress("STORE", 10);
-                // pushCodeWithAddress("LOADI", 10);
-                // pushCodeWithAddress("SUB",   firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+
+                pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                pushCodeWithAddress("STORE", 10);
+                pushCodeWithAddress("LOADI", 10);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
               } else if (types[0] == "variable" && types[1] == "arrayVar") {
-                // pushCodeWithAddress("LOAD", secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                // pushCodeWithAddress("SUB", firstElementAddress);
+
+                pushCodeWithAddress("LOAD", firstElementAddress);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
+
               } else if (types[0] == "arrayVar" && types[1] == "variable") {
-                // pushCodeWithAddress("LOAD", secondElementAddress);
-                // pushCodeWithAddress("SUB",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+                pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+                pushCodeWithAddress("LOAD", secondElementAddress);
+                pushCodeWithAddress("LOAD", secondIteratorsAddress);
+
               } else if (types[0] == "variable" && types[1] == "variable") {
-                // pushCodeWithAddress("LOAD", secondElementAddress);
-                // pushCodeWithAddress("SUB", firstElementAddress);
+
+                pushCodeWithAddress("LOAD",  firstElementAddress);
+                pushCodeWithAddress("STORE", iteratorsAddress);
+
+                pushCodeWithAddress("LOAD",  secondElementAddress);
+                pushCodeWithAddress("STORE", secondIteratorsAddress);
               }
-              // pushCodeWithAddress("STORE", 8);
-              // pushCode("ZERO");
-              // pushCodeWithAddress("STORE", iteratorsAddress);
-                // declareAVariable($2);
-                forStack.emplace(iteratorsAddress);
+              forStack.emplace(iteratorsAddress);
 
             } DO {
               returnStack.emplace(numberOfCommands);
@@ -468,6 +521,7 @@ command      : identifier {
                // usun ze zmiennych
               forStack.pop();
               variablesAddressesMap.erase($2);
+              initializedVariablesMap.erase($2);
              }
 
              | FOR PID {
