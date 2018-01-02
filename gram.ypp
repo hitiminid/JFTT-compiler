@@ -202,7 +202,6 @@ command      : identifier {
                 expressionType[1]         = valueFormat2;
                 currentArrayIndex_assign  = currentArrayIndex;
                 currentArrayAssignAddress = arrayIdentifierAddress;
-                // std::cout << currentArrayAssignAddress << " XDDDD";
 
               } ASSGN expression SEM {
 
@@ -223,10 +222,10 @@ command      : identifier {
                     if (expressionType[0] == "array") { // a[n]
                       pushCodeWithAddress("STORE", 7); // zapisz akumulator w pamieci
                       pushCodeWithAddress("LOAD",  currentArrayAssignAddress); // ladujemy adres a
-                      pushCodeWithAddress("STORE", 7); // 10
+                      pushCodeWithAddress("STORE", 8); // 10
 
                       pushCodeWithAddress("LOAD",  variableAddress);
-                      pushCodeWithAddress("ADD",   7);
+                      pushCodeWithAddress("ADD",   8);
                       pushCodeWithAddress("STORE", 1);
 
                       pushCodeWithAddress("LOAD",   7);
@@ -807,7 +806,10 @@ command      : identifier {
 
                std::string variableName = $<string>2;
 
-               if (isVariableDeclared(&variablesAddressesMap, variableName)) {
+              //  std::cout << valueFormat1 << " " << valueFormat2 << "\n";
+               if (valueFormat1 == "number" && valueFormat2 == "number") {
+                 pushCode("PUT");
+               } else if (isVariableDeclared(&variablesAddressesMap, variableName)) {
                  // at this point we know that variable is declared, what about being initialized?
                  int variableAddress = variablesAddressesMap[variableName];
 
@@ -1969,8 +1971,8 @@ condition    : value {
 
                } else if (types[0] == "arrayVar" && types[1] == "array") {
 
-                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("LOAD", variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",  secondArrayIdentifierAddress);
                  pushCodeWithAddress("STORE", 1);
                  pushCodeWithAddress("LOADI", 1); // w tym momencie mam dostęp do wartości a[n]
                  pushCode("INC");
@@ -1985,15 +1987,15 @@ condition    : value {
 
                } else if (types[0] == "arrayVar" && types[1] == "variable") {
 
-                 pushCodeWithAddress("LOAD",  secondElementAddress);
+                 pushCodeWithAddress("LOAD", secondElementAddress);
                  pushCode("INC");
                  pushCodeWithAddress("SUB", firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
 
                } else if (types[0] == "variable" && types[1] == "variable") {
 
-                 pushCodeWithAddress("LOAD", secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("LOAD", secondElementAddress);
                  pushCode("INC");
-                 pushCodeWithAddress("SUB",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("SUB",  firstElementAddress);
                }
 
                pushCodeWithAddress("JZERO", numberOfCommands + 2);
