@@ -297,9 +297,7 @@ command      : identifier {
              /*#################                FOR                 ##############*/
              /*###################################################################*/
 
-             | FOR PID {
-
-               // pętla for moze miec jako iterator tylko i wylacznie nowa zmienna
+             | FOR PID FROM value TO {
                std::string iteratorsName = $2;
                if (isVariableDeclared(&variablesAddressesMap, iteratorsName)) {
                  std::cout << iteratorsName << " has been used previously in program! \n";
@@ -309,7 +307,7 @@ command      : identifier {
                  declareAVariable(iteratorsName+"#1");
                  initializedVariablesMap[iteratorsName] = true;
                }
-             } FROM value {
+
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
 
@@ -327,8 +325,7 @@ command      : identifier {
                 //  pushCodeWithAddress("STORE", 8);
                  pushCodeWithAddress("STORE", variablesAddressesMap[$2]);
                }
-
-             } TO value {
+             } value {
 
                secondElementAddress             = equationElementAddress;
                int secondArrayIdentifierAddress = arrayIdentifierAddress;
@@ -459,7 +456,6 @@ command      : identifier {
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
               } else if (types[0] == "arrayVar" && types[1] == "array") {
-
 
                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("STORE", iteratorsAddress);
@@ -531,8 +527,8 @@ command      : identifier {
               initializedVariablesMap.erase(secondIterator);
              }
 
-             | FOR PID {
-               // pętla for moze miec jako iterator tylko i wylacznie nowa zmienna
+             | FOR PID FROM value DOWNTO {
+
                std::string iteratorsName = $2;
                if (isVariableDeclared(&variablesAddressesMap, iteratorsName)) {
                  std::cout << iteratorsName << " has been used previously in program! \n";
@@ -543,7 +539,6 @@ command      : identifier {
                  initializedVariablesMap[iteratorsName] = true;
                }
 
-             } FROM  value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
 
@@ -561,7 +556,8 @@ command      : identifier {
                 //  pushCodeWithAddress("STORE", 8);
                  pushCodeWithAddress("STORE", variablesAddressesMap[$2]);
                }
-             } DOWNTO value {
+             } value {
+
                secondElementAddress             = equationElementAddress;
                int secondArrayIdentifierAddress = arrayIdentifierAddress;
                std::string secondElementName    = variableNameGlobal;
@@ -734,8 +730,9 @@ command      : identifier {
               //zaladuj wartosc i, odejmij
               int address = forStack.top();
 
-              pushCodeWithAddress("LOAD", address);
-              pushCodeWithAddress("SUB",  address+1);
+              pushCodeWithAddress("LOAD", address+1);
+              pushCodeWithAddress("SUB",  address);
+              // pushCode("PUT");
 
               pushCodeWithAddress("JZERO", numberOfCommands + 2);
               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
