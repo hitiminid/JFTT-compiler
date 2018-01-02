@@ -1673,8 +1673,7 @@ condition    : value {
 
                } else if (types[0] == "number" && types[1] == "variable") {
 
-
-                pushCodeWithAddress("LOAD", firstElementAddress);
+                pushCodeWithAddress("LOAD", 2);
                 pushCode("INC"); // a + 1
 
                 pushCodeWithAddress("SUB", secondElementAddress);
@@ -1811,7 +1810,6 @@ condition    : value {
                  pushCode("INC");
 
                  pushCodeWithAddress("SUB",  secondElementAddress);
-
 
                } else if (types[0] == "variable" && types[1] == "variable") {
                  pushCodeWithAddress("LOAD", firstElementAddress);
@@ -2087,8 +2085,6 @@ condition    : value {
 
                  pushCodeWithAddress("SUB", secondElementAddress);
 
-
-
                } else if (types[0] == "array" && types[1] == "array") {
 
                  pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
@@ -2331,8 +2327,8 @@ condition    : value {
 
                } else if (types[0] == "variable" && types[1] == "variable") {
 
-                 pushCodeWithAddress("LOAD", secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
-                 pushCodeWithAddress("SUB",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("LOAD", secondElementAddress);
+                 pushCodeWithAddress("SUB",  firstElementAddress);
                }
 
                pushCodeWithAddress("JZERO", numberOfCommands + 2);
