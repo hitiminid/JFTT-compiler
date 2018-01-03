@@ -89,7 +89,7 @@ union YYSTYPE
 {
 #line 138 "gram.ypp" /* yacc.c:1909  */
 
-    char* string;
+    char * string;
     long long num;
 
 #line 96 "gram.tab.hpp" /* yacc.c:1909  */

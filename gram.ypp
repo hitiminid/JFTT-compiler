@@ -27,7 +27,7 @@
   #define ERROR_BUFFER 150
   #define ARRAY_INDEX_OFFSET 1
   #define JUMP_PLACEHOLDER_ADDRESS -3000
-
+  #define ELSE_PLACEHOLDER_ADDRESS -4000
   /*===================================================*/
   /*                      VARIABLES                    */
   /*===================================================*/
@@ -136,7 +136,7 @@
 %}
 
 %union {
-    char* string;
+    char * string;
     long long num;
 }
 
@@ -242,7 +242,7 @@ command      : identifier {
              | IF  condition THEN commands {
 
              } ELSE {
-               pushCodeWithAddress("JUMP", 21373);
+               pushCodeWithAddress("JUMP", ELSE_PLACEHOLDER_ADDRESS);
                changeJumpValue();
 
             } commands {
@@ -1202,20 +1202,27 @@ expression   : value {
 
                } else if (types[0] == "variable" && types[1] == "number") {
 
-                 // performNumberVariableMultiplication($<string>1, secondElementAddress);
-                 performNumberVariableMultiplication($<string>3, firstElementAddress);
+                 performNumberVariableMultiplication($<string>4, firstElementAddress);
 
                } else if (types[0] == "number" && types[1] == "arrayVar") {
 
-                 // performNumberVariableMultiplication($<string>1, secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+                 performNumberVariableMultiplication($<string>1, secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
 
                } else if (types[0] == "arrayVar" && types[1] == "number") {
 
-                 // performNumberVariableMultiplication($<string>3, firstElementAddress  + arrayIndexOfFirstElement  + ARRAY_INDEX_OFFSET);
+                 performNumberVariableMultiplication($<string>4, firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
 
                } else if (types[0] == "number" && types[1] == "arrayVar") {
 
+                 performNumberVariableMultiplication($<string>1, firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
 
+               } else if (types[0] == "number" && types[1] == "array") {
+
+                 // performNumberVariableMultiplication($<string>1, firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+
+               } else if (types[0] == "array" && types[1] == "number") {
+
+                 // performNumberVariableMultiplication($<string>1, firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                }
 
              }
@@ -2503,7 +2510,7 @@ void pushCodeWithAddress(std::string opCode, long long number) {
     if (number == JUMP_PLACEHOLDER_ADDRESS) {
       std::pair<long long, long long> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
       jumpStack.emplace(newJumpPosition);
-    } else if (number == 21373) {
+    } else if (number == ELSE_PLACEHOLDER_ADDRESS) {
       elseStack.emplace(numberOfCommands);
     }
 
@@ -2575,7 +2582,7 @@ void performNumberVariableMultiplication(std::string number, long long variableA
     if (binaryRepresentationStack[i] == 1) {
       pushCodeWithAddress("ADD", variableAddress);
     }
-    if (i < binaryNumberLength -1) {
+    if (i < binaryNumberLength - 1) {
       pushCode("SHL");
     }
   }
