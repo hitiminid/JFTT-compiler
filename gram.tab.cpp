@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.0.2.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.0.4"
+#define YYBISON_VERSION "3.0.2"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -69,6 +69,11 @@
   /*               NOTATKI                     */
   /* ========================================= */
 
+  /*
+    [ ] inicjalizowanie tablic     ----> a := c nie wywala bledu
+    [ ] PRECEDENS DLA MODULO
+  */
+
   //code
   #include <cstdlib>
   #include <iostream>
@@ -92,7 +97,8 @@
   #define ERROR_BUFFER 150
   #define ARRAY_INDEX_OFFSET 1
   #define JUMP_PLACEHOLDER_ADDRESS -3000
-  #define ELSE_PLACEHOLDER_ADDRESS -4000
+
+
   /*===================================================*/
   /*                      VARIABLES                    */
   /*===================================================*/
@@ -111,8 +117,10 @@
   long long firstArrayIdentifierAddress;
   long long arrayIndexOfFirstElement;
 
+
   std::string variableNameGlobal;
   std::string firstElementName;
+
 
   bool isDebugOn = false;
 
@@ -120,7 +128,9 @@
   long long currentArrayIndex_assign;
   char errorMessage[ERROR_BUFFER];
   long long currentArrayAssignAddress;
+
   long long iteratorsAddress;
+
 
   std::string valueFormat1;
   std::string valueFormat2;
@@ -132,7 +142,7 @@
 
   /* declaredVariables */
   /* <nazwa, adres w pamięci> */
-  std::map<std::string, long long> variablesAddressesMap;
+  std::map<std::string, int> variablesAddressesMap;
 
   /* each initialized variable */
   // <nazwa, czy zainicjalizowane>
@@ -141,17 +151,18 @@
   /* each array's size */
   /* if a variable is in here then it's an array - useful when determining type of a data*/
   // <nazwa, rozmiar tablicy>
-  std::map<std::string, long long> arraysMap;
+  std::map<std::string, int> arraysMap;
 
-  std::stack<std::pair<long long, long long>> jumpStack;
+  std::stack<std::pair<int, int>> jumpStack;
 
   // wrzucam na niego adres powrotu w petlach (adres ponownego wyliczenia warunku petli)
-  std::stack<long long> returnStack;
+  std::stack<int> returnStack;
 
-  std::stack<long long> elseStack;
+  std::stack<int> elseStack;
 
 
-  std::stack<long long> forStack;
+  std::stack<int> forStack;
+
 
   // int yylex();
   void yyerror (char* msg);
@@ -166,20 +177,20 @@
   void declareAnArray(std::string name, long long arraySize);
 
   // function used for determining whether variable is declared
-  bool isVariableDeclared(std::map<std::string, long long> *mapToSearch, std::string name);
+  bool isVariableDeclared(std::map<std::string, int> *mapToSearch, std::string name);
 
   bool isVariableInitialized(std::map<std::string, bool>* initializedMap, std::string variableName);
 
   // debug function performed at the end of parsing
   void finish();
 
-  void displayMap(std::map<std::string, long long>* mapToDisplay);
+  void displayMap(std::map<std::string, int>* mapToDisplay);
   void displayInitializedMap(std::map<std::string, bool>* map);
   void displayCommandVector(std::vector<std::string>* commandsVector);
 
   void showAllocatedMemoryIndexes();
 
-  void pushCodeWithAddress(std::string opCode, long long number);
+  void pushCodeWithAddress(std::string opCode, int number);
   void pushCode(std::string opCode);
 
   void generateNumber(std::string);
@@ -188,18 +199,14 @@
   std::string determineDataType(std::string, std::string);
   void changeJumpValue();
 
-  void changeJumpValue(long long value);
+  void changeJumpValue(int value);
   void changeJumpValueForLoop();
-  void changeElseValue(long long value);
+  void changeElseValue(int value);
 
   void setEquationAttributes();
 
-  std::vector<long long> getBinaryRepresentation(long long decimalNumber);
 
-  void performNumberVariableMultiplication(std::string, long long);
-
-
-#line 203 "gram.tab.cpp" /* yacc.c:339  */
+#line 210 "gram.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -273,18 +280,16 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
+typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 138 "gram.ypp" /* yacc.c:355  */
+#line 145 "gram.ypp" /* yacc.c:355  */
 
-    char * string;
-    long long num;
+    char* string;
+    long long  num;
 
-#line 285 "gram.tab.cpp" /* yacc.c:355  */
+#line 292 "gram.tab.cpp" /* yacc.c:355  */
 };
-
-typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -298,7 +303,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 302 "gram.tab.cpp" /* yacc.c:358  */
+#line 307 "gram.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -543,7 +548,7 @@ union yyalloc
 #define YYLAST   148
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  42
+#define YYNTOKENS  43
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  29
 /* YYNRULES -- Number of rules.  */
@@ -572,7 +577,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    42,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -599,12 +604,12 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   169,   169,   173,   176,   180,   185,   186,   189,   189,
-     242,   244,   248,   242,   268,   272,   272,   285,   313,   474,
-     285,   509,   538,   700,   509,   735,   774,   818,   831,   831,
-     987,   987,  1162,  1162,  1229,  1230,  1233,  1233,  1527,  1527,
-    1612,  1612,  1803,  1803,  1982,  1982,  2158,  2158,  2318,  2323,
-    2341,  2354,  2372
+       0,   179,   179,   183,   186,   190,   195,   196,   199,   199,
+     254,   257,   261,   254,   282,   286,   286,   299,   327,   494,
+     299,   529,   558,   726,   529,   762,   801,   851,   866,   866,
+    1022,  1022,  1198,  1198,  1246,  1247,  1250,  1250,  1544,  1544,
+    1629,  1629,  1820,  1820,  1999,  1999,  2175,  2175,  2335,  2340,
+    2358,  2371,  2389
 };
 #endif
 
@@ -617,11 +622,11 @@ static const char *const yytname[] =
   "ELSE", "ENDIF", "WHILE", "DO", "ENDWHILE", "FOR", "FROM", "TO",
   "ENDFOR", "DOWNTO", "READ", "WRITE", "ASSGN", "EQ", "NEQ", "GT", "GE",
   "LT", "LE", "ADD", "SUB", "MUL", "DIV", "MOD", "num", "PID", "SEM",
-  "LEFT_BR", "RIGHT_BR", "'-'", "'+'", "'*'", "'/'", "'%'", "$accept",
-  "program", "vdeclarations", "commands", "command", "$@1", "$@2", "$@3",
-  "$@4", "$@5", "$@6", "$@7", "$@8", "$@9", "$@10", "$@11", "expression",
-  "$@12", "$@13", "$@14", "condition", "$@15", "$@16", "$@17", "$@18",
-  "$@19", "$@20", "value", "identifier", YY_NULLPTR
+  "LEFT_BR", "RIGHT_BR", "'-'", "'+'", "'*'", "'/'", "'%'", "'^'",
+  "$accept", "program", "vdeclarations", "commands", "command", "$@1",
+  "$@2", "$@3", "$@4", "$@5", "$@6", "$@7", "$@8", "$@9", "$@10", "$@11",
+  "expression", "$@12", "$@13", "$@14", "condition", "$@15", "$@16",
+  "$@17", "$@18", "$@19", "$@20", "value", "identifier", YY_NULLPTR
 };
 #endif
 
@@ -634,7 +639,7 @@ static const yytype_uint16 yytoknum[] =
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,    45,    43,    42,
-      47,    37
+      47,    37,    94
 };
 # endif
 
@@ -744,28 +749,28 @@ static const yytype_int8 yycheck[] =
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    43,    44,     0,     4,    33,     6,    10,    13,
-      18,    19,    33,    45,    46,    70,    35,    32,    62,    69,
-      70,    51,    33,    70,    69,    35,     5,    46,    47,    32,
-       7,    63,    64,    65,    66,    67,    68,    62,    14,    34,
-      34,    32,    33,    20,    36,    45,    21,    22,    25,    23,
-      26,    24,    11,    69,    36,    36,    58,    69,     9,    48,
-      69,    69,    69,    69,    69,    69,    45,    15,    17,    34,
-      30,    31,    59,    60,    61,     8,    12,    52,    55,    69,
-      69,    27,    28,    29,    49,    69,    69,    69,    69,    69,
-      45,    53,    56,    50,    11,    11,     9,    54,    57,    45,
-      45,    16,    16
+       0,     3,    44,    45,     0,     4,    33,     6,    10,    13,
+      18,    19,    33,    46,    47,    71,    35,    32,    63,    70,
+      71,    52,    33,    71,    70,    35,     5,    47,    48,    32,
+       7,    64,    65,    66,    67,    68,    69,    63,    14,    34,
+      34,    32,    33,    20,    36,    46,    21,    22,    25,    23,
+      26,    24,    11,    70,    36,    36,    59,    70,     9,    49,
+      70,    70,    70,    70,    70,    70,    46,    15,    17,    34,
+      30,    31,    60,    61,    62,     8,    12,    53,    56,    70,
+      70,    27,    28,    29,    50,    70,    70,    70,    70,    70,
+      46,    54,    57,    51,    11,    11,     9,    55,    58,    46,
+      46,    16,    16
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    42,    43,    44,    44,    44,    45,    45,    47,    46,
-      48,    49,    50,    46,    46,    51,    46,    52,    53,    54,
-      46,    55,    56,    57,    46,    46,    46,    58,    59,    58,
-      60,    58,    61,    58,    58,    58,    63,    62,    64,    62,
-      65,    62,    66,    62,    67,    62,    68,    62,    69,    69,
-      70,    70,    70
+       0,    43,    44,    45,    45,    45,    46,    46,    48,    47,
+      49,    50,    51,    47,    47,    52,    47,    53,    54,    55,
+      47,    56,    57,    58,    47,    47,    47,    59,    60,    59,
+      61,    59,    62,    59,    59,    59,    64,    63,    65,    63,
+      66,    63,    67,    63,    68,    63,    69,    63,    70,    70,
+      71,    71,    71
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1453,52 +1458,52 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 169 "gram.ypp" /* yacc.c:1646  */
+#line 179 "gram.ypp" /* yacc.c:1646  */
     {
                   finish();
                 }
-#line 1461 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1466 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 173 "gram.ypp" /* yacc.c:1646  */
+#line 183 "gram.ypp" /* yacc.c:1646  */
     {
                   declareAVariable((yyvsp[0].string));
                 }
-#line 1469 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1474 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 176 "gram.ypp" /* yacc.c:1646  */
+#line 186 "gram.ypp" /* yacc.c:1646  */
     {
                   long long arraySize = atoi((yyvsp[-1].string));
                   declareAnArray((yyvsp[-3].string), arraySize);
                 }
-#line 1478 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1483 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 180 "gram.ypp" /* yacc.c:1646  */
+#line 190 "gram.ypp" /* yacc.c:1646  */
     {
                   // std::cout << "No variables declared" << "\n";
                 }
-#line 1486 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1491 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 185 "gram.ypp" /* yacc.c:1646  */
+#line 195 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1492 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1497 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 186 "gram.ypp" /* yacc.c:1646  */
+#line 196 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 1498 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1503 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 189 "gram.ypp" /* yacc.c:1646  */
+#line 199 "gram.ypp" /* yacc.c:1646  */
     {
                 expressionType[0]         = valueFormat1;
                 expressionType[1]         = valueFormat2;
@@ -1506,11 +1511,11 @@ yyreduce:
                 currentArrayAssignAddress = arrayIdentifierAddress;
 
               }
-#line 1510 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1515 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 195 "gram.ypp" /* yacc.c:1646  */
+#line 205 "gram.ypp" /* yacc.c:1646  */
     {
 
                 std::string variableName = (yyvsp[-4].string);
@@ -1557,82 +1562,84 @@ yyreduce:
                   }
                 }
              }
-#line 1561 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1566 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 242 "gram.ypp" /* yacc.c:1646  */
+#line 254 "gram.ypp" /* yacc.c:1646  */
     {
 
+
              }
-#line 1569 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1575 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 244 "gram.ypp" /* yacc.c:1646  */
+#line 257 "gram.ypp" /* yacc.c:1646  */
     {
-               pushCodeWithAddress("JUMP", ELSE_PLACEHOLDER_ADDRESS);
+               pushCodeWithAddress("JUMP", 21373);
                changeJumpValue();
 
             }
-#line 1579 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1585 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 248 "gram.ypp" /* yacc.c:1646  */
+#line 261 "gram.ypp" /* yacc.c:1646  */
     {
               elseStack.emplace(numberOfCommands);
 
             }
-#line 1588 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1594 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 251 "gram.ypp" /* yacc.c:1646  */
+#line 264 "gram.ypp" /* yacc.c:1646  */
     {
-              std::stack<std::pair<long long, long long>> tempStack = jumpStack;
+              std::stack<std::pair<int, int>> tempStack = jumpStack;
 
-              for (long long i = 0; i < jumpStack.size(); i++) {
-                std::pair<long long,long long> topElement = tempStack.top();
+              for (int i = 0; i < jumpStack.size(); i++) {
+                std::pair<int,int> topElement = tempStack.top();
                 tempStack.pop();
               }
 
-              long long returnA = elseStack.top();
+              int returnA = elseStack.top();
               elseStack.pop();
+              // std::cout << returnA << " KNOCK HIM OUT" << "\n";
               changeElseValue(returnA);
             }
-#line 1605 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1612 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 268 "gram.ypp" /* yacc.c:1646  */
+#line 282 "gram.ypp" /* yacc.c:1646  */
     {
                changeJumpValue();
              }
-#line 1613 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1620 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 272 "gram.ypp" /* yacc.c:1646  */
+#line 286 "gram.ypp" /* yacc.c:1646  */
     {
                returnStack.emplace(numberOfCommands);
              }
-#line 1621 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1628 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 274 "gram.ypp" /* yacc.c:1646  */
+#line 288 "gram.ypp" /* yacc.c:1646  */
     {
                 long long returnAddress = returnStack.top();
                 returnStack.pop();
                 pushCodeWithAddress("JUMP", returnAddress);
                 changeJumpValue();
              }
-#line 1632 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1639 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 285 "gram.ypp" /* yacc.c:1646  */
+#line 299 "gram.ypp" /* yacc.c:1646  */
     {
                std::string iteratorsName = (yyvsp[-3].string);
                if (isVariableDeclared(&variablesAddressesMap, iteratorsName)) {
@@ -1662,11 +1669,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", variablesAddressesMap[(yyvsp[-3].string)]);
                }
              }
-#line 1666 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1673 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 313 "gram.ypp" /* yacc.c:1646  */
+#line 327 "gram.ypp" /* yacc.c:1646  */
     {
 
                secondElementAddress             = equationElementAddress;
@@ -1698,8 +1705,10 @@ yyreduce:
                  pushCodeWithAddress("LOAD",  secondElementAddress);
                  pushCodeWithAddress("STORE", secondIteratorsAddress);
 
+                //  pushCodeWithAddress("SUB",  8);
                } else if (types[0] == "variable" && types[1] == "number") {
 
+                //  pushCodeWithAddress("SUB",  8);
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
                 pushCodeWithAddress("LOAD",  firstElementAddress);
@@ -1719,6 +1728,7 @@ yyreduce:
 
                 pushCodeWithAddress("LOAD",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("STORE", iteratorsAddress);
+
 
               } else if (types[0] == "number" && types[1] == "arrayVar") {
 
@@ -1753,6 +1763,7 @@ yyreduce:
 
               } else if (types[0] == "array" && types[1] == "number") {
 
+
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
@@ -1772,6 +1783,7 @@ yyreduce:
                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
+
               } else if (types[0] == "number" && types[1] == "array") {
 
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
@@ -1779,6 +1791,7 @@ yyreduce:
                 pushCodeWithAddress("STORE", 10);
                 pushCodeWithAddress("LOADI", 10);
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
+
 
               } else if (types[0] == "variable" && types[1] == "array") {
 
@@ -1829,15 +1842,15 @@ yyreduce:
               forStack.emplace(iteratorsAddress);
 
             }
-#line 1833 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1846 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 474 "gram.ypp" /* yacc.c:1646  */
+#line 494 "gram.ypp" /* yacc.c:1646  */
     {
               returnStack.emplace(numberOfCommands);
               //zaladuj wartosc i, odejmij
-              long long address = forStack.top();
+              int address = forStack.top();
 
               pushCodeWithAddress("LOAD", address);
               pushCodeWithAddress("SUB",  address+1);
@@ -1846,18 +1859,18 @@ yyreduce:
               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
              }
-#line 1850 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1863 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 485 "gram.ypp" /* yacc.c:1646  */
+#line 505 "gram.ypp" /* yacc.c:1646  */
     {
 
               pushCodeWithAddress("LOAD",  forStack.top());
               pushCode("INC");
               pushCodeWithAddress("STORE", forStack.top());
 
-              long long returnAddress = returnStack.top();
+              int returnAddress = returnStack.top();
               returnStack.pop();
               pushCodeWithAddress("JUMP", returnAddress);
               changeJumpValue();
@@ -1874,11 +1887,11 @@ yyreduce:
               variablesAddressesMap.erase(secondIterator);
               initializedVariablesMap.erase(secondIterator);
              }
-#line 1878 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1891 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 509 "gram.ypp" /* yacc.c:1646  */
+#line 529 "gram.ypp" /* yacc.c:1646  */
     {
 
                std::string iteratorsName = (yyvsp[-3].string);
@@ -1909,11 +1922,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", variablesAddressesMap[(yyvsp[-3].string)]);
                }
              }
-#line 1913 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1926 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 538 "gram.ypp" /* yacc.c:1646  */
+#line 558 "gram.ypp" /* yacc.c:1646  */
     {
 
                secondElementAddress             = equationElementAddress;
@@ -1934,7 +1947,7 @@ yyreduce:
                iteratorsAddress = variablesAddressesMap[(yyvsp[-5].string)];
                std::string rightIteratorsBoundName = (yyvsp[-5].string);
                rightIteratorsBoundName = rightIteratorsBoundName + "#1";
-               long long secondIteratorsAddress = variablesAddressesMap[rightIteratorsBoundName];
+               int secondIteratorsAddress = variablesAddressesMap[rightIteratorsBoundName];
 
                if (types[0] == "number" && types[1] == "number") {
 
@@ -1945,8 +1958,10 @@ yyreduce:
                  pushCodeWithAddress("LOAD",  secondElementAddress);
                  pushCodeWithAddress("STORE", secondIteratorsAddress);
 
+                //  pushCodeWithAddress("SUB",  8);
                } else if (types[0] == "variable" && types[1] == "number") {
 
+                //  pushCodeWithAddress("SUB",  8);
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
                 pushCodeWithAddress("LOAD",  firstElementAddress);
@@ -1966,6 +1981,7 @@ yyreduce:
 
                 pushCodeWithAddress("LOAD",  firstElementAddress  + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("STORE", iteratorsAddress);
+
 
               } else if (types[0] == "number" && types[1] == "arrayVar") {
 
@@ -2000,6 +2016,7 @@ yyreduce:
 
               } else if (types[0] == "array" && types[1] == "number") {
 
+
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
@@ -2019,6 +2036,7 @@ yyreduce:
                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
+
               } else if (types[0] == "number" && types[1] == "array") {
 
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
@@ -2026,6 +2044,7 @@ yyreduce:
                 pushCodeWithAddress("STORE", 10);
                 pushCodeWithAddress("LOADI", 10);
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
+
 
               } else if (types[0] == "variable" && types[1] == "array") {
 
@@ -2077,16 +2096,16 @@ yyreduce:
               forStack.emplace(iteratorsAddress);
 
             }
-#line 2081 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2100 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 700 "gram.ypp" /* yacc.c:1646  */
+#line 726 "gram.ypp" /* yacc.c:1646  */
     {
 
               returnStack.emplace(numberOfCommands);
               //zaladuj wartosc i, odejmij
-              long long address = forStack.top();
+              int address = forStack.top();
 
               pushCodeWithAddress("LOAD", address+1);
               pushCodeWithAddress("SUB",  address);
@@ -2096,20 +2115,21 @@ yyreduce:
               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
             }
-#line 2100 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2119 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 713 "gram.ypp" /* yacc.c:1646  */
+#line 739 "gram.ypp" /* yacc.c:1646  */
     {
               pushCodeWithAddress("LOAD",  forStack.top());
               pushCode("DEC");
               pushCodeWithAddress("STORE", forStack.top());
 
-              long long returnAddress = returnStack.top();
+              int returnAddress = returnStack.top();
               returnStack.pop();
               pushCodeWithAddress("JUMP", returnAddress);
               changeJumpValue();
+
                // usun ze zmiennych
               forStack.pop();
 
@@ -2123,11 +2143,11 @@ yyreduce:
               variablesAddressesMap.erase(secondIterator);
               initializedVariablesMap.erase(secondIterator);
              }
-#line 2127 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2147 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 735 "gram.ypp" /* yacc.c:1646  */
+#line 762 "gram.ypp" /* yacc.c:1646  */
     {
 
                std::string variableName = (yyvsp[-1].string);
@@ -2167,15 +2187,16 @@ yyreduce:
                  }
                }
              }
-#line 2171 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2191 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 774 "gram.ypp" /* yacc.c:1646  */
+#line 801 "gram.ypp" /* yacc.c:1646  */
     {
 
                std::string variableName = (yyvsp[-1].string);
 
+              //  std::cout << valueFormat1 << " " << valueFormat2 << "\n";
                if (valueFormat1 == "number" && valueFormat2 == "number") {
                  pushCode("PUT");
                } else if (isVariableDeclared(&variablesAddressesMap, variableName)) {
@@ -2195,17 +2216,22 @@ yyreduce:
                         std::cout << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
                         exit(1);
                       }
+
                       pushCodeWithAddress("LOAD", variableAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                       pushCode("PUT");
 
                     } else { // a[b]
+
                       pushCodeWithAddress("LOAD", variablesAddressesMap[variableName]);
                       pushCodeWithAddress("ADD",  arrayIdentifierAddress); // we load value n from a[n]
                       pushCodeWithAddress("STORE", 0);
                       pushCodeWithAddress("LOADI", 0);
                       pushCode("PUT");
+
                     }
                   } else {
+
+                    // pushCode("ZERO");
                     pushCodeWithAddress("LOAD", variableAddress);
                     pushCode("PUT");
                   }
@@ -2215,15 +2241,16 @@ yyreduce:
                  exit(1);
                }
              }
-#line 2219 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2245 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 818 "gram.ypp" /* yacc.c:1646  */
+#line 851 "gram.ypp" /* yacc.c:1646  */
     {
 
                 if (valueFormat1 == "number" && valueFormat2 == "number") {
                     // do nothing
+                    // pushCode("WABBA LUBBA DUB DUB ");
                 } else if (valueFormat1 == "variable" && valueFormat2 == "variable") {
                   pushCode("ZERO");
                   pushCodeWithAddress("LOAD", equationElementAddress); // todo: do poprawki, wstawiłem tylko dla debuggingu, tutaj znajdz adres zmiennej ktorą teraz przypiszemy
@@ -2232,12 +2259,13 @@ yyreduce:
                 } else if (valueFormat1 == "array" && valueFormat2 == "array"){
 
                 }
+
               }
-#line 2237 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2265 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 831 "gram.ypp" /* yacc.c:1646  */
+#line 866 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -2255,15 +2283,15 @@ yyreduce:
                  pushCodeWithAddress("STORE", 0);
                }
              }
-#line 2259 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2287 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 848 "gram.ypp" /* yacc.c:1646  */
+#line 883 "gram.ypp" /* yacc.c:1646  */
     {
 
               secondElementAddress             = equationElementAddress;
-              long long secondArrayIdentifierAddress = arrayIdentifierAddress;
+              int secondArrayIdentifierAddress = arrayIdentifierAddress;
               std::string secondElementName    = variableNameGlobal;
 
               std::string variableTypes[4];
@@ -2396,11 +2424,11 @@ yyreduce:
 
               }
              }
-#line 2400 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2428 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 987 "gram.ypp" /* yacc.c:1646  */
+#line 1022 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -2419,11 +2447,11 @@ yyreduce:
                }
 
              }
-#line 2423 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2451 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 1004 "gram.ypp" /* yacc.c:1646  */
+#line 1039 "gram.ypp" /* yacc.c:1646  */
     {
 
                secondElementAddress             = equationElementAddress;
@@ -2439,6 +2467,7 @@ yyreduce:
                std::string types[2];
                types[0] = determineDataType(variableTypes[0], variableTypes[1]);
                types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
 
                if (types[0] == "number" && types[1] == "number") {
 
@@ -2579,11 +2608,11 @@ yyreduce:
 
                }
              }
-#line 2583 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2612 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 1162 "gram.ypp" /* yacc.c:1646  */
+#line 1198 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -2602,16 +2631,16 @@ yyreduce:
                }
 
              }
-#line 2606 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2635 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 1179 "gram.ypp" /* yacc.c:1646  */
+#line 1215 "gram.ypp" /* yacc.c:1646  */
     {
 
-               secondElementAddress                   = equationElementAddress;
+               secondElementAddress             = equationElementAddress;
                long long secondArrayIdentifierAddress = arrayIdentifierAddress;
-               std::string secondElementName          = variableNameGlobal;
+               std::string secondElementName    = variableNameGlobal;
                long long arrayIndexOfSecondElement    = currentArrayIndex;
 
                std::string variableTypes[4];
@@ -2626,54 +2655,35 @@ yyreduce:
 
                if (types[0] == "number" && types[1] == "number") {
 
+                 pushCodeWithAddress("STORE", 3);
 
-               } else if (types[0] == "number" && types[1] == "variable") {
+                 /*
+                 #######################################
+                 #      SPRAWDZENIE CZY JEST TO 0      #
+                 #######################################
+                 */
 
-                 performNumberVariableMultiplication((yyvsp[-3].string), secondElementAddress);
 
-               } else if (types[0] == "variable" && types[1] == "number") {
-
-                 performNumberVariableMultiplication((yyvsp[0].string), firstElementAddress);
-
-               } else if (types[0] == "number" && types[1] == "arrayVar") {
-
-                 performNumberVariableMultiplication((yyvsp[-3].string), secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
-
-               } else if (types[0] == "arrayVar" && types[1] == "number") {
-
-                 performNumberVariableMultiplication((yyvsp[0].string), firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
-
-               } else if (types[0] == "number" && types[1] == "arrayVar") {
-
-                 performNumberVariableMultiplication((yyvsp[-3].string), firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
-
-               } else if (types[0] == "number" && types[1] == "array") {
-
-                 // performNumberVariableMultiplication($<string>1, firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
-
-               } else if (types[0] == "array" && types[1] == "number") {
-
-                 // performNumberVariableMultiplication($<string>1, firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                }
 
              }
-#line 2661 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2671 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 1229 "gram.ypp" /* yacc.c:1646  */
+#line 1246 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 2667 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2677 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 1230 "gram.ypp" /* yacc.c:1646  */
+#line 1247 "gram.ypp" /* yacc.c:1646  */
     { }
-#line 2673 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2683 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 1233 "gram.ypp" /* yacc.c:1646  */
+#line 1250 "gram.ypp" /* yacc.c:1646  */
     {
                 expressionType[0]  = valueFormat1;
                 expressionType2[0] = valueFormat2;
@@ -2692,11 +2702,11 @@ yyreduce:
                 }
 
               }
-#line 2696 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2706 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 1250 "gram.ypp" /* yacc.c:1646  */
+#line 1267 "gram.ypp" /* yacc.c:1646  */
     {
 
                 secondElementAddress             = equationElementAddress;
@@ -2974,11 +2984,11 @@ yyreduce:
                 pushCodeWithAddress("JZERO", numberOfCommands + 2);
                 pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
               }
-#line 2978 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2988 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 1527 "gram.ypp" /* yacc.c:1646  */
+#line 1544 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -2996,11 +3006,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
              }
-#line 3000 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3010 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 1543 "gram.ypp" /* yacc.c:1646  */
+#line 1560 "gram.ypp" /* yacc.c:1646  */
     {
 
 
@@ -3070,11 +3080,11 @@ yyreduce:
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
              }
-#line 3074 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3084 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 1612 "gram.ypp" /* yacc.c:1646  */
+#line 1629 "gram.ypp" /* yacc.c:1646  */
     {
 
                expressionType[0]  = valueFormat1;
@@ -3093,11 +3103,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
              }
-#line 3097 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3107 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 1629 "gram.ypp" /* yacc.c:1646  */
+#line 1646 "gram.ypp" /* yacc.c:1646  */
     {
                secondElementAddress             = equationElementAddress;
                long long secondArrayIdentifierAddress = arrayIdentifierAddress;
@@ -3272,11 +3282,11 @@ yyreduce:
                pushCodeWithAddress("JZERO", numberOfCommands + 2);
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
              }
-#line 3276 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3286 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 1803 "gram.ypp" /* yacc.c:1646  */
+#line 1820 "gram.ypp" /* yacc.c:1646  */
     {
 
 
@@ -3296,11 +3306,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
              }
-#line 3300 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3310 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 1821 "gram.ypp" /* yacc.c:1646  */
+#line 1838 "gram.ypp" /* yacc.c:1646  */
     {
 
 
@@ -3462,11 +3472,11 @@ yyreduce:
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
              }
-#line 3466 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3476 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 1982 "gram.ypp" /* yacc.c:1646  */
+#line 1999 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -3484,11 +3494,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
               }
-#line 3488 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3498 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 1998 "gram.ypp" /* yacc.c:1646  */
+#line 2015 "gram.ypp" /* yacc.c:1646  */
     {
 
                secondElementAddress             = equationElementAddress;
@@ -3648,11 +3658,11 @@ yyreduce:
                pushCodeWithAddress("JZERO", numberOfCommands + 2);
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
              }
-#line 3652 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3662 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 2158 "gram.ypp" /* yacc.c:1646  */
+#line 2175 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -3670,11 +3680,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
              }
-#line 3674 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3684 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 2174 "gram.ypp" /* yacc.c:1646  */
+#line 2191 "gram.ypp" /* yacc.c:1646  */
     {
 
                secondElementAddress             = equationElementAddress;
@@ -3818,21 +3828,21 @@ yyreduce:
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
              }
-#line 3822 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3832 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 2318 "gram.ypp" /* yacc.c:1646  */
+#line 2335 "gram.ypp" /* yacc.c:1646  */
     {
                 generateNumber((yyvsp[0].string));
                 valueFormat1 = "number";
                 valueFormat2 = "number";
              }
-#line 3832 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3842 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 2323 "gram.ypp" /* yacc.c:1646  */
+#line 2340 "gram.ypp" /* yacc.c:1646  */
     {
                std::string variableName = (yyvsp[0].string);
 
@@ -3850,11 +3860,11 @@ yyreduce:
                 }
                }
              }
-#line 3854 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3864 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 2341 "gram.ypp" /* yacc.c:1646  */
+#line 2358 "gram.ypp" /* yacc.c:1646  */
     {
               valueFormat1 = "variable";
               valueFormat2 = "variable";
@@ -3868,11 +3878,11 @@ yyreduce:
                 equationElementAddress = variablesAddressesMap[(yyvsp[0].string)];
               }
             }
-#line 3872 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3882 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 2354 "gram.ypp" /* yacc.c:1646  */
+#line 2371 "gram.ypp" /* yacc.c:1646  */
     {
 
               std::string variableName = (yyvsp[-3].string);
@@ -3891,11 +3901,11 @@ yyreduce:
               }
 
            }
-#line 3895 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3905 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 2372 "gram.ypp" /* yacc.c:1646  */
+#line 2389 "gram.ypp" /* yacc.c:1646  */
     {
 
               std::string variableName = (yyvsp[-3].string);
@@ -3918,11 +3928,11 @@ yyreduce:
                 arrayIdentifierAddress  = variablesAddressesMap[(yyvsp[-1].string)]; // is only an address of a variable, not a value!!!
               }
              }
-#line 3922 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3932 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 3926 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3936 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -4150,7 +4160,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 2395 "gram.ypp" /* yacc.c:1906  */
+#line 2412 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
@@ -4166,7 +4176,7 @@ void declareAVariable(std::string name) {
   }
 }
 
-void displayArraySizesMap(std::map<std::string, long long>* arraySizesMap) {
+void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
   for(auto elem : *arraySizesMap) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
@@ -4181,7 +4191,7 @@ void declareAnArray(std::string name, long long arraySize) {
     generateNumber(std::to_string(arrayStartPoint));
     pushCodeWithAddress("STORE", --arrayStartPoint);
 
-    currentMemoryIndex = currentMemoryIndex -1;
+    currentMemoryIndex = currentMemoryIndex - 1;
     variablesAddressesMap[name] = currentMemoryIndex; // the beggining of an array
     arraysMap[name] = arraySize;
     currentMemoryIndex =  currentMemoryIndex + arraySize; //without the first one
@@ -4192,19 +4202,12 @@ void declareAnArray(std::string name, long long arraySize) {
   }
 }
 
-bool isVariableDeclared(std::map<std::string, long long> *mapToSearch, std::string name) {
+bool isVariableDeclared(std::map<std::string, int> *mapToSearch, std::string name) {
   if ( (*mapToSearch).find(name) == (*mapToSearch).end() ) {
     return false;
   } else {
     return true;
   }
-}
-
-void showAllocatedMemoryIndexes() {
-  for (long long i = 0; i < 10; i++) {
-    std::cout << "index: " << i << " allocated for computing variables\n";
-  }
-  std::cout << "###################\n\n\n\n";
 }
 
 void finish() {
@@ -4221,7 +4224,7 @@ void finish() {
   displayCommandVector(&commandsVector);
 }
 
-void displayMap(std::map<std::string, long long>* mapToDisplay) {
+void displayMap(std::map<std::string, int>* mapToDisplay) {
   for(auto elem : *mapToDisplay) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
@@ -4246,8 +4249,8 @@ bool isVariableInitialized(std::map<std::string, bool>* initializedMap, std::str
 }
 
 void displayCommandVector(std::vector<std::string> *commands) {
-  long long vectorSize = commands->size();
-  for (long long i=0; i < vectorSize; i++) {
+  int vectorSize = commands->size();
+  for (int i=0; i < vectorSize; i++) {
     std::cout << commands->at(i) << "\n";
   }
 }
@@ -4258,18 +4261,21 @@ void displayCommandVector(std::vector<std::string> *commands) {
 
 void pushCode(std::string opCode) {
   commandsVector.push_back(opCode);
-  numberOfCommands++;
+  // if (opCode != "HALT") {
+    numberOfCommands++;
+  // }
 }
 
-void pushCodeWithAddress(std::string opCode, long long number) {
+void pushCodeWithAddress(std::string opCode, int number) {
   std::string space = " ";
   std::string whole = opCode + space + std::to_string(number);
   commandsVector.push_back(whole);
   if (opCode == "JUMP" ) {
     if (number == JUMP_PLACEHOLDER_ADDRESS) {
-      std::pair<long long, long long> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
+      std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
       jumpStack.emplace(newJumpPosition);
-    } else if (number == ELSE_PLACEHOLDER_ADDRESS) {
+    } else if (number == 21373) {
+      // std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
       elseStack.emplace(numberOfCommands);
     }
 
@@ -4279,76 +4285,61 @@ void pushCodeWithAddress(std::string opCode, long long number) {
 
 void changeJumpValue() {
   std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
-  long long jumpStackSize = jumpStack.size();
+  int jumpStackSize = jumpStack.size();
 
-  std::pair<long long,long long> topElement = jumpStack.top();
+  std::pair<int,int> topElement = jumpStack.top();
   jumpStack.pop();
-  long long destinationAddress = topElement.first;
-  long long destinationValue   = numberOfCommands;
+  int destinationAddress = topElement.first;
+  int destinationValue   = numberOfCommands;
   // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
 
-  long long finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
+  int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
   std::string address                = std::to_string(destinationValue);
   commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
 
 }
 
-void changeJumpValue(long long value) {
+void changeJumpValue(int value) {
   std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
 
   if (jumpStack.size() > 0) {
-    std::pair<long long,long long> topElement = jumpStack.top();
+    std::pair<int,int> topElement = jumpStack.top();
     jumpStack.pop();
-    long long destinationAddress = topElement.first;
-    long long destinationValue   = value;
+    int destinationAddress = topElement.first;
+    int destinationValue   = value;
     // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
 
-    long long finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
+    int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
     std::string address                = std::to_string(destinationValue);
     commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
   }
 
 }
 
-void changeElseValue(long long value) {
+void changeElseValue(int value) {
   std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);
 
   if (elseStack.size() > 0) {
     // std::cout << "XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDd";
-    long long topElement = elseStack.top();
+    int topElement = elseStack.top();
     elseStack.pop();
-    long long destinationAddress = topElement;
-    long long destinationValue   = value;
+    int destinationAddress = topElement;
+    int destinationValue   = value;
     // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
 
-    long long finishIndex              = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
+    int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
     std::string address                = std::to_string(destinationValue);
     commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
   }
 }
 
-void performNumberVariableMultiplication(std::string number, long long variableAddress) {
 
-  std::vector<long long> binaryRepresentationStack;
+
+void generateNumber(std::string number) {
+
+  std::vector<int> binaryRepresentationStack;
+  long long decimalNumber2 = std::stoi(number);
   long long decimalNumber  = std::stoi(number);
-
-  binaryRepresentationStack = getBinaryRepresentation(decimalNumber);
-  pushCode("ZERO");
-
-  long long binaryNumberLength = binaryRepresentationStack.size();
-
-  for(long long i = 0; i < binaryNumberLength; i++) {
-    if (binaryRepresentationStack[i] == 1) {
-      pushCodeWithAddress("ADD", variableAddress);
-    }
-    if (i < binaryNumberLength - 1) {
-      pushCode("SHL");
-    }
-  }
-}
-
-std::vector<long long> getBinaryRepresentation(long long decimalNumber) {
-  std::vector<long long> binaryRepresentationStack;
 
   while(decimalNumber > 0) {
     if (decimalNumber % 2 == 0) {
@@ -4358,30 +4349,12 @@ std::vector<long long> getBinaryRepresentation(long long decimalNumber) {
     }
     decimalNumber = decimalNumber / 2;
   }
-  return binaryRepresentationStack;
-}
-
-void generateNumber(std::string number) {
-
-  std::vector<long long> binaryRepresentationStack;
-  long long decimalNumber2 = std::stoi(number);
-  long long decimalNumber  = std::stoi(number);
-
-  binaryRepresentationStack = getBinaryRepresentation(decimalNumber);
-  // while(decimalNumber > 0) {
-  //   if (decimalNumber % 2 == 0) {
-  //     binaryRepresentationStack.insert(binaryRepresentationStack.begin(), 0);
-  //   } else {
-  //     binaryRepresentationStack.insert(binaryRepresentationStack.begin(), 1);
-  //   }
-  //   decimalNumber = decimalNumber / 2;
-  // }
 
   pushCode("ZERO");
 
-  long long binaryNumberLength = binaryRepresentationStack.size();
+  int binaryNumberLength = binaryRepresentationStack.size();
 
-  for(long long i = 0; i < binaryNumberLength; i++) {
+  for(int i = 0; i < binaryNumberLength; i++) {
     if (binaryRepresentationStack[i] == 1) {
       pushCode("INC");
     }
