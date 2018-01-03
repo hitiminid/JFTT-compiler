@@ -605,9 +605,9 @@ static const yytype_uint16 yyrline[] =
        0,   175,   175,   179,   182,   186,   191,   192,   195,   195,
      250,   253,   257,   250,   278,   282,   282,   295,   323,   490,
      295,   525,   553,   716,   525,   752,   791,   839,   854,   854,
-    1010,  1010,  1186,  1186,  1245,  1245,  1367,  1370,  1370,  1664,
-    1664,  1749,  1749,  1940,  1940,  2119,  2119,  2295,  2295,  2453,
-    2458,  2476,  2489,  2507
+    1010,  1010,  1186,  1186,  1245,  1245,  1495,  1719,  1719,  2013,
+    2013,  2098,  2098,  2289,  2289,  2468,  2468,  2644,  2644,  2802,
+    2807,  2825,  2838,  2856
 };
 #endif
 
@@ -2719,102 +2719,451 @@ yyreduce:
 
                if (types[0] == "number" && types[1] == "number") {
 
-                 /*
-                 [2] - a
-                 [3] - b
-                 [4] - r
-                 [5] - q
-                 [6] - n
-                 [7] - aux
-                 */
-
-                 pushCodeWithAddress("STORE", 3); // b
-                 pushCodeWithAddress("STORE", 7); // AUX
-                 /* aux = b */
-
-                 pushCode("ZERO");
-                 pushCodeWithAddress("STORE", 5); // q = 0;
-                 pushCodeWithAddress("STORE", 6); // n = 0;
-
-                 pushCodeWithAddress("LOAD",  2);
-                 pushCodeWithAddress("STORE", 4); // r = a;
-
-                 int computeN = numberOfCommands;
-                 pushCodeWithAddress("LOAD",  7);
-                 pushCode("SHL");
-                 pushCodeWithAddress("STORE", 7);
-                 /* aux = aux << 1; */
-
-                 pushCodeWithAddress("LOAD",  6);
-                 pushCode("INC");
-                 pushCodeWithAddress("STORE", 6);
-                 /* n++; */
-
-                 pushCodeWithAddress("LOAD",  7);
-                 pushCodeWithAddress("SUB",   2);
-
-                 pushCodeWithAddress("JZERO", computeN);
-
-                 // pushCodeWithAddress("LOAD", 6);
-                 // pushCode("PUT");
-                 // pushCodeWithAddress("LOAD", 7);
-                 // pushCode("PUT");
-
-                 int secondLoop = numberOfCommands;
-
-                 pushCodeWithAddress("LOAD",  6);
-                 pushCodeWithAddress("JZERO", numberOfCommands + 21);
-                 /*n > 0 */
-
-                 pushCodeWithAddress("LOAD",  7);
-                 pushCode("SHR");
-                 pushCodeWithAddress("STORE", 7);
-                 /* aux = aux >> 1 */
-
-                 pushCodeWithAddress("LOAD",  6);
-                 pushCode("DEC");
-                 pushCodeWithAddress("STORE", 6);
-                 /* n-- */
-
-                 pushCodeWithAddress("LOAD",  5);
-                 pushCode("SHL");
-                 pushCodeWithAddress("STORE", 5);
-                 /* q = q << 1; */
-
-                 pushCodeWithAddress("LOAD",  7);
-                 pushCodeWithAddress("SUB",   4);
-                 pushCodeWithAddress("JZERO", numberOfCommands + 2);
-                 pushCodeWithAddress("JUMP",  numberOfCommands + 7);
-                 /* if (r >= aux) */
-
-                 pushCodeWithAddress("LOAD",  4);
-                 pushCodeWithAddress("SUB",   7);
-                 pushCodeWithAddress("STORE", 4);
-                 /* r = r - aux; */
-
-                 pushCodeWithAddress("LOAD",  5);
-                 pushCode("INC");
-                 pushCodeWithAddress("STORE", 5);
-
-                 pushCodeWithAddress("JUMP", secondLoop);
-
-                 pushCodeWithAddress("LOAD", 5);
+                 pushCodeWithAddress("STORE", 3);
 
                } else if (types[0] == "number" && types[1] == "variable") {
 
+                 pushCodeWithAddress("LOAD", secondElementAddress);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "variable" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress);
+                 pushCodeWithAddress("STORE", 2);
+
+               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "arrayVar" && types[1] == "number") {
+
+
+               } else if (types[0] == "number" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "array" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD", secondElementAddress);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "array" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "array" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 2);
+
+               } else if (types[0] == "array" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("SUB",   secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "number" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "variable" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "arrayVar" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "variable" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("SUB",   secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "arrayVar" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  secondElementAddress);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "variable" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  secondElementAddress);
+                 pushCodeWithAddress("STORE", 3);
                }
+
+               /*
+                [2] - a
+                [3] - b
+                [4] - r
+                [5] - q
+                [6] - n
+                [7] - aux
+              */
+
+               pushCodeWithAddress("LOAD", 3);
+               pushCodeWithAddress("STORE", 7); // AUX
+               /* aux = b */
+
+               pushCode("ZERO");
+               pushCodeWithAddress("STORE", 5); // q = 0;
+               pushCodeWithAddress("STORE", 6); // n = 0;
+
+               pushCodeWithAddress("LOAD",  2);
+               pushCodeWithAddress("STORE", 4); // r = a;
+
+               int computeN = numberOfCommands;
+               pushCodeWithAddress("LOAD",  7);
+               pushCode("SHL");
+               pushCodeWithAddress("STORE", 7);
+               /* aux = aux << 1; */
+
+               pushCodeWithAddress("LOAD",  6);
+               pushCode("INC");
+               pushCodeWithAddress("STORE", 6);
+               /* n++; */
+
+               pushCodeWithAddress("LOAD",  7);
+               pushCodeWithAddress("SUB",   2);
+
+               pushCodeWithAddress("JZERO", computeN);
+
+               // pushCodeWithAddress("LOAD", 6);
+               // pushCode("PUT");
+               // pushCodeWithAddress("LOAD", 7);
+               // pushCode("PUT");
+
+               int secondLoop = numberOfCommands;
+
+               pushCodeWithAddress("LOAD",  6);
+               pushCodeWithAddress("JZERO", numberOfCommands + 21);
+               /*n > 0 */
+
+               pushCodeWithAddress("LOAD",  7);
+               pushCode("SHR");
+               pushCodeWithAddress("STORE", 7);
+               /* aux = aux >> 1 */
+
+               pushCodeWithAddress("LOAD",  6);
+               pushCode("DEC");
+               pushCodeWithAddress("STORE", 6);
+               /* n-- */
+
+               pushCodeWithAddress("LOAD",  5);
+               pushCode("SHL");
+               pushCodeWithAddress("STORE", 5);
+               /* q = q << 1; */
+
+               pushCodeWithAddress("LOAD",  7);
+               pushCodeWithAddress("SUB",   4);
+               pushCodeWithAddress("JZERO", numberOfCommands + 2);
+               pushCodeWithAddress("JUMP",  numberOfCommands + 7);
+               /* if (r >= aux) */
+
+               pushCodeWithAddress("LOAD",  4);
+               pushCodeWithAddress("SUB",   7);
+               pushCodeWithAddress("STORE", 4);
+               /* r = r - aux; */
+
+               pushCodeWithAddress("LOAD",  5);
+               pushCode("INC");
+               pushCodeWithAddress("STORE", 5);
+
+               pushCodeWithAddress("JUMP", secondLoop);
+
+               pushCodeWithAddress("LOAD", 5);
+
              }
-#line 2808 "gram.tab.cpp" /* yacc.c:1646  */
+#line 2936 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 1367 "gram.ypp" /* yacc.c:1646  */
-    { }
-#line 2814 "gram.tab.cpp" /* yacc.c:1646  */
+#line 1495 "gram.ypp" /* yacc.c:1646  */
+    {
+               secondElementAddress             = equationElementAddress;
+               long long secondArrayIdentifierAddress = arrayIdentifierAddress;
+               std::string secondElementName    = variableNameGlobal;
+               long long arrayIndexOfSecondElement    = currentArrayIndex;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               variableTypes[2] = valueFormat1;
+               variableTypes[3] = valueFormat2;
+
+               std::string types[2];
+               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+               if (types[0] == "number" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "number" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD", secondElementAddress);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "variable" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress);
+                 pushCodeWithAddress("STORE", 2);
+
+               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "arrayVar" && types[1] == "number") {
+
+
+               } else if (types[0] == "number" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "array" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD", secondElementAddress);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "array" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "array" && types[1] == "number") {
+
+                 pushCodeWithAddress("STORE", 3);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 2);
+
+               } else if (types[0] == "array" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("SUB",   secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "number" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "variable" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "arrayVar" && types[1] == "array") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
+                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
+                 pushCodeWithAddress("STORE", 1);
+                 pushCodeWithAddress("LOADI", 1);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "variable" && types[1] == "arrayVar") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("SUB",   secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "arrayVar" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  secondElementAddress);
+                 pushCodeWithAddress("STORE", 3);
+
+               } else if (types[0] == "variable" && types[1] == "variable") {
+
+                 pushCodeWithAddress("LOAD",  firstElementAddress);
+                 pushCodeWithAddress("STORE", 2);
+
+                 pushCodeWithAddress("LOAD",  secondElementAddress);
+                 pushCodeWithAddress("STORE", 3);
+               }
+
+               pushCodeWithAddress("LOAD", 3);
+               pushCodeWithAddress("STORE", 7); // AUX
+               /* aux = b */
+
+               pushCode("ZERO");
+               pushCodeWithAddress("STORE", 5); // q = 0;
+               pushCodeWithAddress("STORE", 6); // n = 0;
+
+               pushCodeWithAddress("LOAD",  2);
+               pushCodeWithAddress("STORE", 4); // r = a;
+
+               int computeN = numberOfCommands;
+               pushCodeWithAddress("LOAD",  7);
+               pushCode("SHL");
+               pushCodeWithAddress("STORE", 7);
+               /* aux = aux << 1; */
+
+               pushCodeWithAddress("LOAD",  6);
+               pushCode("INC");
+               pushCodeWithAddress("STORE", 6);
+               /* n++; */
+
+               pushCodeWithAddress("LOAD",  7);
+               pushCodeWithAddress("SUB",   2);
+
+               pushCodeWithAddress("JZERO", computeN);
+
+               // pushCodeWithAddress("LOAD", 6);
+               // pushCode("PUT");
+               // pushCodeWithAddress("LOAD", 7);
+               // pushCode("PUT");
+
+               int secondLoop = numberOfCommands;
+
+               pushCodeWithAddress("LOAD",  6);
+               pushCodeWithAddress("JZERO", numberOfCommands + 21);
+               /*n > 0 */
+
+               pushCodeWithAddress("LOAD",  7);
+               pushCode("SHR");
+               pushCodeWithAddress("STORE", 7);
+               /* aux = aux >> 1 */
+
+               pushCodeWithAddress("LOAD",  6);
+               pushCode("DEC");
+               pushCodeWithAddress("STORE", 6);
+               /* n-- */
+
+               pushCodeWithAddress("LOAD",  5);
+               pushCode("SHL");
+               pushCodeWithAddress("STORE", 5);
+               /* q = q << 1; */
+
+               pushCodeWithAddress("LOAD",  7);
+               pushCodeWithAddress("SUB",   4);
+               pushCodeWithAddress("JZERO", numberOfCommands + 2);
+               pushCodeWithAddress("JUMP",  numberOfCommands + 7);
+               /* if (r >= aux) */
+
+               pushCodeWithAddress("LOAD",  4);
+               pushCodeWithAddress("SUB",   7);
+               pushCodeWithAddress("STORE", 4);
+               /* r = r - aux; */
+
+               pushCodeWithAddress("LOAD",  5);
+               pushCode("INC");
+               pushCodeWithAddress("STORE", 5);
+
+               pushCodeWithAddress("JUMP", secondLoop);
+
+               pushCodeWithAddress("LOAD", 4);
+
+             }
+#line 3163 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 1370 "gram.ypp" /* yacc.c:1646  */
+#line 1719 "gram.ypp" /* yacc.c:1646  */
     {
                 expressionType[0]  = valueFormat1;
                 expressionType2[0] = valueFormat2;
@@ -2833,11 +3182,11 @@ yyreduce:
                 }
 
               }
-#line 2837 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3186 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 1387 "gram.ypp" /* yacc.c:1646  */
+#line 1736 "gram.ypp" /* yacc.c:1646  */
     {
 
                 secondElementAddress             = equationElementAddress;
@@ -3115,11 +3464,11 @@ yyreduce:
                 pushCodeWithAddress("JZERO", numberOfCommands + 2);
                 pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
               }
-#line 3119 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3468 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 1664 "gram.ypp" /* yacc.c:1646  */
+#line 2013 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -3137,11 +3486,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
              }
-#line 3141 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3490 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 1680 "gram.ypp" /* yacc.c:1646  */
+#line 2029 "gram.ypp" /* yacc.c:1646  */
     {
 
 
@@ -3211,11 +3560,11 @@ yyreduce:
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
              }
-#line 3215 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3564 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 1749 "gram.ypp" /* yacc.c:1646  */
+#line 2098 "gram.ypp" /* yacc.c:1646  */
     {
 
                expressionType[0]  = valueFormat1;
@@ -3234,11 +3583,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
              }
-#line 3238 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3587 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 1766 "gram.ypp" /* yacc.c:1646  */
+#line 2115 "gram.ypp" /* yacc.c:1646  */
     {
                secondElementAddress             = equationElementAddress;
                long long secondArrayIdentifierAddress = arrayIdentifierAddress;
@@ -3413,11 +3762,11 @@ yyreduce:
                pushCodeWithAddress("JZERO", numberOfCommands + 2);
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
              }
-#line 3417 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3766 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 1940 "gram.ypp" /* yacc.c:1646  */
+#line 2289 "gram.ypp" /* yacc.c:1646  */
     {
 
 
@@ -3437,11 +3786,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
              }
-#line 3441 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3790 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 1958 "gram.ypp" /* yacc.c:1646  */
+#line 2307 "gram.ypp" /* yacc.c:1646  */
     {
 
 
@@ -3603,11 +3952,11 @@ yyreduce:
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
              }
-#line 3607 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3956 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 2119 "gram.ypp" /* yacc.c:1646  */
+#line 2468 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -3625,11 +3974,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
               }
-#line 3629 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3978 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 2135 "gram.ypp" /* yacc.c:1646  */
+#line 2484 "gram.ypp" /* yacc.c:1646  */
     {
 
                secondElementAddress             = equationElementAddress;
@@ -3789,11 +4138,11 @@ yyreduce:
                pushCodeWithAddress("JZERO", numberOfCommands + 2);
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
              }
-#line 3793 "gram.tab.cpp" /* yacc.c:1646  */
+#line 4142 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 2295 "gram.ypp" /* yacc.c:1646  */
+#line 2644 "gram.ypp" /* yacc.c:1646  */
     {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -3811,11 +4160,11 @@ yyreduce:
                  pushCodeWithAddress("STORE", 2);
                }
              }
-#line 3815 "gram.tab.cpp" /* yacc.c:1646  */
+#line 4164 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 2311 "gram.ypp" /* yacc.c:1646  */
+#line 2660 "gram.ypp" /* yacc.c:1646  */
     {
 
                secondElementAddress             = equationElementAddress;
@@ -3957,21 +4306,21 @@ yyreduce:
                pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
              }
-#line 3961 "gram.tab.cpp" /* yacc.c:1646  */
+#line 4310 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 2453 "gram.ypp" /* yacc.c:1646  */
+#line 2802 "gram.ypp" /* yacc.c:1646  */
     {
                 generateNumber((yyvsp[0].string));
                 valueFormat1 = "number";
                 valueFormat2 = "number";
              }
-#line 3971 "gram.tab.cpp" /* yacc.c:1646  */
+#line 4320 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 2458 "gram.ypp" /* yacc.c:1646  */
+#line 2807 "gram.ypp" /* yacc.c:1646  */
     {
                std::string variableName = (yyvsp[0].string);
 
@@ -3989,11 +4338,11 @@ yyreduce:
                 }
                }
              }
-#line 3993 "gram.tab.cpp" /* yacc.c:1646  */
+#line 4342 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 2476 "gram.ypp" /* yacc.c:1646  */
+#line 2825 "gram.ypp" /* yacc.c:1646  */
     {
               valueFormat1 = "variable";
               valueFormat2 = "variable";
@@ -4007,11 +4356,11 @@ yyreduce:
                 equationElementAddress = variablesAddressesMap[(yyvsp[0].string)];
               }
             }
-#line 4011 "gram.tab.cpp" /* yacc.c:1646  */
+#line 4360 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 2489 "gram.ypp" /* yacc.c:1646  */
+#line 2838 "gram.ypp" /* yacc.c:1646  */
     {
 
               std::string variableName = (yyvsp[-3].string);
@@ -4030,11 +4379,11 @@ yyreduce:
               }
 
            }
-#line 4034 "gram.tab.cpp" /* yacc.c:1646  */
+#line 4383 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 2507 "gram.ypp" /* yacc.c:1646  */
+#line 2856 "gram.ypp" /* yacc.c:1646  */
     {
 
               std::string variableName = (yyvsp[-3].string);
@@ -4057,11 +4406,11 @@ yyreduce:
                 arrayIdentifierAddress  = variablesAddressesMap[(yyvsp[-1].string)]; // is only an address of a variable, not a value!!!
               }
              }
-#line 4061 "gram.tab.cpp" /* yacc.c:1646  */
+#line 4410 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 4065 "gram.tab.cpp" /* yacc.c:1646  */
+#line 4414 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -4289,7 +4638,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 2530 "gram.ypp" /* yacc.c:1906  */
+#line 2879 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {

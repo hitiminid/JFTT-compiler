@@ -1,8 +1,8 @@
 VAR
-    a b c e d[10]
+    a 
 BEGIN
 
-    a := 4 / 2;
+    a := 16 / 4;
     WRITE a;
 
 END
