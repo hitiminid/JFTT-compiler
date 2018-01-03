@@ -2,6 +2,7 @@ VAR
     a b c e d[10]
 BEGIN
 
-    a := 4 / 1;
+    a := 4 / 2;
+    WRITE a;
 
 END

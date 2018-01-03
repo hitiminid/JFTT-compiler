@@ -792,7 +792,6 @@ command      : identifier {
 
                std::string variableName = $<string>2;
 
-              //  std::cout << valueFormat1 << " " << valueFormat2 << "\n";
                if (valueFormat1 == "number" && valueFormat2 == "number") {
                  pushCode("PUT");
                } else if (isVariableDeclared(&variablesAddressesMap, variableName)) {
@@ -827,7 +826,6 @@ command      : identifier {
                     }
                   } else {
 
-                    // pushCode("ZERO");
                     pushCodeWithAddress("LOAD", variableAddress);
                     pushCode("PUT");
                   }
@@ -1241,7 +1239,6 @@ expression   : value {
 
                 } else if (types[0] == "number" && types[1] == "arrayVar") {
 
-
 }
 
              }
@@ -1282,50 +1279,80 @@ expression   : value {
 
                if (types[0] == "number" && types[1] == "number") {
 
-                 /*
-                 [2] - a
-                 [3] - b
-                 [4] - r
-                 [5] - q
-                 [6] - n
-                 [7] - aux
-                 */
-
-                 pushCodeWithAddress("STORE", 3); // b
-                 pushCodeWithAddress("STORE", 7); // AUX
-                 /* aux = b */
-
-                 int computeN = numberOfCommands;
-                 pushCodeWithAddress("LOAD",  7);
-                 pushCode("SHL");
-                 pushCodeWithAddress("STORE", 7);
-                 /* aux = aux << 1; */
-
-                 pushCodeWithAddress("LOAD",  6);
-                 pushCode("INC");
-                 pushCodeWithAddress("STORE", 6);
-                 /* n++; */
-
-                 pushCodeWithAddress("LOAD",  7);
-                 pushCodeWithAddress("SUB",   2);
-
-                 pushCodeWithAddress("JZERO", computeN);
-
-                 // pushCodeWithAddress("LOAD", 6);
-                 // pushCode("PUT");
-                 //
-                 // pushCodeWithAddress("LOAD", 7);
-                 // pushCode("PUT");
-
-
-
-
-
-
-
                } else if (types[0] == "number" && types[1] == "variable") {
 
-               }
+               pushCodeWithAddress("STORE", 3); // b
+               pushCodeWithAddress("STORE", 7); // AUX
+               /* aux = b */
+
+               pushCode("ZERO");
+               pushCodeWithAddress("STORE", 5); // q = 0;
+               pushCodeWithAddress("STORE", 6); // n = 0;
+
+               pushCodeWithAddress("LOAD",  2);
+               pushCodeWithAddress("STORE", 4); // r = a;
+
+               int computeN = numberOfCommands;
+               pushCodeWithAddress("LOAD",  7);
+               pushCode("SHL");
+               pushCodeWithAddress("STORE", 7);
+               /* aux = aux << 1; */
+
+               pushCodeWithAddress("LOAD",  6);
+               pushCode("INC");
+               pushCodeWithAddress("STORE", 6);
+               /* n++; */
+
+               pushCodeWithAddress("LOAD",  7);
+               pushCodeWithAddress("SUB",   2);
+
+               pushCodeWithAddress("JZERO", computeN);
+
+               // pushCodeWithAddress("LOAD", 6);
+               // pushCode("PUT");
+               // pushCodeWithAddress("LOAD", 7);
+               // pushCode("PUT");
+
+               int secondLoop = numberOfCommands;
+
+               pushCodeWithAddress("LOAD",  6);
+               pushCodeWithAddress("JZERO", numberOfCommands + 21);
+               /*n > 0 */
+
+               pushCodeWithAddress("LOAD",  7);
+               pushCode("SHR");
+               pushCodeWithAddress("STORE", 7);
+               /* aux = aux >> 1 */
+
+               pushCodeWithAddress("LOAD",  6);
+               pushCode("DEC");
+               pushCodeWithAddress("STORE", 6);
+               /* n-- */
+
+               pushCodeWithAddress("LOAD",  5);
+               pushCode("SHL");
+               pushCodeWithAddress("STORE", 5);
+               /* q = q << 1; */
+
+               pushCodeWithAddress("LOAD",  7);
+               pushCodeWithAddress("SUB",   4);
+               pushCodeWithAddress("JZERO", numberOfCommands + 2);
+               pushCodeWithAddress("JUMP",  numberOfCommands + 7);
+               /* if (r >= aux) */
+
+               pushCodeWithAddress("LOAD",  4);
+               pushCodeWithAddress("SUB",   7);
+               pushCodeWithAddress("STORE", 4);
+               /* r = r - aux; */
+
+               pushCodeWithAddress("LOAD",  5);
+               pushCode("INC");
+               pushCodeWithAddress("STORE", 5);
+
+               pushCodeWithAddress("JUMP", secondLoop);
+
+               pushCodeWithAddress("LOAD", 5);
+
              }
              | value MOD value { }
 ;
@@ -2287,8 +2314,6 @@ condition    : value {
                std::string types[2];
                types[0] = determineDataType(variableTypes[0], variableTypes[1]);
                types[1] = determineDataType(variableTypes[2], variableTypes[3]);
-
-
 
                if (types[0] == "number" && types[1] == "number") {
 
