@@ -1,37 +1,7 @@
 VAR
     a b c e d[10]
 BEGIN
-    a:=1;
-    b:=2;
-    c:=3;
-    d[0]:=4;
-    e:=0;
 
-    WHILE 0<a DO
-        WRITE 1;
-        a:=a-1;
-    ENDWHILE
-
-    a:=1;
-
-    WHILE 0<b DO
-        WRITE 2;
-        b:=b-1;
-    ENDWHILE
-
-    WHILE 0<d[0] DO
-        WRITE 3;
-        d[0]:=d[0]-1;
-    ENDWHILE
-
-    d[e]:=4;
-
-    WHILE 0<d[e] DO
-        WRITE 4;
-        d[e]:=d[e]-1;
-    ENDWHILE
-
-
-(1-1, 2-2, 3-4, 4-4)
+    a := 4 / 1;
 
 END

@@ -581,10 +581,8 @@ command      : identifier {
                  pushCodeWithAddress("LOAD",  secondElementAddress);
                  pushCodeWithAddress("STORE", secondIteratorsAddress);
 
-                //  pushCodeWithAddress("SUB",  8);
                } else if (types[0] == "variable" && types[1] == "number") {
 
-                //  pushCodeWithAddress("SUB",  8);
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
                 pushCodeWithAddress("LOAD",  firstElementAddress);
@@ -639,7 +637,6 @@ command      : identifier {
 
               } else if (types[0] == "array" && types[1] == "number") {
 
-
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
 
                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
@@ -658,7 +655,6 @@ command      : identifier {
 
                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("STORE", secondIteratorsAddress);
-
 
               } else if (types[0] == "number" && types[1] == "array") {
 
@@ -720,11 +716,10 @@ command      : identifier {
             } DO {
 
               returnStack.emplace(numberOfCommands);
-              //zaladuj wartosc i, odejmij
               long long address = forStack.top();
 
               pushCodeWithAddress("LOAD", address + 1);
-              pushCode("INC");
+              // pushCode("INC");
               pushCodeWithAddress("SUB",  address);
 
               pushCodeWithAddress("JZERO", numberOfCommands + 2);
@@ -753,6 +748,7 @@ command      : identifier {
               variablesAddressesMap.erase(secondIterator);
               initializedVariablesMap.erase(secondIterator);
              }
+
              | READ  identifier SEM {
 
                std::string variableName = $<string>2;
@@ -1208,6 +1204,67 @@ expression   : value {
 
              } MUL value {
 
+               secondElementAddress                   = equationElementAddress;
+               long long secondArrayIdentifierAddress = arrayIdentifierAddress;
+               std::string secondElementName          = variableNameGlobal;
+               long long arrayIndexOfSecondElement    = currentArrayIndex;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               variableTypes[2] = valueFormat1;
+               variableTypes[3] = valueFormat2;
+
+               std::string types[2];
+               types[0] = determineDataType(variableTypes[0], variableTypes[1]);
+               types[1] = determineDataType(variableTypes[2], variableTypes[3]);
+
+               if (types[0] == "number" && types[1] == "number") {
+
+
+               } else if (types[0] == "number" && types[1] == "variable") {
+
+                  performNumberVariableMultiplication($<string>1, secondElementAddress);
+
+               } else if (types[0] == "variable" && types[1] == "number") {
+
+                  // performNumberVariableMultiplication($<string>1, secondElementAddress);
+                  performNumberVariableMultiplication($<string>3, firstElementAddress);
+
+                } else if (types[0] == "number" && types[1] == "arrayVar") {
+
+                  // performNumberVariableMultiplication($<string>1, secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+
+                } else if (types[0] == "arrayVar" && types[1] == "number") {
+
+                  // performNumberVariableMultiplication($<string>3, firstElementAddress  + arrayIndexOfFirstElement  + ARRAY_INDEX_OFFSET);
+
+                } else if (types[0] == "number" && types[1] == "arrayVar") {
+
+
+}
+
+             }
+             | value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+
+               firstElementAddress         = equationElementAddress;
+               arrayIndexOfFirstElement    = currentArrayIndex;
+               firstElementName            = variableNameGlobal;
+               firstArrayIdentifierAddress = arrayIdentifierAddress;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 2);
+               }
+
+             } DIV value {
+
+
                secondElementAddress             = equationElementAddress;
                long long secondArrayIdentifierAddress = arrayIdentifierAddress;
                std::string secondElementName    = variableNameGlobal;
@@ -1225,18 +1282,51 @@ expression   : value {
 
                if (types[0] == "number" && types[1] == "number") {
 
-                 pushCodeWithAddress("STORE", 3);
+                 /*
+                 [2] - a
+                 [3] - b
+                 [4] - r
+                 [5] - q
+                 [6] - n
+                 [7] - aux
+                 */
+
+                 pushCodeWithAddress("STORE", 3); // b
+                 pushCodeWithAddress("STORE", 7); // AUX
+                 /* aux = b */
+
+                 int computeN = numberOfCommands;
+                 pushCodeWithAddress("LOAD",  7);
+                 pushCode("SHL");
+                 pushCodeWithAddress("STORE", 7);
+                 /* aux = aux << 1; */
+
+                 pushCodeWithAddress("LOAD",  6);
+                 pushCode("INC");
+                 pushCodeWithAddress("STORE", 6);
+                 /* n++; */
+
+                 pushCodeWithAddress("LOAD",  7);
+                 pushCodeWithAddress("SUB",   2);
+
+                 pushCodeWithAddress("JZERO", computeN);
+
+                 // pushCodeWithAddress("LOAD", 6);
+                 // pushCode("PUT");
+                 //
+                 // pushCodeWithAddress("LOAD", 7);
+                 // pushCode("PUT");
+
+
+
+
+
+
+
                } else if (types[0] == "number" && types[1] == "variable") {
 
-                 performNumberVariableMultiplication($<string>1, secondElementAddress);
-
-               } else if (types[0] == "number" && types[1] == "arrayVar") {
-
                }
-
-
              }
-             | value DIV value { }
              | value MOD value { }
 ;
 
@@ -2547,7 +2637,6 @@ std::vector<long long> getBinaryRepresentation(long long decimalNumber) {
   return binaryRepresentationStack;
 }
 
-
 void generateNumber(std::string number) {
 
   std::vector<long long> binaryRepresentationStack;
@@ -2583,7 +2672,6 @@ void changeJumpValue() {
   int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
   std::string address                = std::to_string(destinationValue);
   commandsVector[destinationAddress] = commandsVector[destinationAddress].substr(0, finishIndex) + address;
-
 }
 
 void changeJumpValue(int value) {
