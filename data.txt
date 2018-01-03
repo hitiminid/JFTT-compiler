@@ -1,29 +1,37 @@
 VAR
-    a b tab[3]
+    a b c e d[10]
 BEGIN
+    a:=1;
+    b:=2;
+    c:=3;
+    d[0]:=4;
+    e:=0;
 
-    b := 2;
-    tab[1] := 2;
-    a := 5;
-
-    IF a = 5 THEN
+    WHILE 0<a DO
         WRITE 1;
-        a := 15;
-        IF a = 15 THEN
-            WRITE 123;
-        ELSE
-            WRITE 167;
-        ENDIF
-    ELSE
-        WRITE 0;
-    ENDIF
+        a:=a-1;
+    ENDWHILE
 
-    a := 15;
+    a:=1;
 
-    IF a = 5 THEN
-        WRITE 1;
-    ELSE
-        WRITE 0;
-    ENDIF
+    WHILE 0<b DO
+        WRITE 2;
+        b:=b-1;
+    ENDWHILE
+
+    WHILE 0<d[0] DO
+        WRITE 3;
+        d[0]:=d[0]-1;
+    ENDWHILE
+
+    d[e]:=4;
+
+    WHILE 0<d[e] DO
+        WRITE 4;
+        d[e]:=d[e]-1;
+    ENDWHILE
+
+
+(1-1, 2-2, 3-4, 4-4)
 
 END

@@ -4,11 +4,6 @@
   /*               NOTATKI                     */
   /* ========================================= */
 
-  /*
-    [ ] inicjalizowanie tablic     ----> a := c nie wywala bledu
-    [ ] PRECEDENS DLA MODULO
-  */
-
   //code
   #include <cstdlib>
   #include <iostream>
@@ -32,6 +27,7 @@
   #define ERROR_BUFFER 150
   #define ARRAY_INDEX_OFFSET 1
   #define JUMP_PLACEHOLDER_ADDRESS -3000
+  #define ELSE_PLACEHOLDER_ADDRESS -5000
 
 
   /*===================================================*/
@@ -77,7 +73,7 @@
 
   /* declaredVariables */
   /* <nazwa, adres w pamięci> */
-  std::map<std::string, int> variablesAddressesMap;
+  std::map<std::string, long long> variablesAddressesMap;
 
   /* each initialized variable */
   // <nazwa, czy zainicjalizowane>
@@ -86,7 +82,7 @@
   /* each array's size */
   /* if a variable is in here then it's an array - useful when determining type of a data*/
   // <nazwa, rozmiar tablicy>
-  std::map<std::string, int> arraysMap;
+  std::map<std::string, long long> arraysMap;
 
   std::stack<std::pair<int, int>> jumpStack;
 
@@ -95,11 +91,8 @@
 
   std::stack<int> elseStack;
 
+  std::stack<long long> forStack;
 
-  std::stack<int> forStack;
-
-
-  // int yylex();
   void yyerror (char* msg);
 
   /*===================================================*/
@@ -112,7 +105,7 @@
   void declareAnArray(std::string name, long long arraySize);
 
   // function used for determining whether variable is declared
-  bool isVariableDeclared(std::map<std::string, int> *mapToSearch, std::string name);
+  bool isVariableDeclared(std::map<std::string, long long> *mapToSearch, std::string name);
 
   bool isVariableInitialized(std::map<std::string, bool>* initializedMap, std::string variableName);
 
@@ -138,11 +131,16 @@
 
   void setEquationAttributes();
 
+  std::vector<long long> getBinaryRepresentation(long long decimalNumber);
+
+  void performNumberVariableMultiplication(std::string, long long);
+
+
 %}
 
 %union {
     char* string;
-    long long  num;
+    long long num;
 }
 
 // program structure
@@ -253,7 +251,7 @@ command      : identifier {
 
 
              } ELSE {
-               pushCodeWithAddress("JUMP", 21373);
+               pushCodeWithAddress("JUMP", ELSE_PLACEHOLDER_ADDRESS);
                changeJumpValue();
 
             } commands {
@@ -495,7 +493,7 @@ command      : identifier {
               int address = forStack.top();
 
               pushCodeWithAddress("LOAD", address);
-              pushCodeWithAddress("SUB",  address+1);
+              pushCodeWithAddress("SUB",  address + 1);
 
               pushCodeWithAddress("JZERO", numberOfCommands + 2);
               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
@@ -550,7 +548,6 @@ command      : identifier {
                std::string type = determineDataType(variableTypes[0], variableTypes[1]);
 
                if (type == "number") {
-                //  pushCodeWithAddress("STORE", 8);
                  pushCodeWithAddress("STORE", variablesAddressesMap[$2]);
                }
              } value {
@@ -573,7 +570,7 @@ command      : identifier {
                iteratorsAddress = variablesAddressesMap[$2];
                std::string rightIteratorsBoundName = $2;
                rightIteratorsBoundName = rightIteratorsBoundName + "#1";
-               int secondIteratorsAddress = variablesAddressesMap[rightIteratorsBoundName];
+               long long secondIteratorsAddress = variablesAddressesMap[rightIteratorsBoundName];
 
                if (types[0] == "number" && types[1] == "number") {
 
@@ -685,7 +682,6 @@ command      : identifier {
 
               } else if (types[0] == "arrayVar" && types[1] == "array") {
 
-
                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                 pushCodeWithAddress("STORE", iteratorsAddress);
 
@@ -725,11 +721,11 @@ command      : identifier {
 
               returnStack.emplace(numberOfCommands);
               //zaladuj wartosc i, odejmij
-              int address = forStack.top();
+              long long address = forStack.top();
 
-              pushCodeWithAddress("LOAD", address+1);
+              pushCodeWithAddress("LOAD", address + 1);
+              pushCode("INC");
               pushCodeWithAddress("SUB",  address);
-              // pushCode("PUT");
 
               pushCodeWithAddress("JZERO", numberOfCommands + 2);
               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
@@ -739,7 +735,7 @@ command      : identifier {
               pushCode("DEC");
               pushCodeWithAddress("STORE", forStack.top());
 
-              int returnAddress = returnStack.top();
+              long long returnAddress = returnStack.top();
               returnStack.pop();
               pushCodeWithAddress("JUMP", returnAddress);
               changeJumpValue();
@@ -881,7 +877,7 @@ expression   : value {
              ADD value {
 
               secondElementAddress             = equationElementAddress;
-              int secondArrayIdentifierAddress = arrayIdentifierAddress;
+              long long secondArrayIdentifierAddress = arrayIdentifierAddress;
               std::string secondElementName    = variableNameGlobal;
 
               std::string variableTypes[4];
@@ -1230,15 +1226,14 @@ expression   : value {
                if (types[0] == "number" && types[1] == "number") {
 
                  pushCodeWithAddress("STORE", 3);
+               } else if (types[0] == "number" && types[1] == "variable") {
 
-                 /*
-                 #######################################
-                 #      SPRAWDZENIE CZY JEST TO 0      #
-                 #######################################
-                 */
+                 performNumberVariableMultiplication($<string>1, secondElementAddress);
 
+               } else if (types[0] == "number" && types[1] == "arrayVar") {
 
                }
+
 
              }
              | value DIV value { }
@@ -2422,7 +2417,7 @@ void declareAVariable(std::string name) {
   }
 }
 
-void displayArraySizesMap(std::map<std::string, int>* arraySizesMap) {
+void displayArraySizesMap(std::map<std::string, long long>* arraySizesMap) {
   for(auto elem : *arraySizesMap) {
      std::cout << elem.first << " " << elem.second << "\n";
   }
@@ -2448,7 +2443,7 @@ void declareAnArray(std::string name, long long arraySize) {
   }
 }
 
-bool isVariableDeclared(std::map<std::string, int> *mapToSearch, std::string name) {
+bool isVariableDeclared(std::map<std::string, long long> *mapToSearch, std::string name) {
   if ( (*mapToSearch).find(name) == (*mapToSearch).end() ) {
     return false;
   } else {
@@ -2458,15 +2453,6 @@ bool isVariableDeclared(std::map<std::string, int> *mapToSearch, std::string nam
 
 void finish() {
   pushCode("HALT");
-  // std::stack<std::pair<int, int>> temp = jumpStack;
-  // std::cout << jumpStack.size() << "\n\n\n\n\n\n\n";
-  // for (int i = 0; i < jumpStack.size(); i++) {
-  //   std::pair<int, int> abc = temp.top();
-  //   temp.pop();
-  //   // std::cout << " SIZE " << temp.size() << "\n";
-  //   std::cout << abc.first << " " << abc.second << "\n";
-  // }
-  // changeJumpValue();
   displayCommandVector(&commandsVector);
 }
 
@@ -2507,9 +2493,7 @@ void displayCommandVector(std::vector<std::string> *commands) {
 
 void pushCode(std::string opCode) {
   commandsVector.push_back(opCode);
-  // if (opCode != "HALT") {
-    numberOfCommands++;
-  // }
+  numberOfCommands++;
 }
 
 void pushCodeWithAddress(std::string opCode, int number) {
@@ -2520,13 +2504,70 @@ void pushCodeWithAddress(std::string opCode, int number) {
     if (number == JUMP_PLACEHOLDER_ADDRESS) {
       std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
       jumpStack.emplace(newJumpPosition);
-    } else if (number == 21373) {
+    } else if (number == ELSE_PLACEHOLDER_ADDRESS) {
       // std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
       elseStack.emplace(numberOfCommands);
     }
 
   }
   numberOfCommands++;
+}
+
+void performNumberVariableMultiplication(std::string number, long long variableAddress) {
+
+  std::vector<long long> binaryRepresentationStack;
+  long long decimalNumber  = std::stoi(number);
+
+  binaryRepresentationStack = getBinaryRepresentation(decimalNumber);
+  pushCode("ZERO");
+
+  long long binaryNumberLength = binaryRepresentationStack.size();
+
+  for(long long i = 0; i < binaryNumberLength; i++) {
+    if (binaryRepresentationStack[i] == 1) {
+      pushCodeWithAddress("ADD", variableAddress);
+    }
+    if (i < binaryNumberLength -1) {
+      pushCode("SHL");
+    }
+  }
+}
+
+std::vector<long long> getBinaryRepresentation(long long decimalNumber) {
+  std::vector<long long> binaryRepresentationStack;
+
+  while(decimalNumber > 0) {
+    if (decimalNumber % 2 == 0) {
+      binaryRepresentationStack.insert(binaryRepresentationStack.begin(), 0);
+    } else {
+      binaryRepresentationStack.insert(binaryRepresentationStack.begin(), 1);
+    }
+    decimalNumber = decimalNumber / 2;
+  }
+  return binaryRepresentationStack;
+}
+
+
+void generateNumber(std::string number) {
+
+  std::vector<long long> binaryRepresentationStack;
+  long long decimalNumber2 = std::stoi(number);
+  long long decimalNumber  = std::stoi(number);
+
+  binaryRepresentationStack = getBinaryRepresentation(decimalNumber);
+
+  pushCode("ZERO");
+
+  long long binaryNumberLength = binaryRepresentationStack.size();
+
+  for(long long i = 0; i < binaryNumberLength; i++) {
+    if (binaryRepresentationStack[i] == 1) {
+      pushCode("INC");
+    }
+    if (i < binaryNumberLength -1) {
+      pushCode("SHL");
+    }
+  }
 }
 
 void changeJumpValue() {
@@ -2579,36 +2620,6 @@ void changeElseValue(int value) {
   }
 }
 
-
-
-void generateNumber(std::string number) {
-
-  std::vector<int> binaryRepresentationStack;
-  long long decimalNumber2 = std::stoi(number);
-  long long decimalNumber  = std::stoi(number);
-
-  while(decimalNumber > 0) {
-    if (decimalNumber % 2 == 0) {
-      binaryRepresentationStack.insert(binaryRepresentationStack.begin(), 0);
-    } else {
-      binaryRepresentationStack.insert(binaryRepresentationStack.begin(), 1);
-    }
-    decimalNumber = decimalNumber / 2;
-  }
-
-  pushCode("ZERO");
-
-  int binaryNumberLength = binaryRepresentationStack.size();
-
-  for(int i = 0; i < binaryNumberLength; i++) {
-    if (binaryRepresentationStack[i] == 1) {
-      pushCode("INC");
-    }
-    if (i < binaryNumberLength -1) {
-      pushCode("SHL");
-    }
-  }
-}
 
 std::string determineDataType(std::string a, std::string b) {
   if (a == "number" && b == "number") {
