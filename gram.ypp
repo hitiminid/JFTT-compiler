@@ -1261,7 +1261,6 @@ expression   : value {
 
              } DIV value {
 
-
                secondElementAddress             = equationElementAddress;
                long long secondArrayIdentifierAddress = arrayIdentifierAddress;
                std::string secondElementName    = variableNameGlobal;
@@ -1303,6 +1302,9 @@ expression   : value {
 
                } else if (types[0] == "arrayVar" && types[1] == "number") {
 
+                 pushCodeWithAddress("STORE", 3);
+                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
+                 pushCodeWithAddress("STORE", 2);
 
                } else if (types[0] == "number" && types[1] == "arrayVar") {
 
@@ -1420,6 +1422,7 @@ expression   : value {
               */
 
                pushCodeWithAddress("LOAD", 3);
+               pushCodeWithAddress("JZERO", numberOfCommands + 39);
                pushCodeWithAddress("STORE", 7); // AUX
                /* aux = b */
 
@@ -1642,6 +1645,7 @@ expression   : value {
                }
 
                pushCodeWithAddress("LOAD", 3);
+               pushCodeWithAddress("JZERO", numberOfCommands + 39);
                pushCodeWithAddress("STORE", 7); // AUX
                /* aux = b */
 

@@ -1,8 +1,10 @@
 VAR
-    a 
+    a b c
 BEGIN
 
-    a := 16 / 4;
-    WRITE a;
+    READ a;
+    READ b;
+    c := a % b;
+    WRITE c;
 
 END
