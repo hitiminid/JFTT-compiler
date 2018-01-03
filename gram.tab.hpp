@@ -87,10 +87,10 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 145 "gram.ypp" /* yacc.c:1909  */
+#line 139 "gram.ypp" /* yacc.c:1909  */
 
     char* string;
-    long long   num;
+    long long num;
 
 #line 96 "gram.tab.hpp" /* yacc.c:1909  */
 };

@@ -1,9 +1,7 @@
 VAR
     a b
 BEGIN
-    a := 3;
-    b := 1;
-    FOR i FROM a DOWNTO b DO
-        WRITE i;
-    ENDFOR
+    b := 2;
+    a := 3 * b;
+    WRITE a;
 END
