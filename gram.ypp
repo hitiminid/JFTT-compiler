@@ -1493,9 +1493,24 @@ expression   : value {
                pushCodeWithAddress("JUMP", secondLoop);
 
                pushCodeWithAddress("LOAD", 5);
-
              }
-             | value MOD value {
+             | value {
+               expressionType[0]  = valueFormat1;
+               expressionType2[0] = valueFormat2;
+
+               firstElementAddress         = equationElementAddress;
+               arrayIndexOfFirstElement    = currentArrayIndex;
+               firstElementName            = variableNameGlobal;
+               firstArrayIdentifierAddress = arrayIdentifierAddress;
+
+               std::string variableTypes[4];
+               variableTypes[0] = expressionType[0];
+               variableTypes[1] = expressionType2[0];
+               std::string type = determineDataType(variableTypes[0], variableTypes[1]);
+               if (type == "number") {
+                 pushCodeWithAddress("STORE", 2);
+               }
+             } MOD value {
                secondElementAddress             = equationElementAddress;
                long long secondArrayIdentifierAddress = arrayIdentifierAddress;
                std::string secondElementName    = variableNameGlobal;
