@@ -133,7 +133,6 @@
 
   void performNumberVariableMultiplication(std::string, long long);
 
-
 %}
 
 %union {
@@ -1196,11 +1195,26 @@ expression   : value {
 
                if (types[0] == "number" && types[1] == "number") {
 
+
                } else if (types[0] == "number" && types[1] == "variable") {
 
                  performNumberVariableMultiplication($<string>1, secondElementAddress);
 
+               } else if (types[0] == "variable" && types[1] == "number") {
+
+                 // performNumberVariableMultiplication($<string>1, secondElementAddress);
+                 performNumberVariableMultiplication($<string>3, firstElementAddress);
+
                } else if (types[0] == "number" && types[1] == "arrayVar") {
+
+                 // performNumberVariableMultiplication($<string>1, secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
+
+               } else if (types[0] == "arrayVar" && types[1] == "number") {
+
+                 // performNumberVariableMultiplication($<string>3, firstElementAddress  + arrayIndexOfFirstElement  + ARRAY_INDEX_OFFSET);
+
+               } else if (types[0] == "number" && types[1] == "arrayVar") {
+
 
                }
 
@@ -2548,6 +2562,7 @@ void changeElseValue(long long value) {
 }
 
 void performNumberVariableMultiplication(std::string number, long long variableAddress) {
+
   std::vector<long long> binaryRepresentationStack;
   long long decimalNumber  = std::stoi(number);
 
@@ -2564,7 +2579,6 @@ void performNumberVariableMultiplication(std::string number, long long variableA
       pushCode("SHL");
     }
   }
-
 }
 
 std::vector<long long> getBinaryRepresentation(long long decimalNumber) {
