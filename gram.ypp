@@ -136,6 +136,7 @@
   void performMultiplicationWithNumber(std::string, long long);
   void performMultiplication();
 
+  void performMODOrDIV();
   void performDataAssignForDIVAndMOD(std::string, std::string, long long, std::string, long long, std::string, long long, long long, long long);
 
 %}
@@ -1366,9 +1367,7 @@ expression   : value {
                   pushCodeWithAddress("STORE", 3);
 
                   performMultiplication();
-
                 }
-
              }
              | value {
                expressionType[0]  = valueFormat1;
@@ -1406,87 +1405,10 @@ expression   : value {
 
                performDataAssignForDIVAndMOD(types[0], types[1], firstElementAddress, firstElementName, arrayIndexOfFirstElement,
                  secondElementName, secondElementAddress, currentArrayIndex, secondArrayIdentifierAddress);
-               /*
-                [2] - a
-                [3] - b
-                [4] - r
-                [5] - q
-                [6] - n
-                [7] - aux
-              */
 
-               pushCodeWithAddress("LOAD", 3);
-               pushCodeWithAddress("JZERO", numberOfCommands + 39);
-               pushCodeWithAddress("STORE", 7); // AUX
-               /* aux = b */
-
-               pushCode("ZERO");
-               pushCodeWithAddress("STORE", 5); // q = 0;
-               pushCodeWithAddress("STORE", 6); // n = 0;
-
-               pushCodeWithAddress("LOAD",  2);
-               pushCodeWithAddress("STORE", 4); // r = a;
-
-               int computeN = numberOfCommands;
-               pushCodeWithAddress("LOAD",  7);
-               pushCode("SHL");
-               pushCodeWithAddress("STORE", 7);
-               /* aux = aux << 1; */
-
-               pushCodeWithAddress("LOAD",  6);
-               pushCode("INC");
-               pushCodeWithAddress("STORE", 6);
-               /* n++; */
-
-               pushCodeWithAddress("LOAD",  7);
-               pushCodeWithAddress("SUB",   2);
-
-               pushCodeWithAddress("JZERO", computeN);
-
-               // pushCodeWithAddress("LOAD", 6);
-               // pushCode("PUT");
-               // pushCodeWithAddress("LOAD", 7);
-               // pushCode("PUT");
-
-               int secondLoop = numberOfCommands;
-
-               pushCodeWithAddress("LOAD",  6);
-               pushCodeWithAddress("JZERO", numberOfCommands + 21);
-               /*n > 0 */
-
-               pushCodeWithAddress("LOAD",  7);
-               pushCode("SHR");
-               pushCodeWithAddress("STORE", 7);
-               /* aux = aux >> 1 */
-
-               pushCodeWithAddress("LOAD",  6);
-               pushCode("DEC");
-               pushCodeWithAddress("STORE", 6);
-               /* n-- */
-
-               pushCodeWithAddress("LOAD",  5);
-               pushCode("SHL");
-               pushCodeWithAddress("STORE", 5);
-               /* q = q << 1; */
-
-               pushCodeWithAddress("LOAD",  7);
-               pushCodeWithAddress("SUB",   4);
-               pushCodeWithAddress("JZERO", numberOfCommands + 2);
-               pushCodeWithAddress("JUMP",  numberOfCommands + 7);
-               /* if (r >= aux) */
-
-               pushCodeWithAddress("LOAD",  4);
-               pushCodeWithAddress("SUB",   7);
-               pushCodeWithAddress("STORE", 4);
-               /* r = r - aux; */
-
-               pushCodeWithAddress("LOAD",  5);
-               pushCode("INC");
-               pushCodeWithAddress("STORE", 5);
-
-               pushCodeWithAddress("JUMP", secondLoop);
-
+               performMODOrDIV();
                pushCodeWithAddress("LOAD", 5);
+
              }
              | value {
                expressionType[0]  = valueFormat1;
@@ -1520,214 +1442,13 @@ expression   : value {
                types[0] = determineDataType(variableTypes[0], variableTypes[1]);
                types[1] = determineDataType(variableTypes[2], variableTypes[3]);
 
-               if (types[0] == "number" && types[1] == "number") {
-
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "number" && types[1] == "variable") {
-
-                 pushCodeWithAddress("LOAD", secondElementAddress);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "variable" && types[1] == "number") {
-
-                 pushCodeWithAddress("STORE", 3);
-
-                 pushCodeWithAddress("LOAD",  firstElementAddress);
-                 pushCodeWithAddress("STORE", 2);
-
-               } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
-
-                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "arrayVar" && types[1] == "number") {
-
-                 pushCodeWithAddress("STORE", 3);
-
-                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
-                 pushCodeWithAddress("STORE", 2);
+               performDataAssignForDIVAndMOD(types[0], types[1], firstElementAddress, firstElementName, arrayIndexOfFirstElement,
+                 secondElementName, secondElementAddress, currentArrayIndex, secondArrayIdentifierAddress);
 
 
-               } else if (types[0] == "number" && types[1] == "arrayVar") {
 
-                 pushCodeWithAddress("LOAD",  secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                 pushCodeWithAddress("STORE", 3);
 
-               } else if (types[0] == "array" && types[1] == "variable") {
-
-                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
-                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
-                 pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOADI", 1);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("LOAD", secondElementAddress);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "array" && types[1] == "array") {
-
-                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
-                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
-                 pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOADI", 1);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
-                 pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOADI", 1);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "array" && types[1] == "number") {
-
-                 pushCodeWithAddress("STORE", 3);
-
-                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
-                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
-                 pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOADI", 1);
-                 pushCodeWithAddress("STORE", 2);
-
-               } else if (types[0] == "array" && types[1] == "arrayVar") {
-
-                 pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
-                 pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
-                 pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOADI", 1);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("SUB",   secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "number" && types[1] == "array") {
-
-                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
-                 pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOADI", 1);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "variable" && types[1] == "array") {
-
-                 pushCodeWithAddress("LOAD",  firstElementAddress);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
-                 pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOADI", 1);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "arrayVar" && types[1] == "array") {
-
-                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("LOAD",  variablesAddressesMap[secondElementName]);
-                 pushCodeWithAddress("ADD",   secondArrayIdentifierAddress);
-                 pushCodeWithAddress("STORE", 1);
-                 pushCodeWithAddress("LOADI", 1);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "variable" && types[1] == "arrayVar") {
-
-                 pushCodeWithAddress("LOAD",  firstElementAddress);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("SUB",   secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "arrayVar" && types[1] == "variable") {
-
-                 pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("LOAD",  secondElementAddress);
-                 pushCodeWithAddress("STORE", 3);
-
-               } else if (types[0] == "variable" && types[1] == "variable") {
-
-                 pushCodeWithAddress("LOAD",  firstElementAddress);
-                 pushCodeWithAddress("STORE", 2);
-
-                 pushCodeWithAddress("LOAD",  secondElementAddress);
-                 pushCodeWithAddress("STORE", 3);
-               }
-
-               pushCodeWithAddress("LOAD", 3);
-               pushCodeWithAddress("JZERO", numberOfCommands + 39);
-               pushCodeWithAddress("STORE", 7); // AUX
-               /* aux = b */
-
-               pushCode("ZERO");
-               pushCodeWithAddress("STORE", 5); // q = 0;
-               pushCodeWithAddress("STORE", 6); // n = 0;
-
-               pushCodeWithAddress("LOAD",  2);
-               pushCodeWithAddress("STORE", 4); // r = a;
-
-               int computeN = numberOfCommands;
-               pushCodeWithAddress("LOAD",  7);
-               pushCode("SHL");
-               pushCodeWithAddress("STORE", 7);
-               /* aux = aux << 1; */
-
-               pushCodeWithAddress("LOAD",  6);
-               pushCode("INC");
-               pushCodeWithAddress("STORE", 6);
-               /* n++; */
-
-               pushCodeWithAddress("LOAD",  7);
-               pushCodeWithAddress("SUB",   2);
-
-               pushCodeWithAddress("JZERO", computeN);
-
-               // pushCodeWithAddress("LOAD", 6);
-               // pushCode("PUT");
-               // pushCodeWithAddress("LOAD", 7);
-               // pushCode("PUT");
-
-               int secondLoop = numberOfCommands;
-
-               pushCodeWithAddress("LOAD",  6);
-               pushCodeWithAddress("JZERO", numberOfCommands + 21);
-               /*n > 0 */
-
-               pushCodeWithAddress("LOAD",  7);
-               pushCode("SHR");
-               pushCodeWithAddress("STORE", 7);
-               /* aux = aux >> 1 */
-
-               pushCodeWithAddress("LOAD",  6);
-               pushCode("DEC");
-               pushCodeWithAddress("STORE", 6);
-               /* n-- */
-
-               pushCodeWithAddress("LOAD",  5);
-               pushCode("SHL");
-               pushCodeWithAddress("STORE", 5);
-               /* q = q << 1; */
-
-               pushCodeWithAddress("LOAD",  7);
-               pushCodeWithAddress("SUB",   4);
-               pushCodeWithAddress("JZERO", numberOfCommands + 2);
-               pushCodeWithAddress("JUMP",  numberOfCommands + 7);
-               /* if (r >= aux) */
-
-               pushCodeWithAddress("LOAD",  4);
-               pushCodeWithAddress("SUB",   7);
-               pushCodeWithAddress("STORE", 4);
-               /* r = r - aux; */
-
-               pushCodeWithAddress("LOAD",  5);
-               pushCode("INC");
-               pushCodeWithAddress("STORE", 5);
-
-               pushCodeWithAddress("JUMP", secondLoop);
+               performMODOrDIV();
 
                pushCodeWithAddress("LOAD", 4);
 
@@ -3202,7 +2923,7 @@ void performDataAssignForDIVAndMOD(std::string firstType, std::string secondType
     pushCodeWithAddress("LOADI", 1);
     pushCodeWithAddress("STORE", 2);
 
-    pushCodeWithAddress("SUB",   secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
+    pushCodeWithAddress("LOAD",   secondElementAddress + currentArrayIndex + ARRAY_INDEX_OFFSET);
     pushCodeWithAddress("STORE", 3);
 
   } else if (types[0] == "number" && types[1] == "array") {
@@ -3261,6 +2982,88 @@ void performDataAssignForDIVAndMOD(std::string firstType, std::string secondType
   }
 }
 
+void performMODOrDIV() {
+
+  /*
+   [2] - a
+   [3] - b
+   [4] - r
+   [5] - q
+   [6] - n
+   [7] - aux
+  */
+
+  pushCodeWithAddress("LOAD", 3);
+  pushCodeWithAddress("JZERO", numberOfCommands + 39);
+  pushCodeWithAddress("STORE", 7); // AUX
+  /* aux = b */
+
+  pushCode("ZERO");
+  pushCodeWithAddress("STORE", 5); // q = 0;
+  pushCodeWithAddress("STORE", 6); // n = 0;
+
+  pushCodeWithAddress("LOAD",  2);
+  pushCodeWithAddress("STORE", 4); // r = a;
+
+  int computeN = numberOfCommands;
+  pushCodeWithAddress("LOAD",  7);
+  pushCode("SHL");
+  pushCodeWithAddress("STORE", 7);
+  /* aux = aux << 1; */
+
+  pushCodeWithAddress("LOAD",  6);
+  pushCode("INC");
+  pushCodeWithAddress("STORE", 6);
+  /* n++; */
+
+  pushCodeWithAddress("LOAD",  7);
+  pushCodeWithAddress("SUB",   2);
+
+  pushCodeWithAddress("JZERO", computeN);
+
+  // pushCodeWithAddress("LOAD", 6);
+  // pushCode("PUT");
+  // pushCodeWithAddress("LOAD", 7);
+  // pushCode("PUT");
+
+  int secondLoop = numberOfCommands;
+
+  pushCodeWithAddress("LOAD",  6);
+  pushCodeWithAddress("JZERO", numberOfCommands + 21);
+  /*n > 0 */
+
+  pushCodeWithAddress("LOAD",  7);
+  pushCode("SHR");
+  pushCodeWithAddress("STORE", 7);
+  /* aux = aux >> 1 */
+
+  pushCodeWithAddress("LOAD",  6);
+  pushCode("DEC");
+  pushCodeWithAddress("STORE", 6);
+  /* n-- */
+
+  pushCodeWithAddress("LOAD",  5);
+  pushCode("SHL");
+  pushCodeWithAddress("STORE", 5);
+  /* q = q << 1; */
+
+  pushCodeWithAddress("LOAD",  7);
+  pushCodeWithAddress("SUB",   4);
+  pushCodeWithAddress("JZERO", numberOfCommands + 2);
+  pushCodeWithAddress("JUMP",  numberOfCommands + 7);
+  /* if (r >= aux) */
+
+  pushCodeWithAddress("LOAD",  4);
+  pushCodeWithAddress("SUB",   7);
+  pushCodeWithAddress("STORE", 4);
+  /* r = r - aux; */
+
+  pushCodeWithAddress("LOAD",  5);
+  pushCode("INC");
+  pushCodeWithAddress("STORE", 5);
+
+  pushCodeWithAddress("JUMP", secondLoop);
+}
 
 void changeJumpValue(int value) {
   std::string placeholder = std::to_string(JUMP_PLACEHOLDER_ADDRESS);

@@ -1,15 +1,14 @@
 VAR
-    a b result
+    a b array[5] result one zero
 BEGIN
 
-    a := 2;
-    b := 2;
+    a    := 2;
+    b    := 7;
+    one  := 1;
+    zero := 0;
+    array[0] := 4;
+    array[1] := 7;
 
-    result := a * b;
-    WRITE result;
-
-    result := a * b;    
-    WRITE result;
 
 
 END
