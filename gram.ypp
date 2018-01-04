@@ -29,7 +29,6 @@
   #define JUMP_PLACEHOLDER_ADDRESS -3000
   #define ELSE_PLACEHOLDER_ADDRESS -5000
 
-
   /*===================================================*/
   /*                      VARIABLES                    */
   /*===================================================*/
@@ -1786,8 +1785,8 @@ condition    : value {
                } else if (types[0] == "variable" && types[1] == "variable") {
                }
 
-               pushCodeWithAddress("JZERO", numberOfCommands + 2);
-               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
+               pushCodeWithAddress("JZERO", JUMP_PLACEHOLDER_ADDRESS);
+               // pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
              }
              | value {
@@ -2672,10 +2671,11 @@ void pushCodeWithAddress(std::string opCode, int number) {
       std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
       jumpStack.emplace(newJumpPosition);
     } else if (number == ELSE_PLACEHOLDER_ADDRESS) {
-      // std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
       elseStack.emplace(numberOfCommands);
     }
-
+  } else if (opCode == "JZERO" || number == JUMP_PLACEHOLDER_ADDRESS) {
+    std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
+    jumpStack.emplace(newJumpPosition);
   }
   numberOfCommands++;
 }
