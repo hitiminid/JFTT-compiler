@@ -207,7 +207,7 @@ command      : identifier {
                 long long addressToAssign;
 
                 if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
-                  std::cout << "Error [line "<< "]: Variable "<< $<string>1 <<" not declared!" << "\n";
+                  std::cerr << "Error [line "<< "]: Variable "<< $<string>1 <<" not declared!" << "\n";
                   exit(1);
                 } else { // variable is declared
 
@@ -232,7 +232,7 @@ command      : identifier {
                     } else {
 
                       if (currentArrayIndex < 0 || currentArrayIndex >= arraySize) {
-                        std::cout << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
+                        std::cerr << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
                         exit(1);
                       }
                       addressToAssign = variableAddress + currentArrayIndex_assign + 1;
@@ -247,9 +247,6 @@ command      : identifier {
                   }
                 }
              }
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
              | IF  condition THEN commands {
 
 
@@ -270,13 +267,8 @@ command      : identifier {
 
               int returnA = elseStack.top();
               elseStack.pop();
-              // std::cout << returnA << " KNOCK HIM OUT" << "\n";
               changeElseValue(returnA);
             }
-
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
              | IF condition  THEN  commands  ENDIF {
                changeJumpValue();
@@ -290,15 +282,10 @@ command      : identifier {
                 pushCodeWithAddress("JUMP", returnAddress);
                 changeJumpValue();
              }
-
-             /*###################################################################*/
-             /*#################                FOR                 ##############*/
-             /*###################################################################*/
-
              | FOR PID FROM value TO {
                std::string iteratorsName = $2;
                if (isVariableDeclared(&variablesAddressesMap, iteratorsName)) {
-                 std::cout << iteratorsName << " has been used previously in program! \n";
+                 std::cerr << iteratorsName << " has been used previously in program! \n";
                  exit(1);
                } else {
                  declareAVariable(iteratorsName);
@@ -529,7 +516,7 @@ command      : identifier {
 
                std::string iteratorsName = $2;
                if (isVariableDeclared(&variablesAddressesMap, iteratorsName)) {
-                 std::cout << iteratorsName << " has been used previously in program! \n";
+                 std::cerr << iteratorsName << " has been used previously in program! \n";
                  exit(1);
                } else {
                  declareAVariable(iteratorsName);
@@ -729,9 +716,10 @@ command      : identifier {
               pushCodeWithAddress("JUMP",  JUMP_PLACEHOLDER_ADDRESS);
 
             } commands ENDFOR {
+
               pushCodeWithAddress("LOAD",  forStack.top());
+              pushCodeWithAddress("JZERO", numberOfCommands + 4);
               pushCode("DEC");
-              pushCodeWithAddress("JZERO", numberOfCommands + 3);
               pushCodeWithAddress("STORE", forStack.top());
 
               long long returnAddress = returnStack.top();
@@ -758,7 +746,7 @@ command      : identifier {
                std::string variableName = $<string>2;
 
                if (!isVariableDeclared(&variablesAddressesMap, variableName)) { //variable is not declared
-                 std::cout << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared! #READ" << "\n";
+                 std::cerr << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared! #READ" << "\n";
                  exit(1);
                } else {
 
@@ -803,7 +791,7 @@ command      : identifier {
                  long long variableAddress = variablesAddressesMap[variableName];
 
                  if (valueFormat2 != "array" && !isVariableInitialized(&initializedVariablesMap, variableName)) { //checking if it's initialized
-                  std::cout << "Variable " << variableName << " not initialized\n";
+                  std::cerr << "Variable " << variableName << " not initialized\n";
                   exit(1);
                 } else {
 
@@ -812,7 +800,7 @@ command      : identifier {
                       long long arraySize = arraysMap[variableName];
 
                       if (currentArrayIndex < 0 || currentArrayIndex >= arraySize) {
-                        std::cout << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
+                        std::cerr << "[ERROR] IndexArrayOutOfBoundsException: array " << variableName << " is size: " << arraySize << ", tried to access index " << currentArrayIndex << "\n";
                         exit(1);
                       }
 
@@ -835,7 +823,7 @@ command      : identifier {
                   }
                 }
                } else { //variable is not declared
-                 std::cout << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared! #WRITE" << "\n";
+                 std::cerr << "Error [line "<< "]: Variable "<< $<string>2 <<" not declared! #WRITE" << "\n";
                  exit(1);
                }
              }
@@ -1008,9 +996,6 @@ expression   : value {
 
               }
              }
-             /*##################################################################################*/
-             /*#                                      SUB                                       #*/
-             /*##################################################################################*/
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -1184,9 +1169,6 @@ expression   : value {
 
                }
              }
-             /*##################################################################################*/
-             /*#                                      MUL                                       #*/
-             /*##################################################################################*/
              | value {
                expressionType[0]  = valueFormat1;
                expressionType2[0] = valueFormat2;
@@ -1533,8 +1515,6 @@ condition    : value {
 
                   pushCodeWithAddress("ADD", 0);
 
-
-
                 } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
                   // compute a - b
                   pushCodeWithAddress("LOAD",  firstElementAddress  + arrayIndexOfFirstElement  + ARRAY_INDEX_OFFSET);
@@ -1547,8 +1527,6 @@ condition    : value {
 
                   pushCodeWithAddress("ADD", 0);
 
-
-
                 } else if (types[0] == "arrayVar" && types[1] == "number") {
 
                   pushCodeWithAddress("STORE", 3); // zapisz drugi argument (liczba)
@@ -1557,12 +1535,10 @@ condition    : value {
                   pushCodeWithAddress("SUB",   3);
                   pushCodeWithAddress("STORE", 0);
 
-
                   pushCodeWithAddress("LOAD", 3); //zaladuj b
                   pushCodeWithAddress("SUB",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET); //odejmij a
 
                   pushCodeWithAddress("ADD", 0);
-
 
                 } else if (types[0] == "number" && types[1] == "arrayVar") {
 
@@ -1636,7 +1612,6 @@ condition    : value {
                   pushCodeWithAddress("SUB",   4);
                   pushCodeWithAddress("STORE", 0);
 
-
                   pushCodeWithAddress("LOAD", 4);
                   pushCodeWithAddress("SUB",  3);
 
@@ -1669,7 +1644,6 @@ condition    : value {
                   pushCodeWithAddress("LOAD",  2);
                   pushCodeWithAddress("SUB",   3);
                   pushCodeWithAddress("STORE", 0);
-
 
                   pushCodeWithAddress("LOAD",  3);
                   pushCodeWithAddress("SUB",   2);
@@ -1716,7 +1690,6 @@ condition    : value {
                   pushCodeWithAddress("SUB",  secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
                   pushCodeWithAddress("STORE", 0);
 
-
                   pushCodeWithAddress("LOAD", secondElementAddress + arrayIndexOfSecondElement + ARRAY_INDEX_OFFSET);
                   pushCodeWithAddress("SUB",  firstElementAddress);
 
@@ -1727,7 +1700,6 @@ condition    : value {
                   pushCodeWithAddress("LOAD",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
                   pushCodeWithAddress("SUB",   secondElementAddress);
                   pushCodeWithAddress("STORE", 0);
-
 
                   pushCodeWithAddress("LOAD", secondElementAddress);
                   pushCodeWithAddress("SUB",  firstElementAddress + arrayIndexOfFirstElement + ARRAY_INDEX_OFFSET);
@@ -1767,10 +1739,9 @@ condition    : value {
                }
              } NEQ value {
 
-
-               secondElementAddress             = equationElementAddress;
+               secondElementAddress                   = equationElementAddress;
                long long secondArrayIdentifierAddress = arrayIdentifierAddress;
-               std::string secondElementName    = variableNameGlobal;
+               std::string secondElementName          = variableNameGlobal;
                long long arrayIndexOfSecondElement    = currentArrayIndex;
 
                std::string variableTypes[4];
@@ -1798,36 +1769,21 @@ condition    : value {
 
                  pushCodeWithAddress("ADD",   0);
 
-               } else if (types[0] == "number" && types[1] == "variable") {
-
+               } else if (types[0] == "number"   && types[1] == "variable") {
                } else if (types[0] == "variable" && types[1] == "number") {
-
                } else if (types[0] == "arrayVar" && types[1] == "arrayVar") {
-
                } else if (types[0] == "arrayVar" && types[1] == "number") {
-
-               } else if (types[0] == "number" && types[1] == "arrayVar") {
-
-               } else if (types[0] == "array" && types[1] == "variable") {
-
-               } else if (types[0] == "array" && types[1] == "array") {
-
-               } else if (types[0] == "array" && types[1] == "number") {
-
-               } else if (types[0] == "array" && types[1] == "arrayVar") {
-
-               } else if (types[0] == "number" && types[1] == "array") {
-
+               } else if (types[0] == "number"   && types[1] == "arrayVar") {
+               } else if (types[0] == "array"    && types[1] == "variable") {
+               } else if (types[0] == "array"    && types[1] == "array") {
+               } else if (types[0] == "array"    && types[1] == "number") {
+               } else if (types[0] == "array"    && types[1] == "arrayVar") {
+               } else if (types[0] == "number"   && types[1] == "array") {
                } else if (types[0] == "variable" && types[1] == "array") {
-
                } else if (types[0] == "arrayVar" && types[1] == "array") {
-
                } else if (types[0] == "variable" && types[1] == "arrayVar") {
-
                } else if (types[0] == "arrayVar" && types[1] == "variable") {
-
                } else if (types[0] == "variable" && types[1] == "variable") {
-
                }
 
                pushCodeWithAddress("JZERO", numberOfCommands + 2);
@@ -2547,13 +2503,11 @@ value        : num {
                std::string variableName = $<string>1;
 
                if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
-                 // not declared
-                  std::cout << "variable " << variableName << " is not declared! \n";
+                  std::cerr << "Variable " << variableName << " is not declared! \n";
                   exit(1);
-               } else { // variable is declared
-
+               } else {
                 if(valueFormat2 != "array" && !isVariableInitialized(&initializedVariablesMap, variableName)) {
-                  std::cout << "Variable " << variableName << " declared but not initialized\n";
+                  std::cerr << "Variable " << variableName << " is declared but not initialized!\n";
                   exit(1);
                 } else {
 
@@ -2568,7 +2522,7 @@ identifier   : PID {
               variableNameGlobal = $1;
 
               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
-                std::cout << "variable " << variableName << " is not declared! \n";
+                std::cerr << "variable " << variableName << " is not declared! \n";
                 exit(1);
               } else {
                 equationElementAddress = variablesAddressesMap[$1];
@@ -2579,7 +2533,7 @@ identifier   : PID {
               std::string variableName = $1;
 
               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
-                std::cout << "variable " << variableName << " is not declared! \n";
+                std::cerr << "variable " << variableName << " is not declared! \n";
                 exit(1);
               } else {
                 valueFormat1            = "array";
@@ -2597,7 +2551,7 @@ identifier   : PID {
               std::string variableName = $1;
 
               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
-                std::cout << "variable " << variableName << " is not declared! \n";
+                std::cerr << "variable " << variableName << " is not declared! \n";
                 exit(1);
               } else {
 
@@ -2625,14 +2579,14 @@ void declareAVariable(std::string name) {
 
   } else {
     //throw an error
-    std::cout << "Variable " << name << " already defined!" << "\n";
+    std::cerr << "Variable " << name << " already defined!" << "\n";
     exit(1);
   }
 }
 
 void displayArraySizesMap(std::map<std::string, long long>* arraySizesMap) {
   for(auto elem : *arraySizesMap) {
-     std::cout << elem.first << " " << elem.second << "\n";
+     std::cerr << elem.first << " " << elem.second << "\n";
   }
 }
 
@@ -2651,7 +2605,7 @@ void declareAnArray(std::string name, long long arraySize) {
     currentMemoryIndex =  currentMemoryIndex + arraySize; //without the first one
 
   } else {
-    std::cout << "Array " << name << " already defined!" << "\n";
+    std::cerr << "Array " << name << " already defined!" << "\n";
     exit(1);
   }
 }
@@ -2830,7 +2784,6 @@ void changeJumpValue() {
   jumpStack.pop();
   int destinationAddress = topElement.first;
   int destinationValue   = numberOfCommands;
-  // std::cout << "1: " << topElement.first << " 2: " << topElement.second << " dest: "<< destinationValue << "\n";
 
   int finishIndex                    = commandsVector[destinationAddress].length() - placeholder.length(); // JUMP_-3000, usuwam 5 ostatnich znaków i mam JUMP_[   ]
   std::string address                = std::to_string(destinationValue);

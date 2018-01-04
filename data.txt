@@ -1,14 +1,18 @@
 VAR
-    a b array[5] result one zero
+    a b c
 BEGIN
 
-    a    := 2;
-    b    := 7;
-    one  := 1;
-    zero := 0;
-    array[0] := 4;
-    array[1] := 7;
+    IF 1 <> 2 THEN
+        WRITE 1;
+    ELSE
+        WRITE 0;
+    ENDIF
 
 
+    IF 1 = 1 THEN
+        WRITE 1;
+    ELSE
+        WRITE 0;
+    ENDIF
 
 END
