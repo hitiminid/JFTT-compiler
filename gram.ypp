@@ -1428,7 +1428,6 @@ expression   : value {
 
 
 
-
                performMODOrDIV();
 
                pushCodeWithAddress("LOAD", 4);
@@ -2673,7 +2672,7 @@ void pushCodeWithAddress(std::string opCode, int number) {
     } else if (number == ELSE_PLACEHOLDER_ADDRESS) {
       elseStack.emplace(numberOfCommands);
     }
-  } else if (opCode == "JZERO" || number == JUMP_PLACEHOLDER_ADDRESS) {
+  } else if (opCode == "JZERO" && number == JUMP_PLACEHOLDER_ADDRESS) {
     std::pair<int, int> newJumpPosition = std::make_pair(numberOfCommands, numberOfCommands);
     jumpStack.emplace(newJumpPosition);
   }
