@@ -1,14 +1,18 @@
-( program4.imp )
 VAR
-  helloTHERE
+	 t[7] tab[6] one four five
 BEGIN
 
+  one  := 1;
+  four := 4;
+  five := 5;
 
-	FOR i FROM 0 TO 5 DO
-		WRITE 1;
-		FOR j FROM 0 TO 5 DO
-			WRITE 2;
-		ENDFOR
-	ENDFOR
+  tab[one] := 3;
+  tab[four] := 5;
+
+  t[five] := tab[1];
+
+  WRITE tab[one];
+  WRITE tab[four];
+	WRITE t[5];
 
 END

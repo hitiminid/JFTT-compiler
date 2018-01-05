@@ -32,6 +32,8 @@
   long long currentMemoryIndex = NUMBER_OF_LAST_RESERVED_MEMORY_INDEX;
   long long numberOfCommands   = 0;
 
+  long long currentArrayAddress;
+
 
   long long equationElementAddress;
   long long firstElementAddress;
@@ -170,6 +172,7 @@ command      : identifier {
                 currentArrayIndex_assign  = currentArrayIndex;
                 currentArrayAssignAddress = arrayIdentifierAddress;
 
+
               } ASSGN expression SEM {
 
                 std::string variableName = $<string>1;
@@ -210,6 +213,9 @@ command      : identifier {
                         exit(1);
                       }
                       addressToAssign = variableAddress + currentArrayIndex_assign + 1;
+                      // pushCodeWithAddress("### variableAddress", variableAddress);
+                      // pushCodeWithAddress("### arrayIndex", currentArrayIndex_assign);
+
                       pushCodeWithAddress("STORE", addressToAssign);
 
                     }
@@ -812,12 +818,24 @@ expression   : value {
                 if (valueFormat1 == "number" && valueFormat2 == "number") {
 
                 } else if (valueFormat1 == "variable" && valueFormat2 == "variable") {
+
                   pushCode("ZERO");
                   pushCodeWithAddress("LOAD", equationElementAddress);
+
                 } else if (valueFormat1 == "number" && valueFormat2 == "array") {
 
-                } else if (valueFormat1 == "array" && valueFormat2 == "array"){
+                  pushCodeWithAddress("LOAD", currentArrayAddress + currentArrayIndex + 1 );
 
+                } else if (valueFormat1 == "array" && valueFormat2 == "array") {
+
+
+                  pushCodeWithAddress("LOAD",  variablesAddressesMap[firstElementName]);
+                  pushCodeWithAddress("ADD",   firstArrayIdentifierAddress);
+                  // pushCode(firstElementName);
+                  // pushCodeWithAddress("ADDING :DDDD", firstArrayIdentifierAddress);
+
+                  pushCodeWithAddress("STORE", 10);
+                  pushCodeWithAddress("LOADI", 10);
                 }
               }
              | value {
@@ -2272,12 +2290,11 @@ identifier   : PID {
                 valueFormat2 = "array";
 
                 variableNameGlobal = $1;
-
                 currentArrayIndex = atoll($3);
 
-                equationElementAddress = variablesAddressesMap[$1];
-                long long searchedIndex = variablesAddressesMap[$1] + currentArrayIndex;
+                currentArrayAddress     = variablesAddressesMap[$1];
                 equationElementAddress  = variablesAddressesMap[$1];
+                long long searchedIndex = variablesAddressesMap[$1] + currentArrayIndex;
                 arrayIdentifierAddress  = variablesAddressesMap[$3]; // is only an address of a variable, not a value!!!
               }
              }
