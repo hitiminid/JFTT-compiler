@@ -2,7 +2,7 @@
 
   #include <cstdlib>
   #include <iostream>
-
+  #include <algorithm>
   #include <cstring>
   #include <string>
   #include <map>
@@ -64,7 +64,7 @@
   /*===================================================*/
   /*                     STRUCTURES                    */
   /*===================================================*/
-
+  std::vector<std::string> currentlyUsedIterators;
 	std::vector<std::string> commandsVector;
   std::map<std::string, long long> variablesAddressesMap;
   std::map<std::string, bool> initializedVariablesMap;
@@ -185,6 +185,11 @@ command      : identifier {
                   exit(1);
                 } else { // variable is declared
 
+                  if(std::find(currentlyUsedIterators.begin(), currentlyUsedIterators.end(), variableName) != currentlyUsedIterators.end()) {
+                    std::cerr << "Error [line "<< yylineno <<  "]: " << "Trying to modify iterator '"<< variableName << "' - this action is prohibited!\n";
+                    exit(1);
+                  }
+
                   long long variableAddress = variablesAddressesMap[variableName];
 
                   if (expressionType[1] == "array") {
@@ -257,13 +262,15 @@ command      : identifier {
              }
              | FOR PID FROM value TO {
                std::string iteratorsName = $2;
+
                if (isVariableDeclared(&variablesAddressesMap, iteratorsName)) {
-                 std::cerr << "[#" << yylineno << "] " << iteratorsName << " has been previously used in program! \n";
+                 std::cerr << "Error [line "<< yylineno <<  "]: '"<< iteratorsName << "' has been previously used in program! \n";
                  exit(1);
                } else {
                  declareAVariable(iteratorsName);
                  declareAVariable(iteratorsName+"#1");
                  initializedVariablesMap[iteratorsName] = true;
+                 currentlyUsedIterators.push_back(iteratorsName);
                }
 
                expressionType[0]  = valueFormat1;
@@ -280,7 +287,6 @@ command      : identifier {
                std::string type = determineDataType(variableTypes[0], variableTypes[1]);
 
                if (type == "number") {
-                //  pushCodeWithAddress("STORE", 8);
                  pushCodeWithAddress("STORE", variablesAddressesMap[$2]);
                }
              } value {
@@ -481,6 +487,11 @@ command      : identifier {
 
               variablesAddressesMap.erase(secondIterator);
               initializedVariablesMap.erase(secondIterator);
+
+              std::vector<std::string>::iterator position = std::find(currentlyUsedIterators.begin(), currentlyUsedIterators.end(), firstIterator);
+              if (position != currentlyUsedIterators.end()) {
+                currentlyUsedIterators.erase(position);
+              }
              }
 
              | FOR PID FROM value DOWNTO {
@@ -493,6 +504,7 @@ command      : identifier {
                  declareAVariable(iteratorsName);
                  declareAVariable(iteratorsName+"#1");
                  initializedVariablesMap[iteratorsName] = true;
+                 currentlyUsedIterators.push_back(iteratorsName);
                }
 
                expressionType[0]  = valueFormat1;
@@ -710,6 +722,14 @@ command      : identifier {
 
               variablesAddressesMap.erase(secondIterator);
               initializedVariablesMap.erase(secondIterator);
+
+              std::vector<std::string>::iterator position = std::find(currentlyUsedIterators.begin(), currentlyUsedIterators.end(), firstIterator);
+              if (position != currentlyUsedIterators.end()) {
+                currentlyUsedIterators.erase(position);
+              }
+              // currentlyUsedIterators.push_back(iteratorsName);
+
+
              }
 
              | READ  identifier SEM {

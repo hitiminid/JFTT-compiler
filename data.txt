@@ -1,13 +1,13 @@
+( errorf3.imp - modyfikacja iteratora w petli )
 VAR
-    a b
+	c
 BEGIN
-    READ a;
-    WHILE a > 0 DO
-        b := a / 2;
-        b := 2 * b;
-        IF a > b THEN WRITE 1;
-        ELSE WRITE 0;
-        ENDIF
-        a := a / 2;
-    ENDWHILE
+	c := 0;
+	FOR i FROM 1 TO 100 DO
+		c := c + i;
+		i := i % 2;
+	ENDFOR
+
+	WRITE c;
+
 END
