@@ -596,7 +596,7 @@ static const yytype_uint16 yyrline[] =
      258,   486,   514,   677,   486,   715,   754,   802,   817,   817,
      970,   970,  1143,  1143,  1325,  1325,  1367,  1367,  1410,  1410,
     1451,  1451,  1491,  1491,  1681,  1681,  1858,  1858,  2031,  2031,
-    2189,  2194,  2210,  2223,  2245
+    2189,  2194,  2210,  2228,  2257
 };
 #endif
 
@@ -1467,7 +1467,7 @@ yyreduce:
   case 4:
 #line 159 "gram.ypp" /* yacc.c:1646  */
     {
-                  long long arraySize = atoi((yyvsp[-1].string));
+                  long long arraySize = atoll((yyvsp[-1].string));
                   declareAnArray((yyvsp[-3].string), arraySize);
                 }
 #line 1474 "gram.tab.cpp" /* yacc.c:1646  */
@@ -3748,11 +3748,11 @@ yyreduce:
                std::string variableName = (yyvsp[0].string);
 
                if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
-                  std::cerr << "Error [line "<< yylineno <<  "]: " << "Variable " << variableName << " is not declared! \n";
+                  std::cerr << "Error [line "<< yylineno <<  "]: " << "Variable '" << variableName << "' is not declared! \n";
                   exit(1);
                } else {
                 if(valueFormat2 != "array" && !isVariableInitialized(&initializedVariablesMap, variableName)) {
-                  std::cerr << "Error [line "<< yylineno <<  "]: " << "Variable " << variableName << " is declared but not initialized!\n";
+                  std::cerr << "Error [line "<< yylineno <<  "]: " << "Variable '" << variableName << "' is declared but not initialized!\n";
                   exit(1);
                 } else {
 
@@ -3774,28 +3774,40 @@ yyreduce:
                 std::cerr << "Error [line "<< yylineno <<  "]: " << " variable '" << variableName << "' is not declared! \n";
                 exit(1);
               } else {
+                if (isVariableDeclared(&arraysMap, variableName)) {
+                  std::cerr << "Error [line "<< yylineno <<  "]: " << "Inappropriate use of '" << variableName <<"'! \n";
+                  exit(1);
+                }
+
                 equationElementAddress = variablesAddressesMap[(yyvsp[0].string)];
               }
             }
-#line 3781 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3786 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 2223 "gram.ypp" /* yacc.c:1646  */
+#line 2228 "gram.ypp" /* yacc.c:1646  */
     {
 
               std::string variableName             = (yyvsp[-3].string);
               std::string arrayAddressVariableName = (yyvsp[-1].string);
+
 
               if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                 std::cerr << "Error [line "<< yylineno <<  "]: " << "variable '" << variableName << "' is not declared! \n";
                 exit(1);
               } else {
 
+                if (!isVariableDeclared(&arraysMap, variableName)) {
+                  std::cerr << "Error [line "<< yylineno <<  "]: " << "Inappropriate use of '" << variableName << "'! \n";
+                  exit(1);
+                }
+
                 if (!isVariableDeclared(&variablesAddressesMap, arrayAddressVariableName)) {
                   std::cerr << "Error [line "<< yylineno <<  "]: " << "Trying to access array '"<< variableName << "' index via variable '" << arrayAddressVariableName << "' which is not declared! \n";
                   exit(1);
                 }
+
                 valueFormat1            = "array";
                 valueFormat2            = "array";
                 variableNameGlobal      = (yyvsp[-3].string);
@@ -3804,11 +3816,11 @@ yyreduce:
               }
 
            }
-#line 3808 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3820 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 2245 "gram.ypp" /* yacc.c:1646  */
+#line 2257 "gram.ypp" /* yacc.c:1646  */
     {
 
               std::string variableName = (yyvsp[-3].string);
@@ -3818,12 +3830,17 @@ yyreduce:
                 exit(1);
               } else {
 
+                if (!isVariableDeclared(&arraysMap, variableName)) {
+                  std::cerr << "Error [line "<< yylineno <<  "]: " << "Inappropriate use of '" << variableName << "'! \n";
+                  exit(1);
+                }
+
                 valueFormat1 = "number";
                 valueFormat2 = "array";
 
                 variableNameGlobal = (yyvsp[-3].string);
 
-                currentArrayIndex = atoi((yyvsp[-1].string));
+                currentArrayIndex = atoll((yyvsp[-1].string));
 
                 equationElementAddress = variablesAddressesMap[(yyvsp[-3].string)];
                 long long searchedIndex = variablesAddressesMap[(yyvsp[-3].string)] + currentArrayIndex;
@@ -3831,11 +3848,11 @@ yyreduce:
                 arrayIdentifierAddress  = variablesAddressesMap[(yyvsp[-1].string)]; // is only an address of a variable, not a value!!!
               }
              }
-#line 3835 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3852 "gram.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 3839 "gram.tab.cpp" /* yacc.c:1646  */
+#line 3856 "gram.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -4063,7 +4080,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 2268 "gram.ypp" /* yacc.c:1906  */
+#line 2285 "gram.ypp" /* yacc.c:1906  */
 
 
 void declareAVariable(std::string name) {
@@ -4798,5 +4815,6 @@ int main() {
 }
 
 void yyerror (char *msg) {
-    printf("ERROR\n");
+    std::cerr << "Error [line "<< yylineno <<  "]: Syntax error!\n";
+    exit(1);
 }
