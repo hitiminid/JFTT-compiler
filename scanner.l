@@ -2,7 +2,7 @@
 %{
 
 #include "gram.tab.hpp"
-#include <stdlib.h>
+#include <iostream>
 extern "C" int yylex();
 
 %}
@@ -14,13 +14,13 @@ WHITESPACES   [ \t\r\n]+
 
 %%
 
-"(" 	      { BEGIN(COMMENT);      }
+"(" 	        { BEGIN(COMMENT);      }
 <COMMENT>")"  { BEGIN(INITIAL);      }
 <COMMENT>.    {                      }
 <COMMENT>"\n" {                      }
 
 
-<COMMENT><<EOF>> { printf("Error: unterminated comment\n"); yyterminate(); }
+<COMMENT><<EOF>> { std::cerr << "Error: comment is unterminated\n"; exit(1); /*maybe yyterminate(); ?*/}
 
 {WHITESPACES} {                      }
 
@@ -74,7 +74,7 @@ WHITESPACES   [ \t\r\n]+
 "["           { return(LEFT_BR);     }
 "]"           { return(RIGHT_BR);    }
 
-.             {                      }
+.             { std::cerr << "Error: Expression doesn't belong to this language\n"; exit(1);  }
 %%
 
 int yywrap(void) {

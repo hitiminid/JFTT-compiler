@@ -1,5 +1,6 @@
 ( program4.imp )
 VAR
+  helloTHERE
 BEGIN
 
 

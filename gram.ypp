@@ -21,7 +21,6 @@
   /*===================================================*/
 
   #define NUMBER_OF_LAST_RESERVED_MEMORY_INDEX 10
-  #define ERROR_BUFFER 150
   #define ARRAY_INDEX_OFFSET 1
   #define JUMP_PLACEHOLDER_ADDRESS -3000
   #define ELSE_PLACEHOLDER_ADDRESS -5000
@@ -49,7 +48,6 @@
 
   long long currentArrayIndex;
   long long currentArrayIndex_assign;
-  char errorMessage[ERROR_BUFFER];
   long long currentArrayAssignAddress;
 
   long long iteratorsAddress;
