@@ -1515,7 +1515,7 @@ yyreduce:
                 if (!isVariableDeclared(&variablesAddressesMap, variableName)) {
                   std::cerr << "Error [line "<< yylineno <<  "]: " << "Variable '" << (yyvsp[-4].string) <<"' not declared!" << "\n";
                   exit(1);
-                } else { // variable is declared
+                } else {
 
                   if(std::find(currentlyUsedIterators.begin(), currentlyUsedIterators.end(), variableName) != currentlyUsedIterators.end()) {
                     std::cerr << "Error [line "<< yylineno <<  "]: " << "Trying to modify iterator '"<< variableName << "' - this action is prohibited!\n";
@@ -1671,9 +1671,9 @@ yyreduce:
 #line 292 "gram.ypp" /* yacc.c:1646  */
     {
 
-               secondElementAddress             = equationElementAddress;
+               secondElementAddress                   = equationElementAddress;
                long long secondArrayIdentifierAddress = arrayIdentifierAddress;
-               std::string secondElementName    = variableNameGlobal;
+               std::string secondElementName          = variableNameGlobal;
                long long arrayIndexOfSecondElement    = currentArrayIndex;
 
                std::string variableTypes[4];
