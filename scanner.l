@@ -14,13 +14,13 @@ WHITESPACES   [ \t\r\n]+
 
 %%
 
-"(" 	        { BEGIN(COMMENT);      }
+"(" 	      { BEGIN(COMMENT);      }
 <COMMENT>")"  { BEGIN(INITIAL);      }
 <COMMENT>.    {                      }
 <COMMENT>"\n" {                      }
 
 
-<COMMENT><<EOF>> { std::cerr << "Error: comment is unterminated\n"; exit(1); /*maybe yyterminate(); ?*/}
+<COMMENT><<EOF>> { std::cerr << "Error: comment is unterminated\n"; exit(1);}
 
 {WHITESPACES} {                      }
 
