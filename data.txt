@@ -1,18 +1,17 @@
 VAR
-	 t[7] tab[6] one four five
+  tab[5] a
 BEGIN
 
-  one  := 1;
-  four := 4;
-  five := 5;
 
-  tab[one] := 3;
-  tab[four] := 5;
+  a := 1;
+  WRITE a;
 
-  t[five] := tab[1];
+  tab[1] := 2 + 2;
+  WRITE tab[a];
 
-  WRITE tab[one];
-  WRITE tab[four];
-	WRITE t[5];
+
+
+
+
 
 END
