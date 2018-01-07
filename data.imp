@@ -1,0 +1,33 @@
+( a ^ b mod c
+? 1234567890
+? 1234567890987654321
+? 987654321
+> 674106858
+)
+VAR
+    a b c wynik pot wybor iterator
+BEGIN
+
+    a := 1234567890;
+    b := 1234567890987654321;
+    c := 987654321;
+
+    wynik:=1;
+    pot:=a%c;
+    iterator := 0;
+
+    WHILE b>0 DO
+		wybor:=b%2;
+		IF wybor=1 THEN
+			wynik:=wynik*pot;
+			wynik:=wynik%c;
+            WRITE iterator;
+        ENDIF
+		b:=b/2;
+		pot:=pot*pot;
+		pot:=pot%c;
+        iterator := iterator + 1;
+
+    ENDWHILE
+    WRITE wynik;
+END
