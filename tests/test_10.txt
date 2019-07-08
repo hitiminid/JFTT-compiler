@@ -1,0 +1,54 @@
+VAR
+  a b c[2] true false
+BEGIN
+
+  a    := 1;
+  b    := 2;
+  c[1] := 3;
+
+  true  := 1;
+  false := 1;
+
+
+  IF 1 < c[1] THEN
+    WRITE true;
+  ENDIF
+
+
+  IF 1 < c[a] THEN
+    WRITE true;
+  ENDIF
+
+
+  IF a < c[a] THEN
+    WRITE true;
+  ENDIF
+
+  IF a < c[1] THEN
+    WRITE true;
+  ENDIF
+
+(
+  IF 1 < b THEN
+    WRITE true;
+  ENDIF
+
+  IF 1 < 2 THEN
+    WRITE true;
+  ENDIF
+
+
+  IF b < 2 THEN
+    WRITE true;
+  ENDIF
+
+  IF 1 < 2 THEN
+    WRITE true;
+  ENDIF
+
+
+  IF 1 <= 2 THEN
+    WRITE true;
+  ENDIF
+)
+END
