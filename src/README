@@ -1,0 +1,30 @@
+===================
+     JFTT 2017
+===================
+
+1) Kompilacja
+
+W celu kompilacji wywołać polecenie 'make'. Kompiluje ono plik flex (scanner.l) oraz bison (gram.ypp).
+Polecenie 'make interpreter' kompiluje interpreter ('g++ -Wall -std=c++11 interpreter.cc -o interpreter').
+
+2) Uruchamianie
+
+Przekazanie kodu na standardowe wejście pliku compiler powoduje wyświetlenie kodu wynikowego na ekranie terminala ('./compiler < data.imp'). 
+Komenda './compiler < data.imp > result.mr' zapisuje kod wynikowy do pliku 'result.mr'. 
+Kod uruchamiany jest w interpreterze za pomocą ./interpreter [nazwa pliku] np. './interpreter result.mr'.
+
+
+3) Makefile
+
+Makefile posiada zaimplementowane komendy 'run' oraz 'test'.
+'make run' przyjmuje do kompilatora dane z pliku 'data.imp', a kod wynikowy wyświetla w oknie terminala.
+'make test' przyjmuje dane tak samo, jednakże są one zapisywane w pliku 'result.mr', który jest następnie parametrem uruchomienia interpretera ('./interpreter result.mr').
+Makefile posiada również opcję 'clean', która usuwa pliki interpreter, compiler oraz lex.yy.c.
+
+
+4) Środowisko testowania oraz użyte wersje programów
+
+Kompilator pisany oraz testowany był pod systemem Ubuntu 14.04 oraz Fedora 26.
+Bison 3.0.2
+flex  2.5.35
+C++11

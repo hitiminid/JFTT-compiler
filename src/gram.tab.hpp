@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.0.2.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_GRAM_TAB_H_INCLUDED
-# define YY_YY_GRAM_TAB_H_INCLUDED
+#ifndef YY_YY_GRAM_TAB_HPP_INCLUDED
+# define YY_YY_GRAM_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -84,15 +84,18 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE YYSTYPE;
+
 union YYSTYPE
 {
-#line 9 "gram.y" /* yacc.c:1909  */
+#line 112 "gram.ypp" /* yacc.c:1909  */
 
-    char* str;
+    char* string;
+    long long num;
 
-#line 95 "gram.tab.h" /* yacc.c:1909  */
+#line 96 "gram.tab.hpp" /* yacc.c:1909  */
 };
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -102,4 +105,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_GRAM_TAB_H_INCLUDED  */
+#endif /* !YY_YY_GRAM_TAB_HPP_INCLUDED  */
